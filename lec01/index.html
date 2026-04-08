@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分子生物学 第1回 — Interactive Lab</title>
+<style>
+  :root {
+    --bg: #f7f9fc;
+    --card: #ffffff;
+    --border: #d7dce5;
+    --ink: #1a2633;
+    --muted: #5a6978;
+    --primary: #2b6cb0;
+    --accent: #d64545;
+    --ok: #2e8b57;
+    --warn: #e09f3e;
+    --mono: 'SF Mono', 'Consolas', 'Menlo', monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+  }
+  header {
+    background: linear-gradient(135deg, #2b6cb0 0%, #1a4a80 100%);
+    color: white;
+    padding: 20px 28px;
+  }
+  header h1 { margin: 0 0 4px 0; font-size: 22px; }
+  header p { margin: 0; opacity: 0.9; font-size: 14px; }
+
+  /* Layout: sidebar + content */
+  .layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: calc(100vh - 82px);
+  }
+  @media (max-width: 820px) {
+    .layout { grid-template-columns: 1fr; }
+    aside.sidebar { display: none; }
+  }
+  aside.sidebar {
+    background: #1a2633;
+    color: #cbd5e0;
+    padding: 18px 0;
+    border-right: 1px solid #0f1923;
+  }
+  aside.sidebar h3 {
+    font-size: 11px;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 10px 0;
+    padding: 0 20px;
+    font-weight: 600;
+  }
+  aside.sidebar ul { list-style: none; padding: 0; margin: 0 0 20px 0; }
+  aside.sidebar li a {
+    display: block;
+    padding: 10px 20px 10px 24px;
+    color: #a0aec0;
+    text-decoration: none;
+    font-size: 13px;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+  }
+  aside.sidebar li a:hover:not(.disabled) {
+    background: #2d3748;
+    color: white;
+    border-left-color: #4a90d9;
+  }
+  aside.sidebar li a.active {
+    background: #2b4a6f;
+    color: white;
+    border-left-color: #4a90d9;
+    font-weight: 600;
+  }
+  aside.sidebar li a.disabled {
+    color: #4a5568;
+    cursor: not-allowed;
+    font-style: italic;
+  }
+  aside.sidebar li a .lec-num {
+    display: inline-block;
+    width: 38px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #718096;
+  }
+  aside.sidebar li a.active .lec-num { color: #a0c4ea; }
+  aside.sidebar li a .soon-badge {
+    float: right;
+    background: #2d3748;
+    color: #718096;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+  }
+  .content { background: var(--bg); }
+  nav.tabs {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 0 16px;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+  }
+  nav.tabs button {
+    background: none;
+    border: none;
+    padding: 14px 18px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+  nav.tabs button:hover { color: var(--primary); }
+  nav.tabs button.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+  }
+  main { padding: 24px; max-width: 1100px; margin: 0 auto; }
+  .tab { display: none; }
+  .tab.active { display: block; animation: fadeIn 0.25s; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  h2 { margin-top: 0; font-size: 20px; color: var(--ink); }
+  .lead { color: var(--muted); margin-bottom: 20px; font-size: 14px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  /* Genome Explorer */
+  .genome-list { display: flex; flex-direction: column; gap: 10px; }
+  .genome-row {
+    display: grid;
+    grid-template-columns: 180px 1fr 110px;
+    gap: 12px;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px 10px;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+  .genome-row:hover { background: #eef3fa; }
+  .genome-row.selected { background: #dce8f7; }
+  .genome-row .name {
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .genome-row .name em { font-style: italic; color: var(--muted); font-weight: 400; font-size: 12px; display: block; }
+  .bar-container {
+    background: #eef1f5;
+    height: 22px;
+    border-radius: 3px;
+    position: relative;
+    overflow: hidden;
+  }
+  .bar {
+    height: 100%;
+    background: linear-gradient(90deg, #2b6cb0, #4a90d9);
+    border-radius: 3px;
+    transition: width 0.5s;
+  }
+  .genome-row .size {
+    font-family: var(--mono);
+    font-size: 13px;
+    text-align: right;
+    color: var(--muted);
+  }
+  .genome-detail {
+    background: #f0f7ff;
+    border-left: 4px solid var(--primary);
+    padding: 16px 20px;
+    border-radius: 4px;
+    margin-top: 16px;
+    display: none;
+  }
+  .genome-detail.shown { display: block; }
+  .genome-detail h3 { margin: 0 0 8px 0; font-size: 16px; }
+  .genome-detail .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 12px 0;
+  }
+  .stat { background: white; padding: 10px; border-radius: 4px; text-align: center; }
+  .stat .val { font-size: 20px; font-weight: 700; color: var(--primary); font-family: var(--mono); }
+  .stat .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .scale-toggle { display: flex; gap: 8px; margin-bottom: 12px; }
+  .scale-toggle button {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: inherit;
+  }
+  .scale-toggle button.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+  /* Codon Decoder */
+  textarea.mrna {
+    width: 100%;
+    min-height: 90px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 13px;
+    resize: vertical;
+  }
+  .btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    margin-right: 8px;
+    margin-top: 8px;
+  }
+  .btn:hover { opacity: 0.9; }
+  .btn.secondary { background: #6c757d; }
+  .frame {
+    margin-top: 14px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #fafbfc;
+  }
+  .frame.longest { border-color: var(--ok); background: #f0fff4; }
+  .frame h4 { margin: 0 0 6px 0; font-size: 13px; color: var(--muted); font-weight: 600; }
+  .frame .seq {
+    font-family: var(--mono);
+    font-size: 12px;
+    word-break: break-all;
+    line-height: 1.8;
+  }
+  .codon {
+    display: inline-block;
+    padding: 1px 2px;
+    margin: 1px;
+    border-radius: 2px;
+  }
+  .codon.start { background: #c6f6d5; color: #22543d; font-weight: 700; }
+  .codon.stop { background: #fed7d7; color: #742a2a; font-weight: 700; }
+  .codon.sec { background: #fefcbf; color: #744210; font-weight: 700; border: 1px dashed #d69e2e; }
+  .protein-out {
+    margin-top: 10px;
+    padding: 10px;
+    background: #edf2f7;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 12px;
+    word-break: break-all;
+  }
+  .hint {
+    background: #fffaf0;
+    border-left: 3px solid var(--warn);
+    padding: 10px 14px;
+    margin-top: 12px;
+    font-size: 13px;
+    color: #744210;
+  }
+
+  /* Central Dogma */
+  .dogma-pool, .dogma-slots {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+    padding: 12px;
+    border-radius: 6px;
+    min-height: 60px;
+  }
+  .dogma-pool { background: #eef1f5; }
+  .dogma-slots { background: #fff; border: 2px dashed var(--border); }
+  .dogma-slots.ok { border-color: var(--ok); background: #f0fff4; }
+  .dogma-item {
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: grab;
+    user-select: none;
+    font-weight: 600;
+    font-size: 13px;
+    color: white;
+  }
+  .dogma-item[data-type="molecule"] { background: var(--primary); }
+  .dogma-item[data-type="process"] { background: var(--accent); }
+  .dogma-item.dragging { opacity: 0.4; }
+  .dogma-feedback { margin-top: 10px; font-size: 14px; font-weight: 600; }
+  .dogma-feedback.ok { color: var(--ok); }
+  .dogma-feedback.ng { color: var(--accent); }
+
+  /* Drug Matcher */
+  .drug-area { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .drug-area { grid-template-columns: 1fr; } }
+  .drug-pool, .target-list { display: flex; flex-direction: column; gap: 8px; }
+  .drug-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    cursor: grab;
+    user-select: none;
+    font-size: 13px;
+  }
+  .drug-card .drug-name { font-weight: 700; }
+  .drug-card .drug-mech { color: var(--muted); font-size: 11px; }
+  .drug-card.matched { opacity: 0.4; cursor: default; }
+  .target-slot {
+    border: 2px dashed var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    min-height: 60px;
+    background: #fafbfc;
+  }
+  .target-slot h4 { margin: 0 0 6px 0; font-size: 13px; color: var(--ink); }
+  .target-slot.hover { border-color: var(--primary); background: #eef3fa; }
+  .target-slot .placed {
+    background: #c6f6d5;
+    border-radius: 4px;
+    padding: 6px 10px;
+    margin-top: 4px;
+    font-size: 12px;
+  }
+  .target-slot .placed.wrong { background: #fed7d7; }
+
+  /* Quiz */
+  .quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #2b6cb0, #4a90d9);
+    color: white;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  .quiz-header .score-big { font-size: 28px; font-weight: 700; font-family: var(--mono); }
+  .quiz-header .score-lbl { font-size: 12px; opacity: 0.85; }
+  .quiz-header .progress-txt { font-size: 13px; opacity: 0.9; }
+  .q-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .q-card.answered.correct { border-color: var(--ok); background: #f0fff4; }
+  .q-card.answered.incorrect { border-color: var(--accent); background: #fffafa; }
+  .q-num {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .q-card.answered.correct .q-num { background: var(--ok); }
+  .q-card.answered.incorrect .q-num { background: var(--accent); }
+  .q-source {
+    display: inline-block;
+    background: #edf2f7;
+    color: var(--muted);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    margin-left: 8px;
+  }
+  .q-stem { font-size: 15px; font-weight: 500; margin: 8px 0 14px 0; }
+  .q-stem strong { color: var(--accent); }
+  .q-opts { display: flex; flex-direction: column; gap: 8px; }
+  .q-opt {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.15s;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .q-opt:hover:not(:disabled) { border-color: var(--primary); background: #f0f7ff; }
+  .q-opt .opt-letter {
+    flex-shrink: 0;
+    width: 24px; height: 24px;
+    border: 1.5px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .q-opt .opt-text { flex: 1; }
+  .q-opt:disabled { cursor: default; }
+  .q-opt.correct { background: #c6f6d5; border-color: var(--ok); }
+  .q-opt.correct .opt-letter { background: var(--ok); color: white; border-color: var(--ok); }
+  .q-opt.wrong { background: #fed7d7; border-color: var(--accent); }
+  .q-opt.wrong .opt-letter { background: var(--accent); color: white; border-color: var(--accent); }
+  .q-opt.revealed.correct-answer { background: #e6fffa; border-color: var(--ok); border-style: dashed; }
+  .q-explain {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: #f7fafc;
+    border-left: 3px solid var(--primary);
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 1.7;
+    display: none;
+  }
+  .q-card.answered .q-explain { display: block; }
+  .q-explain strong { color: var(--ink); }
+  .quiz-finish {
+    background: linear-gradient(135deg, #2e8b57, #38a169);
+    color: white;
+    padding: 24px;
+    border-radius: 8px;
+    text-align: center;
+    margin-top: 20px;
+    display: none;
+  }
+  .quiz-finish.shown { display: block; }
+  .quiz-finish h3 { margin: 0 0 8px 0; font-size: 22px; }
+  .quiz-finish .final-score { font-size: 40px; font-weight: 700; font-family: var(--mono); margin: 8px 0; }
+  .quiz-finish.low { background: linear-gradient(135deg, #e09f3e, #d4891c); }
+
+  footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--muted);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧬 分子生物学 Interactive Lab</h1>
+  <p>FY2026 · 慶應義塾大学薬学部 · 高橋大輔</p>
+</header>
+
+<div class="layout">
+
+<aside class="sidebar">
+  <h3>講義一覧</h3>
+  <ul>
+    <li><a href="#" class="active"><span class="lec-num">Lec 01</span>セントラルドグマ入門</a></li>
+    <li><a href="#" class="disabled"><span class="lec-num">Lec 02</span>DNA 構造と複製<span class="soon-badge">SOON</span></a></li>
+    <li><a href="#" class="disabled"><span class="lec-num">Lec 03</span>転写とその制御<span class="soon-badge">SOON</span></a></li>
+    <li><a href="#" class="disabled"><span class="lec-num">Lec 04</span>RNA プロセシング<span class="soon-badge">SOON</span></a></li>
+    <li><a href="#" class="disabled"><span class="lec-num">Lec 05</span>翻訳とリボソーム<span class="soon-badge">SOON</span></a></li>
+    <li><a href="#" class="disabled"><span class="lec-num">Lec 06</span>遺伝子発現制御<span class="soon-badge">SOON</span></a></li>
+    <li><a href="#" class="disabled"><span class="lec-num">Lec 07</span>ゲノミクスと疾患<span class="soon-badge">SOON</span></a></li>
+    <li><a href="#" class="disabled"><span class="lec-num">Lec 08</span>エピゲノムと創薬<span class="soon-badge">SOON</span></a></li>
+  </ul>
+  <h3>リソース</h3>
+  <ul>
+    <li><a href="#" class="disabled"><span class="lec-num">📚</span>教科書<span class="soon-badge">TBA</span></a></li>
+    <li><a href="#" class="disabled"><span class="lec-num">📝</span>過去問<span class="soon-badge">TBA</span></a></li>
+  </ul>
+</aside>
+
+<div class="content">
+
+<div style="padding: 16px 24px 0 24px; border-bottom: 1px solid var(--border); background: white;">
+  <div style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">LEC 01</div>
+  <h2 style="margin: 0 0 4px 0; font-size: 20px;">セントラルドグマ入門</h2>
+  <p style="margin: 0 0 12px 0; color: var(--muted); font-size: 13px;">4つのミニツール + 復習クイズで遊びながら理解を深めよう</p>
+</div>
+
+<nav class="tabs">
+  <button data-tab="explorer" class="active">🌍 Genome Explorer</button>
+  <button data-tab="decoder">📖 Codon Decoder</button>
+  <button data-tab="dogma">🎯 Central Dogma</button>
+  <button data-tab="drugs">💊 Drug-Target Matcher</button>
+  <button data-tab="quiz">✅ Quiz (10問)</button>
+</nav>
+
+<main>
+
+<!-- ============ GENOME EXPLORER ============ -->
+<section id="explorer" class="tab active">
+  <h2>🌍 Genome Scale Explorer</h2>
+  <p class="lead">生物ごとのゲノムサイズ・遺伝子数・タンパク質コーディング率を比較しよう。<br>
+    クリックで詳細表示。スケールを切り替えてみるとヒトゲノムの位置付けが直感的にわかる。</p>
+
+  <div class="card">
+    <div class="scale-toggle">
+      <button data-scale="log" class="active">対数スケール (log)</button>
+      <button data-scale="linear">線形スケール</button>
+    </div>
+    <div class="genome-list" id="genome-list"></div>
+    <div class="genome-detail" id="genome-detail"></div>
+  </div>
+
+  <div class="hint">
+    💡 <b>C-value paradox</b>: 生物の「複雑さ」とゲノムサイズは比例しない。
+    アメーバ (<i>Polychaos dubium</i>) のゲノムはヒトの約 200 倍。
+    なぜか？ → 大量の非コード配列（反復配列、ポリプロイド化の名残）を含むため。
+    ゲノムサイズ ≠ 遺伝子数 ≠ 生物の複雑さ、という事実は分子生物学の重要な教訓。
+  </div>
+</section>
+
+<!-- ============ CODON DECODER ============ -->
+<section id="decoder" class="tab">
+  <h2>📖 Codon Decoder (ORF Finder)</h2>
+  <p class="lead">mRNA 配列を貼り付けると、6つの reading frame（順3+逆3）で翻訳し、最長 ORF をハイライトする。</p>
+
+  <div class="card">
+    <label style="font-size:13px; color:var(--muted);">mRNA 配列 (A/U/G/C、T でも可):</label>
+    <textarea class="mrna" id="mrna-input">AUGGCCAUGGCGCCCAGAACUGAGAUCAAUAGUACCCGUAUUAACGGGUGA</textarea>
+    <button class="btn" id="translate-btn">翻訳する</button>
+    <button class="btn secondary" id="example-btn">例題をロード</button>
+    <button class="btn secondary" id="clear-btn">クリア</button>
+    <div id="frame-results"></div>
+  </div>
+
+  <div class="hint">
+    💡 <b>UGA の二重機能</b>: 通常は終止コドンだが、mRNA の 3' UTR に <b>SECIS エレメント</b>があると、
+    専用 tRNA^Sec によって <b>セレノシステイン (Sec, 21番目のアミノ酸)</b> として翻訳される。
+    このツールでは Sec 候補として黄色ハイライトで示す（ただし実際の Sec 挿入は SECIS の有無に依存）。<br>
+    ヒトには約 25 種のセレノプロテイン（グルタチオンペルオキシダーゼ、脱ヨウ素酵素など）が存在し、
+    薬学的にも重要。
+  </div>
+</section>
+
+<!-- ============ CENTRAL DOGMA ============ -->
+<section id="dogma" class="tab">
+  <h2>🎯 Central Dogma Assembler</h2>
+  <p class="lead">分子（DNA, RNA, Protein）とプロセス（Replication, Transcription, Translation）をドラッグ＆ドロップで正しい順序に並べよう。</p>
+
+  <div class="card">
+    <h4 style="margin-top:0; font-size:13px; color:var(--muted);">パーツ（ここからドラッグ）</h4>
+    <div class="dogma-pool" id="dogma-pool"></div>
+
+    <h4 style="font-size:13px; color:var(--muted);">セントラルドグマ（ここにドロップして正しい順に並べる）</h4>
+    <div class="dogma-slots" id="dogma-slots"></div>
+
+    <button class="btn" id="dogma-check">答え合わせ</button>
+    <button class="btn secondary" id="dogma-reset">リセット</button>
+    <div class="dogma-feedback" id="dogma-feedback"></div>
+  </div>
+
+  <div class="hint">
+    💡 Crick (1958, 1970) の定義では、セントラルドグマは「<b>配列情報</b>の流れ」についての原則。<br>
+    一般的な流れ: <b>DNA →(複製)→ DNA</b>、<b>DNA →(転写)→ RNA</b>、<b>RNA →(翻訳)→ Protein</b>。<br>
+    例外: 逆転写 (RNA→DNA、レトロウイルス・テロメラーゼ)、RNA 複製 (RNA→RNA、RNA ウイルス)。<br>
+    Crick が「決して起こらない」とした流れ: Protein→RNA、Protein→DNA、Protein→Protein（情報の）。
+  </div>
+</section>
+
+<!-- ============ DRUG MATCHER ============ -->
+<section id="drugs" class="tab">
+  <h2>💊 Drug-Target Matcher</h2>
+  <p class="lead">各薬剤をセントラルドグマのどの段階を阻害するか、ドラッグ＆ドロップでマッチさせよう。<br>薬学部生向けの臨床接点問題。</p>
+
+  <div class="card">
+    <div class="drug-area">
+      <div>
+        <h4 style="margin-top:0; font-size:13px; color:var(--muted);">💊 薬剤（ドラッグ）</h4>
+        <div class="drug-pool" id="drug-pool"></div>
+      </div>
+      <div>
+        <h4 style="margin-top:0; font-size:13px; color:var(--muted);">🎯 標的段階（ドロップ）</h4>
+        <div class="target-list" id="target-list"></div>
+      </div>
+    </div>
+    <button class="btn" id="drug-reset" style="margin-top:16px;">リセット</button>
+    <div class="dogma-feedback" id="drug-feedback"></div>
+  </div>
+
+  <div class="hint">
+    💡 <b>セントラルドグマ各段階は主要な創薬標的</b>。
+    特に感染症薬は宿主と病原体の違い（細菌リボソーム vs 真核リボソーム、レトロウイルス逆転写酵素等）を利用した選択毒性で設計される。
+    がん治療薬には DNA 複製・転写を標的とするものが多い。
+  </div>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section id="quiz" class="tab">
+  <h2>✅ 復習クイズ（10問）</h2>
+  <p class="lead">各問題の選択肢をクリックすると、その場で正解・解説が表示されます。<br>
+    問1-6 は講義内容の基本問題、問7-10 は <i>Genomes 5</i> (Brown 2023) 章末問題を多肢選択化したもの。</p>
+
+  <div class="quiz-header">
+    <div>
+      <div class="progress-txt" id="quiz-progress">0 / 10 問回答済み</div>
+    </div>
+    <div style="text-align:right;">
+      <div class="score-big" id="quiz-score">0 / 0</div>
+      <div class="score-lbl">正答数 / 回答済</div>
+    </div>
+  </div>
+
+  <div id="quiz-list"></div>
+
+  <div class="quiz-finish" id="quiz-finish">
+    <h3 id="quiz-finish-title">🎉 全問クリア！</h3>
+    <div class="final-score" id="quiz-finish-score">0 / 10</div>
+    <div id="quiz-finish-msg">お疲れさまでした。</div>
+  </div>
+
+  <button class="btn secondary" id="quiz-reset" style="margin-top:14px;">クイズをリセット</button>
+</section>
+
+</main>
+
+</div> <!-- /.content -->
+</div> <!-- /.layout -->
+
+<footer>
+  分子生物学 第1回 Interactive Lab · FY2026 · Keio University Faculty of Pharmacy<br>
+  Static HTML, no tracking, no server-side state. localStorage に進捗が保存されます。
+</footer>
+
+<script>
+'use strict';
+
+/* ========== Sidebar disabled links ========== */
+document.querySelectorAll('aside.sidebar a.disabled').forEach(a => {
+  a.addEventListener('click', e => e.preventDefault());
+});
+
+/* ========== Tab switching ========== */
+document.querySelectorAll('nav.tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ========== 1. Genome Explorer ========== */
+const GENOMES = [
+  { name: '大腸菌', latin: 'Escherichia coli',      size_bp: 4.6e6,   genes: 4300,   coding: 88, note: '原核生物の代表。ほぼ全ゲノムが遺伝子。イントロンなし。' },
+  { name: '出芽酵母', latin: 'Saccharomyces cerevisiae', size_bp: 12e6,  genes: 6000,   coding: 70, note: '単細胞真核生物のモデル。遺伝子密度高め、イントロン少ない。' },
+  { name: '線虫',    latin: 'Caenorhabditis elegans', size_bp: 100e6, genes: 20000,  coding: 25, note: '多細胞モデル生物。興味深いことにヒトと遺伝子数はほぼ同じ。' },
+  { name: 'ショウジョウバエ', latin: 'Drosophila melanogaster', size_bp: 140e6, genes: 14000, coding: 20, note: '古典的モデル生物。コンパクトゲノム。' },
+  { name: 'ゼブラフィッシュ', latin: 'Danio rerio', size_bp: 1.4e9, genes: 26000, coding: 3, note: '脊椎動物モデル。遺伝子数はヒトより多い。' },
+  { name: 'マウス',  latin: 'Mus musculus',          size_bp: 2.7e9,   genes: 22000,  coding: 1.5, note: 'ヒトと極めて近い。ヒト医学研究の基盤。' },
+  { name: 'ヒト',    latin: 'Homo sapiens',          size_bp: 3.2e9,   genes: 20000,  coding: 1.5, note: '98.5% が非コード。反復配列が ~45%。' },
+  { name: 'パンコムギ', latin: 'Triticum aestivum',    size_bp: 17e9,    genes: 108000, coding: 2,  note: '六倍体 (hexaploid)。ヒトの ~5 倍のゲノムサイズ。' },
+  { name: 'マーブルサラマンダー', latin: 'Ambystoma mexicanum', size_bp: 32e9, genes: 23000, coding: 0.5, note: 'アホロートル。ヒトの 10 倍のゲノムだが遺伝子数は同じ。' },
+  { name: 'アメーバ', latin: 'Polychaos dubium',      size_bp: 670e9,   genes: null,   coding: null, note: 'C-value paradox の象徴。ヒトの ~200 倍。遺伝子数は未解明。' },
+];
+
+let currentScale = 'log';
+function renderGenomes() {
+  const list = document.getElementById('genome-list');
+  list.innerHTML = '';
+  const maxLog = Math.log10(Math.max(...GENOMES.map(g => g.size_bp)));
+  const minLog = Math.log10(Math.min(...GENOMES.map(g => g.size_bp)));
+  const maxLin = Math.max(...GENOMES.map(g => g.size_bp));
+  GENOMES.forEach((g, i) => {
+    const row = document.createElement('div');
+    row.className = 'genome-row';
+    row.dataset.idx = i;
+    let w;
+    if (currentScale === 'log') {
+      w = ((Math.log10(g.size_bp) - minLog) / (maxLog - minLog)) * 100;
+    } else {
+      w = (g.size_bp / maxLin) * 100;
+    }
+    row.innerHTML = `
+      <div class="name">${g.name}<em>${g.latin}</em></div>
+      <div class="bar-container"><div class="bar" style="width:${w}%"></div></div>
+      <div class="size">${fmtSize(g.size_bp)}</div>
+    `;
+    row.addEventListener('click', () => showGenomeDetail(i));
+    list.appendChild(row);
+  });
+}
+function fmtSize(bp) {
+  if (bp >= 1e9) return (bp/1e9).toFixed(1) + ' Gbp';
+  if (bp >= 1e6) return (bp/1e6).toFixed(0) + ' Mbp';
+  if (bp >= 1e3) return (bp/1e3).toFixed(0) + ' kbp';
+  return bp + ' bp';
+}
+function showGenomeDetail(i) {
+  const g = GENOMES[i];
+  document.querySelectorAll('.genome-row').forEach(r => r.classList.remove('selected'));
+  document.querySelector(`.genome-row[data-idx="${i}"]`).classList.add('selected');
+  const d = document.getElementById('genome-detail');
+  d.classList.add('shown');
+  d.innerHTML = `
+    <h3>${g.name} <em style="color:var(--muted); font-weight:400;">${g.latin}</em></h3>
+    <div class="stats">
+      <div class="stat"><div class="val">${fmtSize(g.size_bp)}</div><div class="lbl">Genome size</div></div>
+      <div class="stat"><div class="val">${g.genes ? g.genes.toLocaleString() : '?'}</div><div class="lbl">Gene count</div></div>
+      <div class="stat"><div class="val">${g.coding !== null ? g.coding + '%' : '?'}</div><div class="lbl">Protein coding</div></div>
+    </div>
+    <p style="margin:8px 0 0 0; font-size:13px;">${g.note}</p>
+  `;
+}
+document.querySelectorAll('.scale-toggle button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.scale-toggle button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    currentScale = b.dataset.scale;
+    renderGenomes();
+  });
+});
+renderGenomes();
+
+/* ========== 2. Codon Decoder ========== */
+const CODON_TABLE = {
+  UUU:'F', UUC:'F', UUA:'L', UUG:'L',
+  UCU:'S', UCC:'S', UCA:'S', UCG:'S',
+  UAU:'Y', UAC:'Y', UAA:'*', UAG:'*',
+  UGU:'C', UGC:'C', UGA:'*', UGG:'W',
+  CUU:'L', CUC:'L', CUA:'L', CUG:'L',
+  CCU:'P', CCC:'P', CCA:'P', CCG:'P',
+  CAU:'H', CAC:'H', CAA:'Q', CAG:'Q',
+  CGU:'R', CGC:'R', CGA:'R', CGG:'R',
+  AUU:'I', AUC:'I', AUA:'I', AUG:'M',
+  ACU:'T', ACC:'T', ACA:'T', ACG:'T',
+  AAU:'N', AAC:'N', AAA:'K', AAG:'K',
+  AGU:'S', AGC:'S', AGA:'R', AGG:'R',
+  GUU:'V', GUC:'V', GUA:'V', GUG:'V',
+  GCU:'A', GCC:'A', GCA:'A', GCG:'A',
+  GAU:'D', GAC:'D', GAA:'E', GAG:'E',
+  GGU:'G', GGC:'G', GGA:'G', GGG:'G',
+};
+const COMPLEMENT = { A:'U', U:'A', G:'C', C:'G', T:'A' };
+
+function cleanSeq(s) {
+  return s.toUpperCase().replace(/T/g, 'U').replace(/[^AUGC]/g, '');
+}
+function revComp(s) {
+  return s.split('').reverse().map(b => COMPLEMENT[b] || 'N').join('');
+}
+function translateFrame(seq, frameNum) {
+  const codons = [];
+  for (let i = 0; i + 3 <= seq.length; i += 3) {
+    codons.push(seq.substr(i, 3));
+  }
+  return codons;
+}
+function renderFrame(seq, frameNum, strand) {
+  const codons = translateFrame(seq);
+  let html = '';
+  let protein = '';
+  let inOrf = false;
+  let orfLen = 0;
+  let maxOrf = 0;
+  codons.forEach((c, idx) => {
+    const aa = CODON_TABLE[c] || '?';
+    let cls = 'codon';
+    if (c === 'AUG') { cls += ' start'; inOrf = true; }
+    if (aa === '*') { cls += ' stop'; if (inOrf) { maxOrf = Math.max(maxOrf, orfLen); orfLen = 0; inOrf = false; } }
+    if (c === 'UGA') { cls += ' sec'; }  // Sec candidate
+    html += `<span class="${cls}" title="${c}=${aa}">${c}</span>`;
+    if (inOrf) orfLen++;
+    protein += aa;
+  });
+  maxOrf = Math.max(maxOrf, orfLen);
+  return { html, protein, maxOrf };
+}
+function runTranslate() {
+  const raw = document.getElementById('mrna-input').value;
+  const seq = cleanSeq(raw);
+  const rc = revComp(seq);
+  const out = document.getElementById('frame-results');
+  if (seq.length < 3) {
+    out.innerHTML = '<div class="hint">配列が短すぎます (3塩基以上必要)</div>';
+    return;
+  }
+  const frames = [
+    { label: '+1 (forward frame 1)', seq: seq.substr(0) },
+    { label: '+2 (forward frame 2)', seq: seq.substr(1) },
+    { label: '+3 (forward frame 3)', seq: seq.substr(2) },
+    { label: '-1 (reverse frame 1)', seq: rc.substr(0) },
+    { label: '-2 (reverse frame 2)', seq: rc.substr(1) },
+    { label: '-3 (reverse frame 3)', seq: rc.substr(2) },
+  ];
+  const rendered = frames.map(f => ({ ...f, ...renderFrame(f.seq) }));
+  const maxFrameOrf = Math.max(...rendered.map(f => f.maxOrf));
+  out.innerHTML = rendered.map(f => `
+    <div class="frame ${f.maxOrf === maxFrameOrf && f.maxOrf > 0 ? 'longest' : ''}">
+      <h4>${f.label} ${f.maxOrf === maxFrameOrf && f.maxOrf > 0 ? '  ⭐ 最長 ORF (' + f.maxOrf + ' codons)' : '(ORF max: ' + f.maxOrf + ')'}</h4>
+      <div class="seq">${f.html}</div>
+      <div class="protein-out">Protein: ${f.protein || '(なし)'}</div>
+    </div>
+  `).join('');
+}
+document.getElementById('translate-btn').addEventListener('click', runTranslate);
+document.getElementById('clear-btn').addEventListener('click', () => {
+  document.getElementById('mrna-input').value = '';
+  document.getElementById('frame-results').innerHTML = '';
+});
+document.getElementById('example-btn').addEventListener('click', () => {
+  const examples = [
+    'AUGGCCAUGGCGCCCAGAACUGAGAUCAAUAGUACCCGUAUUAACGGGUGA',
+    'AUGGAUUUCUUGUCCCAGAUGUUGUUACUCUAAGCCGCCUAA',
+    'GCAUAUGAUGAUGGCUAUGUGAUAAGCUAGUAAUGA',
+  ];
+  document.getElementById('mrna-input').value = examples[Math.floor(Math.random()*examples.length)];
+  runTranslate();
+});
+runTranslate();
+
+/* ========== 3. Central Dogma Drag-Drop ========== */
+const DOGMA_PARTS = [
+  { id: 'dna1', type: 'molecule', label: 'DNA' },
+  { id: 'rna',  type: 'molecule', label: 'mRNA' },
+  { id: 'prot', type: 'molecule', label: 'Protein' },
+  { id: 'dna2', type: 'molecule', label: 'DNA' },
+  { id: 'rep',  type: 'process', label: '複製 (Replication)' },
+  { id: 'trc',  type: 'process', label: '転写 (Transcription)' },
+  { id: 'tln',  type: 'process', label: '翻訳 (Translation)' },
+];
+const DOGMA_ANSWER = ['dna1', 'rep', 'dna2', 'trc', 'rna', 'tln', 'prot'];
+
+function renderDogma() {
+  const pool = document.getElementById('dogma-pool');
+  const slots = document.getElementById('dogma-slots');
+  pool.innerHTML = '';
+  slots.innerHTML = '';
+  slots.classList.remove('ok');
+  document.getElementById('dogma-feedback').textContent = '';
+  // Shuffle
+  const shuffled = [...DOGMA_PARTS].sort(() => Math.random() - 0.5);
+  shuffled.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'dogma-item';
+    el.dataset.type = p.type;
+    el.dataset.id = p.id;
+    el.draggable = true;
+    el.textContent = p.label;
+    el.addEventListener('dragstart', e => { el.classList.add('dragging'); e.dataTransfer.setData('text/plain', p.id); });
+    el.addEventListener('dragend', () => el.classList.remove('dragging'));
+    pool.appendChild(el);
+  });
+}
+function setupDogmaDrop(zone) {
+  zone.addEventListener('dragover', e => e.preventDefault());
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    const id = e.dataTransfer.getData('text/plain');
+    const item = document.querySelector(`.dogma-item[data-id="${id}"]`);
+    if (item) zone.appendChild(item);
+  });
+}
+setupDogmaDrop(document.getElementById('dogma-pool'));
+setupDogmaDrop(document.getElementById('dogma-slots'));
+
+document.getElementById('dogma-check').addEventListener('click', () => {
+  const slots = document.getElementById('dogma-slots');
+  const fb = document.getElementById('dogma-feedback');
+  const placed = [...slots.querySelectorAll('.dogma-item')].map(el => el.dataset.id);
+  // Multiple valid orders exist; check canonical
+  const ok = JSON.stringify(placed) === JSON.stringify(DOGMA_ANSWER);
+  if (ok) {
+    slots.classList.add('ok');
+    fb.className = 'dogma-feedback ok';
+    fb.textContent = '✅ 正解！ DNA →(複製)→ DNA →(転写)→ mRNA →(翻訳)→ Protein の流れが正しく並びました。';
+  } else {
+    fb.className = 'dogma-feedback ng';
+    fb.textContent = '❌ 正しい順序: DNA → 複製 → DNA → 転写 → mRNA → 翻訳 → Protein。もう一度試してみよう。';
+  }
+});
+document.getElementById('dogma-reset').addEventListener('click', renderDogma);
+renderDogma();
+
+/* ========== 4. Drug-Target Matcher ========== */
+const DRUGS = [
+  { id:'azt',  name:'Zidovudine (AZT)',  mech:'ヌクレオシド系逆転写酵素阻害薬', target:'reverse' },
+  { id:'rif',  name:'Rifampicin',        mech:'細菌 RNA ポリメラーゼ阻害',         target:'transcription' },
+  { id:'amg',  name:'Gentamicin',        mech:'細菌 30S リボソーム阻害',           target:'translation' },
+  { id:'cis',  name:'Cisplatin',         mech:'DNA 架橋形成（白金製剤）',          target:'replication' },
+  { id:'acv',  name:'Acyclovir',         mech:'ヘルペスウイルス DNA pol 阻害',    target:'replication' },
+  { id:'5fu',  name:'5-Fluorouracil',    mech:'チミジル酸合成阻害',                 target:'replication' },
+  { id:'dox',  name:'Doxycycline',       mech:'細菌 30S リボソーム阻害',           target:'translation' },
+  { id:'efv',  name:'Efavirenz',         mech:'非ヌクレオシド系逆転写酵素阻害薬', target:'reverse' },
+];
+const TARGETS = [
+  { id:'replication',  name:'複製 (DNA → DNA)', desc:'DNA ポリメラーゼや DNA 自体を標的' },
+  { id:'transcription', name:'転写 (DNA → RNA)', desc:'RNA ポリメラーゼを標的' },
+  { id:'translation',  name:'翻訳 (RNA → Protein)', desc:'リボソームを標的' },
+  { id:'reverse',      name:'逆転写 (RNA → DNA)', desc:'逆転写酵素を標的（抗レトロウイルス薬）' },
+];
+
+function renderDrugs() {
+  const pool = document.getElementById('drug-pool');
+  const tgts = document.getElementById('target-list');
+  pool.innerHTML = '';
+  tgts.innerHTML = '';
+  document.getElementById('drug-feedback').textContent = '';
+  [...DRUGS].sort(() => Math.random() - 0.5).forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'drug-card';
+    el.draggable = true;
+    el.dataset.id = d.id;
+    el.innerHTML = `<div class="drug-name">${d.name}</div><div class="drug-mech">${d.mech}</div>`;
+    el.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', d.id));
+    pool.appendChild(el);
+  });
+  TARGETS.forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'target-slot';
+    el.dataset.target = t.id;
+    el.innerHTML = `<h4>${t.name}</h4><div style="font-size:11px; color:var(--muted);">${t.desc}</div>`;
+    el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('hover'); });
+    el.addEventListener('dragleave', () => el.classList.remove('hover'));
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      el.classList.remove('hover');
+      const id = e.dataTransfer.getData('text/plain');
+      const drug = DRUGS.find(x => x.id === id);
+      if (!drug) return;
+      const card = document.querySelector(`.drug-card[data-id="${id}"]`);
+      if (card && card.classList.contains('matched')) return;
+      const correct = drug.target === t.id;
+      const placed = document.createElement('div');
+      placed.className = 'placed ' + (correct ? '' : 'wrong');
+      placed.textContent = (correct ? '✅ ' : '❌ ') + drug.name;
+      el.appendChild(placed);
+      if (correct && card) card.classList.add('matched');
+      updateDrugFeedback();
+    });
+    tgts.appendChild(el);
+  });
+}
+function updateDrugFeedback() {
+  const done = document.querySelectorAll('.drug-card.matched').length;
+  const total = DRUGS.length;
+  const fb = document.getElementById('drug-feedback');
+  fb.className = 'dogma-feedback ' + (done === total ? 'ok' : '');
+  fb.textContent = `進捗: ${done} / ${total} 問正解${done === total ? ' 🎉 全問クリア！' : ''}`;
+}
+document.getElementById('drug-reset').addEventListener('click', renderDrugs);
+renderDrugs();
+
+/* ========== 5. Quiz ========== */
+const QUIZ = [
+  {
+    stem: 'セントラルドグマに関する記述のうち、<strong>正しいもの</strong>はどれか。',
+    options: [
+      'DNA の遺伝情報は直接タンパク質に翻訳される',
+      'mRNA は核内で転写された後、細胞質でタンパク質に翻訳される',
+      '逆転写は全ての生物で起こる普遍的な反応である',
+      'RNA ポリメラーゼは RNA を鋳型として DNA を合成する',
+      '翻訳は DNA の情報をもとにリボソームで行われる',
+    ],
+    correct: 1,
+    explain: 'セントラルドグマ: DNA→(転写)→mRNA→(翻訳)→タンパク質。a) DNA からまず RNA に転写される。c) 逆転写はレトロウイルスやテロメラーゼなど限定的。d) RNA ポリメラーゼは DNA を鋳型として RNA を合成する。e) 翻訳は mRNA の情報をもとに行われる（DNA は核内にとどまる）。',
+  },
+  {
+    stem: 'ヒトゲノムに関する記述のうち、<strong>誤っているもの</strong>はどれか。',
+    options: [
+      'ヒトゲノムは約 32 億塩基対（3.2 Gbp）である',
+      'タンパク質をコードする遺伝子は約 20,000 個である',
+      'ゲノムの約 45% は反復配列（SINE, LINE, Alu 等）で占められる',
+      'タンパク質をコードする領域はゲノム全体の約 15% である',
+      'ヒトの染色体は 22 対の常染色体と 1 対の性染色体からなる',
+    ],
+    correct: 3,
+    explain: 'タンパク質コード領域はゲノムの約 1.5%（15% ではない）。残りの 98.5% は非コード領域（イントロン、遺伝子間領域、反復配列、非コード RNA 遺伝子等）。',
+  },
+  {
+    stem: 'RNA に関する記述のうち、<strong>最も適切なもの</strong>はどれか。',
+    options: [
+      'mRNA は細胞内 RNA の約 80% を占める',
+      'rRNA はリボソームの構造成分であり、触媒活性（リボザイム）も持つ',
+      'tRNA はタンパク質の情報をリボソームに運搬する',
+      'hnRNA は mRNA のプロセシング後に生じる成熟 RNA である',
+      'snRNA は mRNA キャップ構造の合成に関与する',
+    ],
+    correct: 1,
+    explain: 'a) mRNA は全 RNA の約 4%。rRNA が約 80% を占める。b) 正しい。rRNA はペプチド結合形成を触媒する（リボザイム）。c) tRNA はアミノ酸をリボソームに運搬する（タンパク質の情報ではない）。d) hnRNA (=pre-mRNA) はプロセシング「前」の前駆体。e) snRNA が関与するのはキャップ形成ではなく<strong>スプライシング</strong>（スプライソソームの構成成分）。mRNA の 5\' キャップ付加は capping enzyme 複合体（RNA triphosphatase, guanylyltransferase, methyltransferase）が RNA pol II の CTD と協調して行う。',
+  },
+  {
+    stem: 'DNA が遺伝物質であることを示した実験に関する記述のうち、<strong>正しいもの</strong>はどれか。',
+    options: [
+      'Griffith は DNA が形質転換因子であることを直接証明した',
+      'Avery は形質転換因子を RNase 処理すると形質転換が消失することを示した',
+      'Hershey-Chase は ³²P で標識した DNA が子ファージに移行することを示した',
+      'Chargaff は DNA の二重らせん構造を X 線回折により証明した',
+      'Watson と Crick は DNA が遺伝物質であることを実験的に証明した',
+    ],
+    correct: 2,
+    explain: 'a) Griffith は形質転換現象を発見したが、因子が DNA であることは特定していない。b) Avery は DNase 処理（RNase ではない）で形質転換が消失することを示した。c) 正しい。³²P は DNA に、³⁵S はタンパク質に含まれる。d) Chargaff は塩基組成の法則 (A=T, G=C) を発見。X 線回折は Franklin/Wilkins。e) Watson-Crick は構造モデルを提唱（遺伝物質の証明は Avery や Hershey-Chase）。',
+  },
+  {
+    stem: 'セントラルドグマの各段階を標的とする薬剤の組合せとして、<strong>正しいもの</strong>はどれか。',
+    options: [
+      '複製阻害 — リファンピシン',
+      '逆転写阻害 — ジドブジン（AZT）',
+      '転写阻害 — アミノグリコシド',
+      '翻訳阻害 — シスプラチン',
+      'DNA pol 阻害 — 5-フルオロウラシル (5-FU)',
+    ],
+    correct: 1,
+    explain: 'a) リファンピシンは細菌 RNA pol 阻害（転写阻害）。b) 正しい。AZT はヌクレオシド系逆転写酵素阻害薬（抗 HIV 薬）。c) アミノグリコシドは細菌 30S リボソーム阻害（翻訳阻害）。d) シスプラチンは DNA 架橋形成（複製阻害）。e) 5-FU はチミジル酸合成酵素を阻害し dTMP 枯渇を起こす（DNA pol を直接阻害するわけではない）。',
+  },
+  {
+    stem: '遺伝暗号に関する記述のうち、<strong>誤っているもの</strong>はどれか。',
+    options: [
+      '1 つのコドンは 3 つの塩基から構成される',
+      '64 種のコドンのうち、61 種がアミノ酸をコードする',
+      '開始コドン AUG はメチオニンをコードする',
+      '終止コドンは UAA, UAG, UGA の 3 種類である',
+      '1 つのアミノ酸に対応するコドンは必ず 1 つである',
+    ],
+    correct: 4,
+    explain: '遺伝暗号には縮重（degeneracy）がある。多くのアミノ酸は複数のコドンでコードされる（例: ロイシンは 6 種のコドン）。これはコドンの 3 文字目の「ゆらぎ」(wobble) による。メチオニンとトリプトファンのみ 1 コドン。',
+  },
+  {
+    stem: 'DNA 複製の忠実度 (fidelity) に関する記述のうち、<strong>正しいもの</strong>はどれか。',
+    source: 'Genomes 5 Ch.1 SAQ #3',
+    options: [
+      'A-T 対と G-C 対はそれぞれ異なる数の水素結合を形成するため、誤った組合せは熱力学的に不安定である',
+      '二重らせんの塩基スタッキングは塩基配列に依存せず、どのペアでも同じ安定性を示す',
+      'DNA ポリメラーゼは塩基対合なしでもテンプレートから正しい塩基を選択できる',
+      '複製の忠実度は主に塩基間の共有結合の強度によって担保される',
+      'A-T 対と G-C 対は同じ数の水素結合（各 2 本）を形成するため、どちらの組合せも同等に安定である',
+    ],
+    correct: 0,
+    explain: 'A-T は 2 本、G-C は 3 本の水素結合を形成する（Watson-Crick 対合）。誤対合は水素結合ドナー／アクセプターの配置が合わず、形状も Watson-Crick 対合と異なるため DNA ポリメラーゼの活性部位に収まらない。この<strong>形状相補性 + 水素結合パターン</strong>の二重チェックが複製忠実度の一次的基盤。加えてポリメラーゼの proofreading (3\'→5\' エキソヌクレアーゼ活性) と ミスマッチ修復 (MMR) がバックアップとして働き、最終エラー率は ~10⁻⁹ / bp に達する。',
+  },
+  {
+    stem: '非コード RNA (noncoding RNA, ncRNA) に関する記述のうち、<strong>誤っているもの</strong>はどれか。',
+    source: 'Genomes 5 Ch.1 SAQ #5',
+    options: [
+      'rRNA と tRNA はタンパク質をコードしないが、翻訳装置の必須構成要素である',
+      'miRNA や siRNA は標的 mRNA の発現を転写後レベルで制御する',
+      'lncRNA (long non-coding RNA) の多くは転写されるだけで細胞内で機能を持たない',
+      '非コード RNA が「機能的 RNA (functional RNA)」とも呼ばれるのは、翻訳されなくても RNA 分子自体が生理機能を担うためである',
+      'スプライシングに関与する snRNA はスプライソソームの構成成分である',
+    ],
+    correct: 2,
+    explain: '「非コード」とは「タンパク質をコードしない」という意味にすぎず、「機能がない」という意味ではない。rRNA、tRNA、snRNA、snoRNA、miRNA、siRNA、piRNA、lncRNA、circRNA など、いずれも RNA 分子自体が構造的・触媒的・制御的な役割を果たす。だからこそ「functional RNA」という代替名で呼ばれる。c) は典型的な誤解で、多くの lncRNA (例: XIST, HOTAIR, MALAT1) は染色体不活化やクロマチン修飾など明確な機能を持つ。',
+  },
+  {
+    stem: 'セレノシステイン (Sec, 21 番目のアミノ酸) の翻訳機構に関する記述のうち、<strong>正しいもの</strong>はどれか。',
+    source: 'Genomes 5 Ch.1 SAQ #11',
+    options: [
+      'UGA コドンは通常は終止コドンだが、mRNA の 3\' UTR に <b>SECIS エレメント</b>が存在すると、専用の tRNA<sup>Sec</sup> によってセレノシステインとして翻訳される',
+      'セレノシステインはメチオニンの硫黄原子をセレンに置換した翻訳後修飾アミノ酸である',
+      'セレノシステインは独自のコドン (例: UGG) を持ち、標準遺伝暗号に含まれる',
+      'UGA の意味は細胞周期に依存して変化するため、S 期特異的にセレノシステインとして翻訳される',
+      'セレノシステインはリボソームではなく、翻訳後に酵素的に Cys から変換される',
+    ],
+    correct: 0,
+    explain: 'セレノシステインはタンパク質に共翻訳的 (co-translationally) に組み込まれる<strong>真の 21 番目のアミノ酸</strong>で、翻訳後修飾ではない。専用の tRNA<sup>Sec</sup> (UCA アンチコドン) が存在し、専用の延長因子 EFsec が関与する。UGA がストップとして読まれるか Sec として読まれるかは、mRNA の 3\' UTR にある <strong>SECIS (Selenocysteine Insertion Sequence) エレメント</strong>というステムループ構造で決まる。ヒトでは少なくとも 25 種のセレノプロテインが知られ、グルタチオンペルオキシダーゼや脱ヨウ素酵素など重要な酸化還元酵素を含む。<strong>薬学への接点</strong>: 抗甲状腺薬の一部は脱ヨウ素酵素を阻害する。',
+  },
+  {
+    stem: '細胞の転写産物 (transcriptome) に関する記述のうち、<strong>正しいもの</strong>はどれか。',
+    source: 'Genomes 5 Ch.1 SAQ #7',
+    options: [
+      '活発に分裂している細胞だけが転写産物を持ち、休止期の細胞は転写産物を持たない',
+      '細胞が機能し続けている限り、何らかの転写産物が必ず存在する。転写産物の欠如は細胞が既に機能を停止していることを意味する',
+      '哺乳類の成熟赤血球は核を失うが、新規転写を継続するため豊富な転写産物を維持する',
+      '転写産物は DNA と違って細胞間で同一であり、どの細胞でも同じ mRNA セットを持つ',
+      '精子細胞は転写を完全に停止しているため、受精後も新規タンパク質合成は起こらない',
+    ],
+    correct: 1,
+    explain: '転写産物 (transcriptome) は「いまこの細胞で何が発現しているか」のスナップショット。<strong>細胞が生きて機能している限り、ハウスキーピング遺伝子</strong> (rRNA, tRNA, リボソームタンパク質, 解糖系酵素など) <strong>が常に転写されている</strong>ため、転写産物が完全にゼロになることはない。例外的に哺乳類の成熟赤血球は核とリボソームを失い転写・翻訳が停止するが、これは「最終分化した例外」。c) は誤り（核を失うので新規転写不可）。d) は細胞種特異的発現の概念を否定するため誤り。e) は受精卵で母性 mRNA と新規ゲノム活性化 (ZGA) があるため誤り。<strong>統合的視点</strong>: ゲノムは全細胞で同一でも、転写産物は細胞種・時期・刺激で大きく変動する — これが「ゲノム 1 つから多様な細胞が作られる」分子基盤。',
+  },
+];
+
+const quizState = { answered: [], correct: 0 };
+const LETTERS = ['a', 'b', 'c', 'd', 'e'];
+
+function renderQuiz() {
+  quizState.answered = new Array(QUIZ.length).fill(null);
+  quizState.correct = 0;
+  const list = document.getElementById('quiz-list');
+  list.innerHTML = '';
+  QUIZ.forEach((q, qi) => {
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.dataset.qi = qi;
+    card.innerHTML = `
+      <div>
+        <span class="q-num">問 ${qi + 1}</span>
+        ${q.source ? `<span class="q-source">📚 ${q.source}</span>` : ''}
+      </div>
+      <div class="q-stem">${q.stem}</div>
+      <div class="q-opts">
+        ${q.options.map((opt, oi) => `
+          <button class="q-opt" data-oi="${oi}">
+            <span class="opt-letter">${LETTERS[oi]}</span>
+            <span class="opt-text">${opt}</span>
+          </button>
+        `).join('')}
+      </div>
+      <div class="q-explain"><strong>解説:</strong> ${q.explain}</div>
+    `;
+    card.querySelectorAll('.q-opt').forEach(btn => {
+      btn.addEventListener('click', () => answerQuestion(qi, parseInt(btn.dataset.oi)));
+    });
+    list.appendChild(card);
+  });
+  updateQuizHeader();
+  document.getElementById('quiz-finish').classList.remove('shown');
+}
+
+function answerQuestion(qi, oi) {
+  if (quizState.answered[qi] !== null) return;  // already answered
+  const q = QUIZ[qi];
+  const card = document.querySelector(`.q-card[data-qi="${qi}"]`);
+  const opts = card.querySelectorAll('.q-opt');
+  const isCorrect = oi === q.correct;
+  quizState.answered[qi] = oi;
+  if (isCorrect) quizState.correct++;
+  opts.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.correct) {
+      btn.classList.add(isCorrect ? 'correct' : 'revealed');
+      if (!isCorrect) btn.classList.add('correct-answer');
+    }
+    if (i === oi && !isCorrect) btn.classList.add('wrong');
+  });
+  card.classList.add('answered', isCorrect ? 'correct' : 'incorrect');
+  updateQuizHeader();
+  saveQuizState();
+  // Auto-show finish banner when all answered
+  if (quizState.answered.every(x => x !== null)) showFinish();
+}
+
+function updateQuizHeader() {
+  const done = quizState.answered.filter(x => x !== null).length;
+  document.getElementById('quiz-progress').textContent = `${done} / ${QUIZ.length} 問回答済み`;
+  document.getElementById('quiz-score').textContent = `${quizState.correct} / ${done}`;
+}
+
+function showFinish() {
+  const box = document.getElementById('quiz-finish');
+  const pct = quizState.correct / QUIZ.length;
+  box.classList.add('shown');
+  box.classList.toggle('low', pct < 0.6);
+  const title = pct >= 0.9 ? '🎉 素晴らしい！' : pct >= 0.7 ? '✨ よくできました' : pct >= 0.5 ? '📘 もう一歩' : '📖 復習しましょう';
+  document.getElementById('quiz-finish-title').textContent = title;
+  document.getElementById('quiz-finish-score').textContent = `${quizState.correct} / ${QUIZ.length}`;
+  const msgs = {
+    high: '定期試験対策も万全です。Interactive Lab の他のツールも使って理解を深めよう。',
+    mid: '基本は理解できています。間違えた問題の解説を読み直してみよう。',
+    low: '講義資料と教科書 (Brown <i>Genomes 5</i> Ch.1) を見直してから再挑戦してみよう。',
+  };
+  const level = pct >= 0.7 ? 'high' : pct >= 0.5 ? 'mid' : 'low';
+  document.getElementById('quiz-finish-msg').innerHTML = msgs[level];
+}
+
+function saveQuizState() {
+  try {
+    localStorage.setItem('lec01_quiz_state', JSON.stringify(quizState));
+  } catch(e) {}
+}
+
+function loadQuizState() {
+  try {
+    const s = localStorage.getItem('lec01_quiz_state');
+    if (!s) return;
+    const saved = JSON.parse(s);
+    if (!saved.answered || saved.answered.length !== QUIZ.length) return;
+    saved.answered.forEach((oi, qi) => {
+      if (oi !== null) {
+        // Replay the answer
+        const q = QUIZ[qi];
+        const card = document.querySelector(`.q-card[data-qi="${qi}"]`);
+        if (!card) return;
+        const opts = card.querySelectorAll('.q-opt');
+        const isCorrect = oi === q.correct;
+        quizState.answered[qi] = oi;
+        if (isCorrect) quizState.correct++;
+        opts.forEach((btn, i) => {
+          btn.disabled = true;
+          if (i === q.correct) {
+            btn.classList.add(isCorrect ? 'correct' : 'revealed');
+            if (!isCorrect) btn.classList.add('correct-answer');
+          }
+          if (i === oi && !isCorrect) btn.classList.add('wrong');
+        });
+        card.classList.add('answered', isCorrect ? 'correct' : 'incorrect');
+      }
+    });
+    updateQuizHeader();
+    if (quizState.answered.every(x => x !== null)) showFinish();
+  } catch(e) {}
+}
+
+document.getElementById('quiz-reset').addEventListener('click', () => {
+  localStorage.removeItem('lec01_quiz_state');
+  renderQuiz();
+});
+renderQuiz();
+loadQuizState();
+
+</script>
+</body>
+</html>

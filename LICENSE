@@ -1,0 +1,34 @@
+Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
+
+Copyright (c) 2026 Daisuke Takahashi, Keio University Faculty of Pharmacy
+
+You are free to:
+  - Share: copy and redistribute the material in any medium or format
+  - Adapt: remix, transform, and build upon the material
+
+Under the following terms:
+  - Attribution: You must give appropriate credit, provide a link to the
+    license, and indicate if changes were made.
+  - NonCommercial: You may not use the material for commercial purposes.
+  - No additional restrictions: You may not apply legal terms or
+    technological measures that legally restrict others from doing
+    anything the license permits.
+
+Full license text:
+  https://creativecommons.org/licenses/by-nc/4.0/legalcode
+
+Human-readable summary:
+  https://creativecommons.org/licenses/by-nc/4.0/
+
+Attribution format example:
+  "分子生物学 Interactive Labs FY2026 by Daisuke Takahashi
+   (Keio University Faculty of Pharmacy), licensed under CC BY-NC 4.0.
+   https://github.com/kpdbcdt/molbio-lectures-FY2026"
+
+This license applies to all content in this repository, including
+educational materials (quiz questions, explanations, diagrams) and
+source code (HTML, CSS, JavaScript).
+
+Note: Some quiz questions in lec01 are adapted from
+Brown, T.A. (2023) Genomes 5, CRC Press, Chapter 1. Adaptations
+are used under educational fair use / fair dealing principles.
