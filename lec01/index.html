@@ -559,10 +559,34 @@
 <!-- ============ CODON DECODER ============ -->
 <section id="decoder" class="tab">
   <h2>📖 Codon Decoder (ORF Finder)</h2>
-  <p class="lead">mRNA 配列を貼り付けると、6つの reading frame（順3+逆3）で翻訳し、最長 ORF をハイライトする。</p>
+  <p class="lead">mRNA 配列からタンパク質を「翻訳」してみよう。細胞内でリボソームがやっていることを自分の目で追体験する。</p>
+
+  <!-- Intent / Why section -->
+  <div class="card" style="background:#f0f7ff; border-color:#4a90d9;">
+    <h3 style="margin-top:0; font-size:16px; color:#1a4a80;">🎯 このツールの目的</h3>
+    <p style="font-size:14px; margin:8px 0;">
+      遺伝暗号（genetic code）は「3塩基 (codon) = 1 アミノ酸」というルール。
+      でも mRNA 配列を渡されて「どこから翻訳が始まる？」「本当のタンパク質コード領域はどれ？」
+      を見抜くのは意外と難しい。<strong>6 つの reading frame（順鎖 3 + 逆鎖 3）</strong>のうち、
+      生物学的に意味のある <strong>ORF (Open Reading Frame)</strong> を特定する体験ができる。
+    </p>
+    <p style="font-size:14px; margin:8px 0;">
+      バイオインフォマティクスの基礎: NCBI の ORFfinder や Expasy Translate と同じことを、この場で小さく再現する。
+    </p>
+  </div>
 
   <div class="card">
-    <label style="font-size:13px; color:var(--muted);">mRNA 配列 (A/U/G/C、T でも可):</label>
+    <h3 style="margin-top:0; font-size:16px;">📝 使い方</h3>
+    <ol style="font-size:13px; line-height:1.8; margin:8px 0;">
+      <li>下のテキスト欄に mRNA 配列（A/U/G/C、T でも自動変換）を貼り付け</li>
+      <li>「翻訳する」ボタン or 「例題をロード」で自動サンプル</li>
+      <li>6 つの reading frame が表示される（+1/+2/+3 = 順鎖の 3 フレーム、−1/−2/−3 = 逆鎖の 3 フレーム）</li>
+      <li>最長 ORF を含むフレームが <span style="background:#c6f6d5; padding:1px 6px; border-radius:3px;">緑背景</span> でハイライトされる（⭐ マーク付き）</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <label style="font-size:13px; color:var(--muted);"><strong>mRNA 配列</strong>（A/U/G/C、T でも可。スペース・改行・数字は自動除去）:</label>
     <textarea class="mrna" id="mrna-input">AUGGCCAUGGCGCCCAGAACUGAGAUCAAUAGUACCCGUAUUAACGGGUGA</textarea>
     <button class="btn" id="translate-btn">翻訳する</button>
     <button class="btn secondary" id="example-btn">例題をロード</button>
@@ -570,12 +594,66 @@
     <div id="frame-results"></div>
   </div>
 
+  <div class="card" style="background:#fffaf0; border-color:#e09f3e;">
+    <h3 style="margin-top:0; font-size:16px; color:#744210;">🔍 結果の読み方</h3>
+    <h4 style="margin:12px 0 4px 0; font-size:14px;">コドンの色分け</h4>
+    <ul style="font-size:13px; line-height:1.9; margin:4px 0;">
+      <li><span style="background:#c6f6d5; color:#22543d; padding:1px 6px; border-radius:3px; font-family:monospace; font-weight:700;">AUG</span> = 開始コドン (Met, メチオニン)。真の ORF はここから始まるはず</li>
+      <li><span style="background:#fed7d7; color:#742a2a; padding:1px 6px; border-radius:3px; font-family:monospace; font-weight:700;">UAA / UAG / UGA</span> = 終止コドン (Stop)。ここでリボソームが翻訳を終了</li>
+      <li><span style="background:#fefcbf; color:#744210; padding:1px 6px; border-radius:3px; font-family:monospace; font-weight:700; border:1px dashed #d69e2e;">UGA</span> = 通常は終止だが、SECIS があると <strong>セレノシステイン</strong> として翻訳される（黄色＝候補マーク）</li>
+    </ul>
+
+    <h4 style="margin:14px 0 4px 0; font-size:14px;">ORF とは？</h4>
+    <p style="font-size:13px; margin:4px 0;">
+      <strong>ORF (Open Reading Frame)</strong> = 「<strong>開始コドンから終止コドンまで</strong>の、途中で終止コドンに遮られない読み枠」。
+      長い ORF ほど「偶然ではなく本物のタンパク質コード領域」である可能性が高い。
+      6 フレームのうち 1 つ（多くの場合 +1）に極端に長い ORF があれば、それが翻訳される領域。
+    </p>
+
+    <h4 style="margin:14px 0 4px 0; font-size:14px;">なぜ 6 フレームを試すのか？</h4>
+    <p style="font-size:13px; margin:4px 0;">
+      DNA の 3 塩基周期性 (reading frame) は開始位置で 3 通りあり、さらに DNA は二本鎖なので順鎖・逆鎖でそれぞれ 3 通り × 2 = <strong>6 通りの読み枠</strong>がある。
+      どれが真の ORF かは生物学的に決まっている（プロモーター・リボソーム結合部位等）が、配列だけ見るとき全部試す必要がある。
+      これが「ORF finder」の基本戦略。
+    </p>
+
+    <h4 style="margin:14px 0 4px 0; font-size:14px;">1 文字アミノ酸コード</h4>
+    <p style="font-size:12px; margin:4px 0; font-family:monospace; line-height:1.8;">
+      A=Ala, C=Cys, D=Asp, E=Glu, F=Phe, G=Gly, H=His, I=Ile, K=Lys, L=Leu,<br>
+      M=Met, N=Asn, P=Pro, Q=Gln, R=Arg, S=Ser, T=Thr, V=Val, W=Trp, Y=Tyr,<br>
+      * = 終止コドン
+    </p>
+  </div>
+
+  <div class="card" style="background:#f7fafc; border-color:#94a3b8;">
+    <h3 style="margin-top:0; font-size:16px;">🧪 試してみる例題</h3>
+    <p style="font-size:13px; margin:4px 0;">以下を順にコピペして結果を比較しよう:</p>
+    <ol style="font-size:13px; line-height:1.8;">
+      <li>
+        <strong>簡単な ORF</strong>:
+        <code style="font-size:11px; background:white; padding:2px 5px; border-radius:3px; display:block; margin:4px 0; word-break:break-all;">AUGGCCAUGGCGCCCAGAACUGAGAUCAAUAGUACCCGUAUUAACGGGUGA</code>
+        → 期待される翻訳: <code>MAMAPRTEINSTRING*</code>（隠れメッセージ入り）
+      </li>
+      <li>
+        <strong>ヒトインスリン A 鎖の一部</strong>:
+        <code style="font-size:11px; background:white; padding:2px 5px; border-radius:3px; display:block; margin:4px 0; word-break:break-all;">AUGGGCAUCGUGGAGCAGUGCUGCACCAGCAUCUGCUCCCUCUACCAGCUGGAGAACUACUGCAAC</code>
+        → 期待: <code>MGIVEQCCTSICSLYQLENYCN</code>
+      </li>
+      <li>
+        <strong>ランダムに見えるが ORF が隠れている配列</strong>:
+        <code style="font-size:11px; background:white; padding:2px 5px; border-radius:3px; display:block; margin:4px 0; word-break:break-all;">GCAUAUGAUGAUGGCUAUGUGAUAAGCUAGUAAUGA</code>
+        → 複数のフレームで停止コドンが早く来る。どのフレームが最長？
+      </li>
+    </ol>
+  </div>
+
   <div class="hint">
-    💡 <b>UGA の二重機能</b>: 通常は終止コドンだが、mRNA の 3' UTR に <b>SECIS エレメント</b>があると、
-    専用 tRNA^Sec によって <b>セレノシステイン (Sec, 21番目のアミノ酸)</b> として翻訳される。
-    このツールでは Sec 候補として黄色ハイライトで示す（ただし実際の Sec 挿入は SECIS の有無に依存）。<br>
-    ヒトには約 25 種のセレノプロテイン（グルタチオンペルオキシダーゼ、脱ヨウ素酵素など）が存在し、
-    薬学的にも重要。
+    💡 <b>UGA の二重機能 (発展)</b>: 通常は終止コドンだが、mRNA の 3' UTR に <b>SECIS エレメント</b>があると、
+    専用 tRNA<sup>Sec</sup> によって <b>セレノシステイン (Sec, 21 番目のアミノ酸)</b> として翻訳される。
+    このツールでは Sec 候補として黄色ハイライトで示すが、実際の Sec 挿入は SECIS の有無に依存するため、
+    ここでは「ここに UGA がある」という情報提示のみ。<br>
+    ヒトには約 25 種のセレノプロテイン（グルタチオンペルオキシダーゼ、脱ヨウ素酵素など）が存在し、薬学的にも重要。
+    詳しくは <strong>復習クイズ問9</strong> で。
   </div>
 </section>
 
@@ -658,7 +736,14 @@
     <div id="quiz-finish-msg">お疲れさまでした。</div>
   </div>
 
-  <button class="btn secondary" id="quiz-reset" style="margin-top:14px;">クイズをリセット</button>
+  <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+    <button class="btn secondary" id="quiz-reset">🔄 クイズをリセット</button>
+    <button class="btn" id="quiz-pdf" style="background:#2e8b57;">🖨️ 問題・正解・解説を PDF 出力</button>
+  </div>
+  <p style="font-size:12px; color:var(--muted); margin-top:8px;">
+    💡 PDF 出力ボタンを押すと印刷用のきれいなレイアウトで別窓が開きます。
+    ブラウザの印刷ダイアログで「<strong>PDF として保存</strong>」を選ぶと PDF ファイルとしてダウンロードできます（iPhone Safari でもOK）。
+  </p>
 </section>
 
 </main>
@@ -1300,6 +1385,227 @@ document.getElementById('quiz-reset').addEventListener('click', () => {
   localStorage.removeItem('lec01_quiz_state');
   renderQuiz();
 });
+
+/* ---- Quiz PDF export ---- */
+document.getElementById('quiz-pdf').addEventListener('click', () => {
+  const date = new Date().toLocaleDateString('ja-JP');
+  let html = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>分子生物学 Lec01 復習クイズ — 問題・正解・解説</title>
+<style>
+  @page { size: A4; margin: 18mm 15mm; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    color: #1a2633;
+    line-height: 1.6;
+    font-size: 11pt;
+    margin: 0;
+    padding: 0;
+  }
+  header {
+    border-bottom: 3px solid #2b6cb0;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+  h1 { color: #1a4a80; font-size: 18pt; margin: 0 0 4px 0; }
+  .meta { color: #5a6978; font-size: 10pt; }
+  .intro {
+    background: #f7fafc;
+    border-left: 4px solid #2b6cb0;
+    padding: 10px 14px;
+    margin: 14px 0 20px 0;
+    font-size: 10pt;
+  }
+  .challenge-section {
+    background: #fffaf0;
+    border: 2px dashed #e09f3e;
+    padding: 12px 16px;
+    margin: 20px 0 14px 0;
+    border-radius: 6px;
+    page-break-before: auto;
+  }
+  .challenge-section h2 {
+    color: #744210;
+    font-size: 13pt;
+    margin: 0 0 6px 0;
+  }
+  .challenge-section p { font-size: 10pt; margin: 4px 0; }
+  .q {
+    margin-bottom: 18px;
+    page-break-inside: avoid;
+    border-left: 3px solid #2b6cb0;
+    padding-left: 14px;
+  }
+  .q.challenge { border-left-color: #e09f3e; }
+  .q-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .q-num {
+    font-weight: 700;
+    color: #2b6cb0;
+    font-size: 12pt;
+  }
+  .q.challenge .q-num { color: #e09f3e; }
+  .q-source {
+    font-size: 9pt;
+    color: #5a6978;
+    background: #edf2f7;
+    padding: 1px 8px;
+    border-radius: 10px;
+  }
+  .q.challenge .q-source {
+    background: #fef5e7;
+    color: #744210;
+    font-weight: 700;
+  }
+  .q-stem {
+    font-weight: 600;
+    margin: 6px 0;
+    font-size: 11pt;
+  }
+  .q-stem strong { color: #d64545; }
+  .opts { list-style: none; padding: 0; margin: 6px 0; }
+  .opts li {
+    padding: 4px 8px 4px 30px;
+    position: relative;
+    font-size: 10.5pt;
+    margin: 3px 0;
+  }
+  .opts li .letter {
+    position: absolute;
+    left: 6px;
+    font-weight: 700;
+    color: #5a6978;
+  }
+  .opts li.correct {
+    background: #c6f6d5;
+    border-left: 3px solid #2e8b57;
+    border-radius: 3px;
+  }
+  .opts li.correct .letter { color: #22543d; }
+  .opts li.correct::after {
+    content: " ✓ 正解";
+    color: #22543d;
+    font-weight: 700;
+    font-size: 9pt;
+  }
+  .explain {
+    background: #f7fafc;
+    border-left: 3px solid #2b6cb0;
+    padding: 8px 12px;
+    font-size: 10pt;
+    margin-top: 8px;
+    line-height: 1.7;
+  }
+  .explain-label {
+    font-weight: 700;
+    color: #2b6cb0;
+  }
+  footer {
+    margin-top: 30px;
+    padding-top: 10px;
+    border-top: 1px solid #d7dce5;
+    font-size: 9pt;
+    color: #5a6978;
+    text-align: center;
+  }
+  .print-btn {
+    background: #2b6cb0;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 13pt;
+    cursor: pointer;
+    font-weight: 700;
+    font-family: inherit;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  @media print {
+    .print-btn { display: none; }
+    body { padding: 0; }
+  }
+</style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">🖨️ 印刷 / PDF として保存</button>
+
+<header>
+  <h1>分子生物学 第1回 — 復習クイズ</h1>
+  <div class="meta">
+    出題 13 問（基本 6 + <i>Genomes 5</i> 章末 4 + 国試チャレンジ 3）&nbsp; · &nbsp;
+    出力日: ${date}&nbsp; · &nbsp;
+    https://kpdbcdt.github.io/molbio-lectures-FY2026/lec01/
+  </div>
+</header>
+
+<div class="intro">
+  <strong>使い方</strong>: 問1-10 は講義内容の必須問題、問11-13 は薬剤師国試過去問を改変した発展問題（解けなくて OK、チャレンジ）です。
+  解説を読んで理解度を確認しましょう。解答は各問題の直下に緑で示してあります。
+</div>
+`;
+
+  let challengeBannerShown = false;
+  QUIZ.forEach((q, qi) => {
+    if (q.challenge && !challengeBannerShown) {
+      html += `
+<div class="challenge-section">
+  <h2>🏆 ここから国試チャレンジ問題（発展）</h2>
+  <p>以下の問題は薬剤師国家試験の過去問を一部改変したものです。Lec01 の内容を超える発展的なトピック
+  （クロマチン構造、ヒストン、トポイソメラーゼ、テロメア等）が含まれます。今の段階では「解けなくても OK」。
+  解説を読んで「こんな問題が国試で出るんだ」と知っておくだけで十分です。</p>
+</div>
+`;
+      challengeBannerShown = true;
+    }
+    html += `
+<div class="q${q.challenge ? ' challenge' : ''}">
+  <div class="q-header">
+    <span class="q-num">問 ${qi + 1}</span>
+    ${q.challenge ? '<span class="q-source">🏆 国試チャレンジ</span>' : ''}
+    ${q.source ? `<span class="q-source">📚 ${q.source}</span>` : ''}
+  </div>
+  <div class="q-stem">${q.stem}</div>
+  <ul class="opts">
+`;
+    q.options.forEach((opt, oi) => {
+      const isCorrect = oi === q.correct;
+      html += `    <li class="${isCorrect ? 'correct' : ''}"><span class="letter">${LETTERS[oi]})</span>${opt}</li>\n`;
+    });
+    html += `  </ul>
+  <div class="explain"><span class="explain-label">解説:</span> ${q.explain}</div>
+</div>
+`;
+  });
+
+  html += `
+<footer>
+  分子生物学 FY2026 · 慶應義塾大学薬学部 · 高橋大輔<br>
+  CC BY-NC 4.0 · https://github.com/kpdbcdt/molbio-lectures-FY2026
+</footer>
+
+</body>
+</html>`;
+
+  const w = window.open('', '_blank');
+  if (!w) {
+    alert('ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
+    return;
+  }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+});
+
 renderQuiz();
 loadQuizState();
 
