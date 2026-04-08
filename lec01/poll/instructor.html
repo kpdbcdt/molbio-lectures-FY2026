@@ -219,7 +219,8 @@
 
 <div class="controls">
   <button class="btn reveal" id="btn-reveal">🎯 正解を公開</button>
-  <button class="btn reset" id="btn-reset">🔄 投票リセット</button>
+  <button class="btn reset" id="btn-reset">🔄 この Q をリセット</button>
+  <button class="btn reset" id="btn-reset-all" style="background:#9b2c2c;">⚠️ 全 Q を一括リセット</button>
 </div>
 
 <div class="qr-info">
@@ -333,6 +334,35 @@ document.getElementById('btn-reset').addEventListener('click', async () => {
     revealed: false,
     reset_at: new Date().toISOString(),
   }, { merge: true });
+});
+
+document.getElementById('btn-reset-all').addEventListener('click', async () => {
+  if (!confirm('⚠️ Q1 〜 Q4 のすべての投票をリセットしますか？\n\n講義開始直前に実行してください。\n（全カウントを 0 に戻し、正解公開状態も解除）')) return;
+  const btn = document.getElementById('btn-reset-all');
+  btn.disabled = true;
+  btn.textContent = 'リセット中…';
+  try {
+    for (let q = 1; q <= 4; q++) {
+      const pollDoc = doc(db, 'polls_lec01', 'q' + q);
+      await setDoc(pollDoc, {
+        votes: { A: 0, B: 0, C: 0, D: 0 },
+        revealed: false,
+        reset_at: new Date().toISOString(),
+      }, { merge: true });
+    }
+    btn.textContent = '✅ 全リセット完了';
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = '⚠️ 全 Q を一括リセット';
+    }, 2500);
+  } catch (err) {
+    console.error(err);
+    btn.textContent = '❌ エラー: ' + err.message;
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = '⚠️ 全 Q を一括リセット';
+    }, 4000);
+  }
 });
 
 // Init Q1
