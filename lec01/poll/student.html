@@ -179,7 +179,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
 import {
-  getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp
+  getFirestore, doc, setDoc, updateDoc, onSnapshot, increment, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 import { POLLS } from "./poll-data.js";
@@ -233,7 +233,7 @@ if (!poll) {
     if (prev === String(choice)) return;
     setStatus('送信中…', 'waiting');
     try {
-      // Increment vote count, decrement previous if exists
+      // Build update with dot-notation paths. updateDoc treats dotted keys as nested paths.
       const update = {
         [`votes.${LETTERS[choice]}`]: increment(1),
         last_vote_at: serverTimestamp(),
@@ -241,7 +241,21 @@ if (!poll) {
       if (prev !== null) {
         update[`votes.${LETTERS[parseInt(prev)]}`] = increment(-1);
       }
-      await setDoc(pollDoc, update, { merge: true });
+      try {
+        // updateDoc requires the document to exist; uses dot notation for nested fields correctly
+        await updateDoc(pollDoc, update);
+      } catch (e) {
+        if (e.code === 'not-found') {
+          // First vote — initialize document with proper nested structure
+          await setDoc(pollDoc, {
+            votes: { A: 0, B: 0, C: 0, D: 0, [LETTERS[choice]]: 1 },
+            last_vote_at: serverTimestamp(),
+            revealed: false,
+          });
+        } else {
+          throw e;
+        }
+      }
       localStorage.setItem(clientKey, String(choice));
       markSelected(choice);
       setStatus('✅ 回答を送信しました（変更可）', 'submitted');
