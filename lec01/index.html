@@ -514,11 +514,6 @@
     <li><a href="https://notebooklm.google.com/notebook/f98bd92b-6622-447c-bd93-9934e67eb3bd" target="_blank"><span class="lec-num">📓</span>NotebookLM (質問・音声復習)</a></li>
     <li><a href="./poll/instructor.html" target="_blank" class="disabled"><span class="lec-num">🎙️</span>講師用投票画面<span class="soon-badge">講師</span></a></li>
   </ul>
-  <h3>全般リソース</h3>
-  <ul>
-    <li><a href="#" class="disabled"><span class="lec-num">📚</span>教科書<span class="soon-badge">TBA</span></a></li>
-    <li><a href="#" class="disabled"><span class="lec-num">📝</span>過去問<span class="soon-badge">TBA</span></a></li>
-  </ul>
 </aside>
 
 <div class="content">
@@ -1027,21 +1022,56 @@ document.getElementById('dogma-reset').addEventListener('click', renderDogma);
 renderDogma();
 
 /* ========== 4. Drug-Target Matcher ========== */
+// All drugs mentioned in Lec01 slides (S05, S16, S17, S25, S29, S30, S31, S35, S41)
 const DRUGS = [
-  { id:'azt',  name:'Zidovudine (AZT)',  mech:'ヌクレオシド系逆転写酵素阻害薬', target:'reverse' },
-  { id:'rif',  name:'Rifampicin',        mech:'細菌 RNA ポリメラーゼ阻害',         target:'transcription' },
-  { id:'amg',  name:'Gentamicin',        mech:'細菌 30S リボソーム阻害',           target:'translation' },
-  { id:'cis',  name:'Cisplatin',         mech:'DNA 架橋形成（白金製剤）',          target:'replication' },
-  { id:'acv',  name:'Acyclovir',         mech:'ヘルペスウイルス DNA pol 阻害',    target:'replication' },
-  { id:'5fu',  name:'5-Fluorouracil',    mech:'チミジル酸合成阻害',                 target:'replication' },
-  { id:'dox',  name:'Doxycycline',       mech:'細菌 30S リボソーム阻害',           target:'translation' },
-  { id:'efv',  name:'Efavirenz',         mech:'非ヌクレオシド系逆転写酵素阻害薬', target:'reverse' },
+  // 逆転写阻害 (reverse) — 抗 HIV / HBV
+  { id:'azt',  name:'Zidovudine (AZT)',  mech:'チミジンアナログ NRTI、3\'-N₃ で鎖停止 (抗 HIV)', target:'reverse' },
+  { id:'tdf',  name:'Tenofovir',         mech:'アデノシンアナログ NRTI (抗 HIV/HBV)、PrEP にも使用', target:'reverse' },
+  { id:'efv',  name:'Efavirenz',         mech:'非ヌクレオシド系逆転写酵素阻害薬 (NNRTI)', target:'reverse' },
+
+  // 転写阻害 (transcription)
+  { id:'rif',  name:'Rifampicin',        mech:'細菌 RNA pol β サブユニット阻害 (抗結核薬)', target:'transcription' },
+
+  // 翻訳阻害 (translation) — 抗菌薬
+  { id:'gen',  name:'Gentamicin',        mech:'細菌 30S リボソーム (16S rRNA) 結合、誤訳誘導', target:'translation' },
+  { id:'str',  name:'Streptomycin',      mech:'アミノグリコシド系、30S 結合 (抗結核)', target:'translation' },
+  { id:'doy',  name:'Doxycycline',       mech:'テトラサイクリン系、30S A 部位結合', target:'translation' },
+  { id:'ery',  name:'Erythromycin',      mech:'マクロライド系、50S (23S rRNA) 結合', target:'translation' },
+  { id:'azi',  name:'Azithromycin',      mech:'マクロライド系、長時間作用 (1日1回×3日)', target:'translation' },
+  { id:'chl',  name:'Chloramphenicol',   mech:'50S ペプチジルトランスフェラーゼ阻害', target:'translation' },
+  { id:'lzd',  name:'Linezolid',         mech:'オキサゾリジノン系、70S 開始複合体阻害 (MRSA/VRE)', target:'translation' },
+  { id:'cli',  name:'Clindamycin',       mech:'リンコマイシン系、50S 結合', target:'translation' },
+
+  // DNA 複製・トポロジー阻害 (replication)
+  { id:'cis',  name:'Cisplatin',         mech:'白金製剤、DNA 鎖間架橋 (G の N7)', target:'replication' },
+  { id:'ble',  name:'Bleomycin',         mech:'糖ペプチド系、Fe²⁺ で活性酸素生成 → DNA 切断', target:'replication' },
+  { id:'5fu',  name:'5-Fluorouracil',    mech:'チミジル酸合成酵素 (TS) 阻害 → dTMP 枯渇', target:'replication' },
+  { id:'acv',  name:'Acyclovir',         mech:'グアノシンアナログ、HSV DNA pol 阻害 (HSV/VZV)', target:'replication' },
+  { id:'top',  name:'Topotecan',         mech:'カンプトテシン誘導体、Topo I 阻害 (卵巣・小細胞肺癌)', target:'replication' },
+  { id:'iri',  name:'Irinotecan',        mech:'Topo I 阻害、活性代謝物 SN-38 (大腸癌)', target:'replication' },
+  { id:'eto',  name:'Etoposide',         mech:'Topo II 阻害 → DNA 二本鎖切断 (精巣・肺癌)', target:'replication' },
+  { id:'dxr',  name:'Doxorubicin',       mech:'Topo II 阻害 + DNA インターカレーション (心毒性)', target:'replication' },
+  { id:'lev',  name:'Levofloxacin',      mech:'フルオロキノロン系、細菌 DNA ジャイレース阻害', target:'replication' },
+
+  // RNA 複製阻害 (rna_replication) — 抗 RNA ウイルス
+  { id:'sof',  name:'Sofosbuvir',        mech:'ウリジンアナログ、HCV NS5B RdRp 阻害', target:'rna_replication' },
+  { id:'rdv',  name:'Remdesivir',        mech:'アデノシンアナログ、SARS-CoV-2 RdRp の遅延鎖停止', target:'rna_replication' },
+
+  // 核酸医薬 (rna_drug) — RNA レベル介入
+  { id:'nus',  name:'Nusinersen',        mech:'ASO、SMN2 のスプライシング修飾 (SMA 治療)', target:'rna_drug' },
+  { id:'pat',  name:'Patisiran',         mech:'siRNA、TTR mRNA 分解 (家族性アミロイドポリニューロパチー)', target:'rna_drug' },
+  { id:'inc',  name:'Inclisiran',        mech:'siRNA、PCSK9 mRNA 分解 (高 LDL コレステロール血症)', target:'rna_drug' },
+  { id:'ris',  name:'Risdiplam',         mech:'経口小分子、SMN2 スプライシング修飾 (SMA)', target:'rna_drug' },
+  { id:'bnt',  name:'BNT162b2',          mech:'mRNA ワクチン、m1Ψ 修飾スパイク mRNA (Pfizer)', target:'rna_drug' },
 ];
+
 const TARGETS = [
-  { id:'replication',  name:'複製 (DNA → DNA)', desc:'DNA ポリメラーゼや DNA 自体を標的' },
-  { id:'transcription', name:'転写 (DNA → RNA)', desc:'RNA ポリメラーゼを標的' },
-  { id:'translation',  name:'翻訳 (RNA → Protein)', desc:'リボソームを標的' },
-  { id:'reverse',      name:'逆転写 (RNA → DNA)', desc:'逆転写酵素を標的（抗レトロウイルス薬）' },
+  { id:'replication',     name:'複製 (DNA → DNA)',           desc:'DNA pol、トポイソメラーゼ、DNA 自体を標的' },
+  { id:'transcription',   name:'転写 (DNA → RNA)',           desc:'RNA ポリメラーゼを標的' },
+  { id:'translation',     name:'翻訳 (RNA → Protein)',       desc:'リボソームを標的 (主に抗菌薬)' },
+  { id:'reverse',         name:'逆転写 (RNA → DNA)',         desc:'逆転写酵素を標的 (抗レトロウイルス薬)' },
+  { id:'rna_replication', name:'RNA 複製 (RNA → RNA)',       desc:'ウイルスの RdRp を標的 (HCV, SARS-CoV-2)' },
+  { id:'rna_drug',        name:'核酸医薬 (RNA レベル介入)',  desc:'mRNA 分解 / スプライシング修飾 / mRNA ワクチン' },
 ];
 
 function renderDrugs() {
