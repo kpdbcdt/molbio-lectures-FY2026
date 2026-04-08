@@ -387,6 +387,33 @@
     font-size: 10px;
     margin-left: 8px;
   }
+  .q-challenge {
+    display: inline-block;
+    background: linear-gradient(135deg, #e09f3e, #d4891c);
+    color: white;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-left: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .q-card.challenge {
+    border-left: 4px solid #e09f3e;
+    background: linear-gradient(to right, #fffaf0 0%, white 60px);
+  }
+  .q-card.challenge.answered.correct { background: #f0fff4; }
+  .q-card.challenge.answered.incorrect { background: #fffafa; }
+  .challenge-banner {
+    background: linear-gradient(135deg, #fffaf0, #fef5e7);
+    border: 2px dashed #e09f3e;
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin: 20px 0 16px 0;
+  }
+  .challenge-banner h3 { margin: 0 0 4px 0; font-size: 15px; color: #744210; }
+  .challenge-banner p { margin: 0; font-size: 12px; color: #744210; line-height: 1.6; }
   .q-stem { font-size: 15px; font-weight: 500; margin: 8px 0 14px 0; }
   .q-stem strong { color: var(--accent); }
   .q-opts { display: flex; flex-direction: column; gap: 8px; }
@@ -501,7 +528,7 @@
   <button data-tab="decoder">📖 Codon Decoder</button>
   <button data-tab="dogma">🎯 Central Dogma</button>
   <button data-tab="drugs">💊 Drug-Target Matcher</button>
-  <button data-tab="quiz">✅ Quiz (10問)</button>
+  <button data-tab="quiz">✅ Quiz (13問)</button>
 </nav>
 
 <main>
@@ -606,13 +633,16 @@
 
 <!-- ============ QUIZ ============ -->
 <section id="quiz" class="tab">
-  <h2>✅ 復習クイズ（10問）</h2>
-  <p class="lead">各問題の選択肢をクリックすると、その場で正解・解説が表示されます。<br>
-    問1-6 は講義内容の基本問題、問7-10 は <i>Genomes 5</i> (Brown 2023) 章末問題を多肢選択化したもの。</p>
+  <h2>✅ 復習クイズ（10 + 国試チャレンジ 3問）</h2>
+  <p class="lead">各問題の選択肢をクリックすると、その場で正解・解説が表示されます。
+    <br>
+    📘 <strong>問1-6</strong>: 講義内容の基本問題（必須）<br>
+    📚 <strong>問7-10</strong>: <i>Genomes 5</i> (Brown 2023) 章末問題を多肢選択化（教科書ベース、必須）<br>
+    🏆 <strong>問11-13</strong>: 薬剤師国家試験過去問の改変（<strong>発展・チャレンジ</strong>。Lec01 範囲外のトピックを含むので解けなくて OK）</p>
 
   <div class="quiz-header">
     <div>
-      <div class="progress-txt" id="quiz-progress">0 / 10 問回答済み</div>
+      <div class="progress-txt" id="quiz-progress">0 / 13 問回答済み</div>
     </div>
     <div style="text-align:right;">
       <div class="score-big" id="quiz-score">0 / 0</div>
@@ -1086,6 +1116,48 @@ const QUIZ = [
     correct: 1,
     explain: '転写産物 (transcriptome) は「いまこの細胞で何が発現しているか」のスナップショット。<strong>細胞が生きて機能している限り、ハウスキーピング遺伝子</strong> (rRNA, tRNA, リボソームタンパク質, 解糖系酵素など) <strong>が常に転写されている</strong>ため、転写産物が完全にゼロになることはない。例外的に哺乳類の成熟赤血球は核とリボソームを失い転写・翻訳が停止するが、これは「最終分化した例外」。c) は誤り（核を失うので新規転写不可）。d) は細胞種特異的発現の概念を否定するため誤り。e) は受精卵で母性 mRNA と新規ゲノム活性化 (ZGA) があるため誤り。<strong>統合的視点</strong>: ゲノムは全細胞で同一でも、転写産物は細胞種・時期・刺激で大きく変動する — これが「ゲノム 1 つから多様な細胞が作られる」分子基盤。',
   },
+  {
+    stem: 'DNA の二重らせん構造と塩基対に関する記述のうち、<strong>正しいもの</strong>はどれか。',
+    source: '薬剤師国試 第109回 (2024) 問104 改変',
+    challenge: true,
+    options: [
+      'アデニンとチミンは水素結合 3 本で、グアニンとシトシンは水素結合 2 本で対合する',
+      'ポリヌクレオチド鎖の方向性は、5\' 末端から 3\' 末端へとヌクレオチドが連結される方向として定義される',
+      'ピリミジン塩基（A, G）とプリン塩基（C, T, U）が相補的に対合する',
+      'ウラシルは DNA の主要な塩基の 1 つであり、アデニンと対合する',
+      '相補的塩基対は水素結合によって形成されるため、二重らせん構造は完全に平面（2 次元）になる',
+    ],
+    correct: 1,
+    explain: 'a) 誤り — A-T は水素結合 <strong>2 本</strong>、G-C は <strong>3 本</strong>（逆）。b) 正しい — ヌクレオチドは 5\' リン酸が前のヌクレオチドの 3\'-OH に結合する形で連結されるため、鎖の成長方向は <strong>5\'→3\'</strong> と定義される。c) 誤り — プリン塩基は <strong>A, G</strong>（2 環）、ピリミジン塩基は <strong>C, T, U</strong>（1 環）。逆である。d) 誤り — ウラシルは RNA の塩基で、DNA にはチミンが使われる。e) 誤り — 塩基対は平面状だが、二重らせん全体は螺旋構造（3 次元）。平面状の塩基対がねじれて積み重なることで B 型らせんが形成される。<br><em>※ 原典は 2 つ選べ形式。ここでは最も基礎的な b) を単一正答として採用。</em>',
+  },
+  {
+    stem: '染色体及び DNA に関する記述のうち、<strong>正しいもの</strong>はどれか。',
+    source: '薬剤師国試 第99回 問116 改変',
+    challenge: true,
+    options: [
+      'ヒストンの化学修飾（アセチル化、メチル化など）により、クロマチンの構造と遺伝子発現が変化する',
+      '転写が活発に行われている染色体の領域では、ヌクレオソームがより密に凝縮している',
+      'DNA は RNA に比べてアルカリ加水分解を受けやすい',
+      '真核細胞の染色体末端にあるセントロメアは、DNA 末端の保護に寄与する',
+      'DNA 水溶液 (pH 7.0) は、280 nm で吸収極大を示す',
+    ],
+    correct: 0,
+    explain: 'a) 正しい — ヒストン N 末端テールのアセチル化（HAT による、転写活性化）、メチル化（文脈依存）、リン酸化、ユビキチン化などがクロマチン構造を制御する「ヒストンコード」を形成する。Lec08（予定）のエピジェネティクスで詳述。b) 誤り — 転写活発領域は<strong>ユークロマチン</strong>として緩んでおり、ヌクレオソームは緩やかに並ぶ。密に凝縮しているのは転写不活性な<strong>ヘテロクロマチン</strong>。c) 誤り — 逆。<strong>RNA の方がアルカリ加水分解を受けやすい</strong>。これは RNA の 2\'-OH が隣接するリン酸ジエステル結合を求核攻撃できるため（DNA には 2\'-OH がないので安定）。この性質が RNA の安定性が低い生化学的基盤。d) 誤り — DNA 末端を保護するのは<strong>テロメア</strong>（セントロメアは染色体の中央部〜動原体領域で、分裂時の染色体分配を担う）。e) 誤り — DNA の吸収極大は <strong>260 nm</strong>。280 nm はタンパク質（芳香族アミノ酸 Trp, Tyr）の吸収極大。A260/A280 比で核酸純度を評価する。<br><em>※ 原典は 2 つ選べ形式。ここでは a) を単一正答として採用。</em>',
+  },
+  {
+    stem: 'クロマチンとヌクレオソームの構造に関する記述のうち、<strong>正しいもの</strong>はどれか。',
+    source: '薬剤師国試 第93回 問54 改変',
+    challenge: true,
+    options: [
+      'ヌクレオソームはヒストン H2A, H2B, H3, H4 が各 2 分子ずつ集まった 8 量体に、約 147 bp の DNA が巻きついた構造である',
+      'ヌクレオソームはヒストン H1, H2A, H2B, H3 が各 2 分子ずつ集まった 8 量体に DNA が巻きついた構造である',
+      'ヘテロクロマチンは比較的分散した状態のクロマチンであり、転写が活発である',
+      'DNA トポイソメラーゼは DNA の 2 本鎖を切断することのみを行う酵素で、再結合は別の酵素が担う',
+      'セントロメアは染色体末端に位置し、細胞分裂時に DNA 末端を保護する役割を持つ',
+    ],
+    correct: 0,
+    explain: 'a) 正しい — ヌクレオソームコアは (H2A-H2B) ダイマー 2 組と (H3-H4)₂ テトラマーからなる<strong>ヒストン 8 量体</strong>に、約 147 bp の DNA が左巻きに 1.65 回巻き付いた構造。ヒストン H1 はリンカー DNA に結合してヌクレオソーム間を連結する「リンカーヒストン」で、8 量体には含まれない。b) 誤り — H1 ではなく <strong>H4</strong>。H1 は 8 量体の構成要素ではない。c) 誤り — 逆。<strong>ユークロマチン</strong>が分散状態・転写活発、<strong>ヘテロクロマチン</strong>が凝縮状態・転写不活性。d) 誤り — トポイソメラーゼは切断<strong>と再結合</strong>を同一分子内で触媒する（Type I は 1 本鎖、Type II は 2 本鎖切断 + 通過 + 再結合）。キノロン系抗菌薬（レボフロキサシン等）はトポ II (DNA gyrase) を阻害し、抗がん剤のエトポシドはトポ II を「切断状態でトラップ」することで細胞毒性を発揮。e) 誤り — <strong>テロメア</strong>が末端、<strong>セントロメア</strong>は染色体中央部で分裂時の姉妹染色分体分配を担う。<br><em>※ 原典は 2 つ選べ形式。ここではヌクレオソーム組成の a) を単一正答として採用。</em>',
+  },
 ];
 
 const quizState = { answered: [], correct: 0 };
@@ -1096,13 +1168,28 @@ function renderQuiz() {
   quizState.correct = 0;
   const list = document.getElementById('quiz-list');
   list.innerHTML = '';
+  let challengeBannerShown = false;
   QUIZ.forEach((q, qi) => {
+    // Insert challenge banner before the first challenge question
+    if (q.challenge && !challengeBannerShown) {
+      const banner = document.createElement('div');
+      banner.className = 'challenge-banner';
+      banner.innerHTML = `
+        <h3>🏆 ここから国試チャレンジ問題（発展）</h3>
+        <p>以下の問題は<strong>薬剤師国家試験の過去問</strong>を一部改変したものです。Lec01 の内容を超える発展的なトピック（クロマチン構造、ヒストン、トポイソメラーゼ、テロメア等）が含まれます。
+        これらのトピックは Lec02 以降や生化学・遺伝子工学で詳しく扱うので、<strong>今の段階では「解けなくても OK」</strong>。
+        解説を読んで「こんな問題が国試で出るんだ」と知っておくだけで十分です。チャレンジしたい人だけ取り組んでください。</p>
+      `;
+      list.appendChild(banner);
+      challengeBannerShown = true;
+    }
     const card = document.createElement('div');
-    card.className = 'q-card';
+    card.className = 'q-card' + (q.challenge ? ' challenge' : '');
     card.dataset.qi = qi;
     card.innerHTML = `
       <div>
         <span class="q-num">問 ${qi + 1}</span>
+        ${q.challenge ? `<span class="q-challenge">🏆 国試チャレンジ</span>` : ''}
         ${q.source ? `<span class="q-source">📚 ${q.source}</span>` : ''}
       </div>
       <div class="q-stem">${q.stem}</div>
