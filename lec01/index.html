@@ -18,6 +18,7 @@
     --mono: 'SF Mono', 'Consolas', 'Menlo', monospace;
   }
   * { box-sizing: border-box; }
+  html, body { max-width: 100%; overflow-x: hidden; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
     background: var(--bg);
@@ -37,10 +38,12 @@
   /* Layout: sidebar + content */
   .layout {
     display: grid;
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: 240px minmax(0, 1fr);  /* minmax(0,1fr) allows shrinking */
     min-height: calc(100vh - 82px);
+    max-width: 100%;
+    overflow-x: hidden;
   }
-  @media (max-width: 820px) {
+  @media (max-width: 900px) {
     .layout { grid-template-columns: 1fr; }
     aside.sidebar { display: none; }
   }
@@ -102,7 +105,7 @@
     border-radius: 8px;
     letter-spacing: 0.5px;
   }
-  .content { background: var(--bg); }
+  .content { background: var(--bg); min-width: 0; overflow-x: hidden; }
   nav.tabs {
     background: white;
     border-bottom: 1px solid var(--border);
@@ -128,7 +131,7 @@
     color: var(--primary);
     border-bottom-color: var(--primary);
   }
-  main { padding: 24px; max-width: 1100px; margin: 0 auto; }
+  main { padding: 24px; max-width: 1100px; margin: 0 auto; min-width: 0; overflow-x: hidden; }
   .tab { display: none; }
   .tab.active { display: block; animation: fadeIn 0.25s; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
@@ -147,7 +150,7 @@
   .genome-list { display: flex; flex-direction: column; gap: 10px; }
   .genome-row {
     display: grid;
-    grid-template-columns: 180px 1fr 110px;
+    grid-template-columns: minmax(120px, 180px) minmax(0, 1fr) minmax(70px, 110px);
     gap: 12px;
     align-items: center;
     cursor: pointer;
@@ -310,8 +313,8 @@
   .dogma-feedback.ng { color: var(--accent); }
 
   /* Drug Matcher */
-  .drug-area { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media (max-width: 720px) { .drug-area { grid-template-columns: 1fr; } }
+  .drug-area { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  @media (max-width: 820px) { .drug-area { grid-template-columns: 1fr; } }
   .drug-pool, .target-list { display: flex; flex-direction: column; gap: 8px; }
   .drug-card {
     background: white;
