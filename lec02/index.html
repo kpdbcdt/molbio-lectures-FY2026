@@ -1218,14 +1218,9 @@ function tmCalc() {
   const C = (raw.match(/C/g) || []).length;
   const n = raw.length;
   const gc = ((G + C) / n) * 100;
-  // Marmur (short oligo)
-  let tm;
-  if (n < 14) {
-    tm = 4 * (G + C) + 2 * (A + T);
-  } else {
-    // Wallace → Marmur-Doty: Tm = 64.9 + 41*(G+C-16.4)/n  (approx for longer, in 1 M Na+)
-    tm = 64.9 + 41 * (G + C - 16.4) / n;
-  }
+  // Always use Marmur/Wallace rule (matches the formula displayed in the card)
+  // Tm = 4 × (G + C) + 2 × (A + T)  — valid for short oligos up to ~30 bp
+  let tm = 4 * (G + C) + 2 * (A + T);
   tm = Math.round(tm * 10) / 10;
 
   document.getElementById('tm-stats').innerHTML = `
