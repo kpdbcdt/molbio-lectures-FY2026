@@ -494,7 +494,7 @@
   <h3>Lec02 リソース</h3>
   <ul>
     <li><a href="https://lms.keio.jp/courses/140260/modules/items/6121498" target="_blank"><span class="lec-num">📄</span>講義スライド (PDF)</a></li>
-    <li><a href="#" id="notebooklm-link" href="https://notebooklm.google.com/notebook/35cccc00-744d-4c5c-a615-f809e07818c7" target="_blank"><span class="lec-num">📓</span>NotebookLM</a></li>
+    <li><a href="https://notebooklm.google.com/notebook/35cccc00-744d-4c5c-a615-f809e07818c7" id="notebooklm-link" target="_blank"><span class="lec-num">📓</span>NotebookLM</a></li>
     <li><a href="./poll/instructor.html" target="_blank" class="disabled"><span class="lec-num">🎙️</span>講師用投票画面<span class="soon-badge">講師</span></a></li>
   </ul>
 </aside>
@@ -513,7 +513,7 @@
          style="display:inline-flex; align-items:center; gap:8px; background:#d64545; color:white; padding:10px 18px; border-radius:8px; text-decoration:none; font-weight:600; font-size:14px; box-shadow:0 2px 6px rgba(214,69,69,0.25);">
         📄 講義スライド (PDF)
       </a>
-      <a href="#" id="notebooklm-link-top" target="_blank"
+      <a href="https://notebooklm.google.com/notebook/35cccc00-744d-4c5c-a615-f809e07818c7" id="notebooklm-link-top" target="_blank"
          style="display:inline-flex; align-items:center; gap:8px; background:#2e8b57; color:white; padding:10px 18px; border-radius:8px; text-decoration:none; font-weight:600; font-size:14px; box-shadow:0 2px 6px rgba(46,139,87,0.25);">
         📓 NotebookLM
       </a>
@@ -705,7 +705,7 @@
 
   <div class="hint">
     💡 <b>ハイパークロミシティ (hyperchromicity)</b>:
-    二本鎖 DNA が変性 (一本鎖に解離) すると、260 nm の吸光度が約 <strong>40% 増加</strong>する。
+    二本鎖 DNA が変性 (一本鎖に解離) すると、260 nm の吸光度が約 <strong>30-40% 増加</strong>する。
     これは塩基スタッキング相互作用が壊れ、π 電子の遷移が自由になるため。
     融解曲線の中点 = Tm。PCR の denaturation (94-98°C) はこの Tm を超える温度に設定している。
   </div>
@@ -1511,7 +1511,7 @@ const QUIZ = [
       "DNA 合成は 3\u2032→5\u2032 方向に進行する",
     ],
     correct: 2,
-    explain: 'a は誤り (ヌクレオシドにはリン酸なし)、b は誤り (DNA は T を使う、U は損傷として出現)、<strong>c が正解</strong> (RNA のリボースは 2\u2032-OH を持つ、これが安定性・A-form 選好・自己切断性の根本原因)、d は誤り (DNA 合成は 5\u2032→3\u2032)。元の国試形式は「2 つ選べ」で c と d (ホスホジエステル結合) が正解だが、ここでは単一選択に改変。',
+    explain: 'a は誤り (ヌクレオシドにはリン酸なし)、b は誤り (DNA は T を使う、U は損傷として出現)、<strong>c が正解</strong> (RNA のリボースは 2\u2032-OH を持つ、これが安定性・A-form 選好・自己切断性の根本原因)、d は誤り (DNA 合成は 5\u2032→3\u2032)。国試では「正しいものを 2 つ選べ」形式で出題される (元の選択肢には「ホスホジエステル結合は 3\u2032-OH と 5\u2032-P の間に形成される」が含まれていた)。ここでは単一選択に改変。',
   },
   {
     source: 'S21',
@@ -1530,7 +1530,7 @@ const QUIZ = [
     stem: '下の 4 種の DNA 配列 (いずれも 20 bp) のうち、融解温度 Tm が<strong>最も高い</strong>のはどれ？',
     options: [
       '5\u2032-AAAAAAAAAAAAAAAAAAAA-3\u2032 (poly-A)',
-      '5\u2032-AAAATTTTAAAATTTTAAAT-3\u2032 (AT 多い)',
+      '5\u2032-AAAATTTTGCAATTTTAAAT-3\u2032 (AT 多い)',
       '5\u2032-ATGCATGCATGCATGCATGC-3\u2032 (GC 50%)',
       '5\u2032-GGGGCCCCGGGGCCCCGGGG-3\u2032 (GC 100%)',
     ],
