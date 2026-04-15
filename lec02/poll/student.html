@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<title>分子生物学 Lec02 — いきなり質問</title>
+<style>
+  :root {
+    --primary: #2b6cb0;
+    --primary-dark: #1a4a80;
+    --accent: #e09f3e;
+    --ok: #2e8b57;
+    --ng: #d64545;
+    --bg: #f7f9fc;
+    --card: #ffffff;
+    --ink: #1a2633;
+    --muted: #5a6978;
+    --border: #d7dce5;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    padding: 20px 24px;
+    text-align: center;
+  }
+  header .lec { font-size: 12px; opacity: 0.85; letter-spacing: 1px; }
+  header h1 { margin: 4px 0 0 0; font-size: 18px; }
+  main {
+    flex: 1;
+    padding: 24px 20px;
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .qcard {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 24px 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom: 16px;
+  }
+  .q-meta {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .q-stem {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .opts {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .opt-btn {
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: inherit;
+    transition: all 0.15s;
+    -webkit-appearance: none;
+  }
+  .opt-btn:active:not(:disabled) {
+    transform: scale(0.98);
+    border-color: var(--primary);
+    background: #f0f7ff;
+  }
+  .opt-btn .letter {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #edf2f7;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 16px;
+  }
+  .opt-btn:disabled { cursor: default; opacity: 0.6; }
+  .opt-btn.selected {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+  .opt-btn.selected .letter {
+    background: white;
+    color: var(--primary);
+  }
+  .opt-btn.correct {
+    background: #c6f6d5;
+    border-color: var(--ok);
+    color: #22543d;
+  }
+  .opt-btn.correct .letter { background: var(--ok); color: white; }
+  .opt-btn.wrong {
+    background: #fed7d7;
+    border-color: var(--ng);
+    color: #742a2a;
+  }
+  .opt-btn.wrong .letter { background: var(--ng); color: white; }
+  .status {
+    text-align: center;
+    padding: 16px;
+    margin-top: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  .status.waiting { background: #edf2f7; color: var(--muted); }
+  .status.submitted { background: #e6f6ee; color: var(--ok); }
+  .status.revealed { background: #fef5e7; color: #744210; border: 1px solid #e09f3e; }
+  .status.error { background: #fed7d7; color: var(--ng); }
+  footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .reveal-text {
+    margin-top: 12px;
+    padding: 14px 16px;
+    background: #fffaf0;
+    border-left: 4px solid var(--accent);
+    border-radius: 6px;
+    font-size: 14px;
+    color: #744210;
+    line-height: 1.7;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="lec">分子生物学 LEC 02</div>
+  <h1>🤔 いきなり質問</h1>
+</header>
+
+<main>
+  <div class="qcard">
+    <div class="q-meta" id="q-meta">問題を読み込み中…</div>
+    <div class="q-stem" id="q-stem">—</div>
+    <div class="opts" id="opts"></div>
+    <div class="status waiting" id="status">選択肢をタップしてください</div>
+    <div class="reveal-text" id="reveal" style="display:none;"></div>
+  </div>
+</main>
+
+<footer>
+  分子生物学 FY2026 · Keio · 匿名投票 · 個人情報収集なし
+</footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+import {
+  getFirestore, doc, setDoc, updateDoc, onSnapshot, increment, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+import { firebaseConfig } from "./firebase-config.js";
+import { POLLS } from "./poll-data.js";
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const LETTERS = ['A', 'B', 'C', 'D'];
+
+// Get question ID from URL ?q=1 / ?q=2 / etc, default to 1
+const params = new URLSearchParams(location.search);
+const qNum = params.get('q') || '1';
+const qId = 'q' + qNum;
+const poll = POLLS[qId];
+
+if (!poll) {
+  document.getElementById('q-stem').textContent = '質問が見つかりません (?q=1〜4 を指定してください)';
+  document.getElementById('status').textContent = '';
+} else {
+  document.getElementById('q-meta').textContent = `Slide ${poll.slide}  ·  質問 #${qNum}`;
+  document.getElementById('q-stem').textContent = poll.stem;
+  const optsEl = document.getElementById('opts');
+  poll.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.dataset.idx = i;
+    btn.innerHTML = `<span class="letter">${LETTERS[i]}</span><span>${opt}</span>`;
+    btn.addEventListener('click', () => submitVote(i));
+    optsEl.appendChild(btn);
+  });
+
+  // Stable client ID per device per question (allows revote within 30 min)
+  const clientKey = `lec02_poll_${qId}_voted`;
+  const previousVote = localStorage.getItem(clientKey);
+  if (previousVote !== null) {
+    markSelected(parseInt(previousVote));
+    document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+    setStatus('✅ 回答済み（変更不可）', 'submitted');
+  }
+
+  // Subscribe to poll status (revealed/not)
+  const pollDoc = doc(db, 'polls_lec02', qId);
+  onSnapshot(pollDoc, (snap) => {
+    const data = snap.data() || {};
+    if (data.revealed) {
+      revealAnswer();
+    }
+  }, (err) => console.warn('snapshot err:', err));
+
+  async function submitVote(choice) {
+    const prev = localStorage.getItem(clientKey);
+    // 回答変更不可: 既に回答済みならブロック
+    if (prev !== null) {
+      setStatus('⚠️ 回答済みです（変更できません）', 'submitted');
+      return;
+    }
+    if (prev === String(choice)) return;
+    setStatus('送信中…', 'waiting');
+    try {
+      const update = {
+        [`votes.${LETTERS[choice]}`]: increment(1),
+        last_vote_at: serverTimestamp(),
+      };
+      try {
+        await updateDoc(pollDoc, update);
+      } catch (e) {
+        if (e.code === 'not-found') {
+          await setDoc(pollDoc, {
+            votes: { A: 0, B: 0, C: 0, D: 0, [LETTERS[choice]]: 1 },
+            last_vote_at: serverTimestamp(),
+            revealed: false,
+          });
+        } else {
+          throw e;
+        }
+      }
+      localStorage.setItem(clientKey, String(choice));
+      markSelected(choice);
+      // 全ボタンを無効化（変更不可を視覚的に示す）
+      document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+      setStatus('✅ 回答を送信しました（変更不可）', 'submitted');
+    } catch (err) {
+      console.error(err);
+      setStatus('⚠️ 送信エラー: ' + err.message, 'error');
+    }
+  }
+
+  function markSelected(idx) {
+    document.querySelectorAll('.opt-btn').forEach((b, i) => {
+      b.classList.toggle('selected', i === idx);
+    });
+  }
+
+  // ページ読み込み時: 既回答ならボタン無効化
+  const existingVote = localStorage.getItem(clientKey);
+  if (existingVote !== null) {
+    markSelected(parseInt(existingVote));
+    document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+    setStatus('✅ 回答済み（変更不可）', 'submitted');
+  }
+
+  function revealAnswer() {
+    const myVote = localStorage.getItem(clientKey);
+    document.querySelectorAll('.opt-btn').forEach((b, i) => {
+      b.disabled = true;
+      b.classList.remove('selected');
+      if (i === poll.correct) b.classList.add('correct');
+      else if (myVote !== null && parseInt(myVote) === i) b.classList.add('wrong');
+    });
+    const reveal = document.getElementById('reveal');
+    reveal.textContent = poll.reveal;
+    reveal.style.display = 'block';
+    if (myVote !== null) {
+      const got = parseInt(myVote) === poll.correct;
+      setStatus(got ? '🎉 正解！' : '❌ 不正解', 'revealed');
+    } else {
+      setStatus('正解が公開されました', 'revealed');
+    }
+  }
+
+  function setStatus(text, cls) {
+    const el = document.getElementById('status');
+    el.textContent = text;
+    el.className = 'status ' + cls;
+  }
+}
+</script>
+
+</body>
+</html>

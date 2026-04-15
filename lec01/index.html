@@ -15,6 +15,7 @@
     --accent: #d64545;
     --ok: #2e8b57;
     --warn: #e09f3e;
+    --ng: #d64545;
     --mono: 'SF Mono', 'Consolas', 'Menlo', monospace;
   }
   * { box-sizing: border-box; }
@@ -749,18 +750,26 @@
   <div id="quiz-list"></div>
 
   <div class="quiz-finish" id="quiz-finish">
-    <h3 id="quiz-finish-title">🎉 全問クリア！</h3>
-    <div class="final-score" id="quiz-finish-score">0 / 10</div>
-    <div id="quiz-finish-msg">お疲れさまでした。</div>
+    <h3 id="quiz-finish-title">結果</h3>
+    <div class="final-score" id="quiz-finish-score">0 / 13</div>
+    <div id="quiz-finish-msg"></div>
+  </div>
+
+  <div id="quiz-cert-section" style="display:none; margin-top:16px; padding:16px; background:#f7fafc; border:2px solid var(--ok); border-radius:8px;">
+    <h4 style="margin:0 0 8px 0; color:var(--ok);">📜 修了証の発行</h4>
+    <p style="font-size:13px; margin:0 0 10px 0;">学籍番号を入力して修了証PDFを出力してください。再度試験の事前課題として K-LMS に提出します。</p>
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <input type="text" id="cert-student-id" placeholder="学籍番号（例: 25-2-001）" style="padding:8px 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; width:200px;">
+      <button class="btn" id="quiz-pdf" style="background:#2e8b57;">📜 修了証 PDF を出力</button>
+    </div>
+    <p id="cert-error" style="color:var(--ng); font-size:12px; margin:6px 0 0 0; display:none;">学籍番号を入力してください。</p>
   </div>
 
   <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
     <button class="btn secondary" id="quiz-reset">🔄 クイズをリセット</button>
-    <button class="btn" id="quiz-pdf" style="background:#2e8b57;">🖨️ 問題・正解・解説を PDF 出力</button>
   </div>
   <p style="font-size:12px; color:var(--muted); margin-top:8px;">
-    💡 PDF 出力ボタンを押すと印刷用のきれいなレイアウトで別窓が開きます。
-    ブラウザの印刷ダイアログで「<strong>PDF として保存</strong>」を選ぶと PDF ファイルとしてダウンロードできます（iPhone Safari でもOK）。
+    💡 合格基準: 13問中11問以上正解で修了証を発行できます。不合格の場合はリセットして再挑戦してください（選択肢の順番が毎回変わります）。
   </p>
 </section>
 
@@ -1298,12 +1307,23 @@ const QUIZ = [
   },
 ];
 
-const quizState = { answered: [], correct: 0 };
+const quizState = { answered: [], correct: 0, shuffleMaps: [] };
 const LETTERS = ['a', 'b', 'c', 'd', 'e'];
+const PASS_THRESHOLD = 0.8; // 80% to pass
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 function renderQuiz() {
   quizState.answered = new Array(QUIZ.length).fill(null);
   quizState.correct = 0;
+  quizState.shuffleMaps = [];
   const list = document.getElementById('quiz-list');
   list.innerHTML = '';
   let challengeBannerShown = false;
@@ -1321,6 +1341,10 @@ function renderQuiz() {
       list.appendChild(banner);
       challengeBannerShown = true;
     }
+    // Shuffle options: create index map [0,1,2,3] -> shuffled order
+    const indices = q.options.map((_, i) => i);
+    const shuffled = shuffleArray(indices);
+    quizState.shuffleMaps[qi] = shuffled; // shuffled[displayPos] = originalIndex
     const card = document.createElement('div');
     card.className = 'q-card' + (q.challenge ? ' challenge' : '');
     card.dataset.qi = qi;
@@ -1332,10 +1356,10 @@ function renderQuiz() {
       </div>
       <div class="q-stem">${q.stem}</div>
       <div class="q-opts">
-        ${q.options.map((opt, oi) => `
-          <button class="q-opt" data-oi="${oi}">
-            <span class="opt-letter">${LETTERS[oi]}</span>
-            <span class="opt-text">${opt}</span>
+        ${shuffled.map((origIdx, displayPos) => `
+          <button class="q-opt" data-oi="${origIdx}">
+            <span class="opt-letter">${LETTERS[displayPos]}</span>
+            <span class="opt-text">${q.options[origIdx]}</span>
           </button>
         `).join('')}
       </div>
@@ -1348,28 +1372,36 @@ function renderQuiz() {
   });
   updateQuizHeader();
   document.getElementById('quiz-finish').classList.remove('shown');
+  document.getElementById('quiz-cert-section').style.display = 'none';
 }
 
 function answerQuestion(qi, oi) {
-  if (quizState.answered[qi] !== null) return;  // already answered
+  if (quizState.answered[qi] !== null) return;
   const q = QUIZ[qi];
   const card = document.querySelector(`.q-card[data-qi="${qi}"]`);
   const opts = card.querySelectorAll('.q-opt');
   const isCorrect = oi === q.correct;
   quizState.answered[qi] = oi;
   if (isCorrect) quizState.correct++;
-  opts.forEach((btn, i) => {
+  opts.forEach(btn => {
     btn.disabled = true;
-    if (i === q.correct) {
-      btn.classList.add(isCorrect ? 'correct' : 'revealed');
-      if (!isCorrect) btn.classList.add('correct-answer');
+    const origIdx = parseInt(btn.dataset.oi);
+    if (isCorrect && origIdx === q.correct) {
+      btn.classList.add('correct');
     }
-    if (i === oi && !isCorrect) btn.classList.add('wrong');
+    if (origIdx === oi && !isCorrect) btn.classList.add('wrong');
+    // Do NOT reveal correct answer on wrong — student must figure it out
   });
+  // Show explanation only on correct; on wrong show hint to retry
   card.classList.add('answered', isCorrect ? 'correct' : 'incorrect');
+  if (!isCorrect) {
+    const explain = card.querySelector('.q-explain');
+    explain.innerHTML = '<strong>不正解です。</strong> 講義資料・教科書を復習して、リセット後に再挑戦してください。';
+    explain.style.display = 'block';
+    explain.style.borderLeftColor = 'var(--ng)';
+  }
   updateQuizHeader();
   saveQuizState();
-  // Auto-show finish banner when all answered
   if (quizState.answered.every(x => x !== null)) showFinish();
 }
 
@@ -1380,58 +1412,64 @@ function updateQuizHeader() {
 }
 
 function showFinish() {
+  // Guard: all questions must be answered (prevents DevTools bypass)
+  const answeredCount = quizState.answered.filter(x => x !== null).length;
+  if (answeredCount < QUIZ.length) return;
   const box = document.getElementById('quiz-finish');
   const pct = quizState.correct / QUIZ.length;
+  const passed = pct >= PASS_THRESHOLD;
   box.classList.add('shown');
-  box.classList.toggle('low', pct < 0.6);
-  const title = pct >= 0.9 ? '🎉 素晴らしい！' : pct >= 0.7 ? '✨ よくできました' : pct >= 0.5 ? '📘 もう一歩' : '📖 復習しましょう';
+  box.classList.toggle('low', !passed);
+  const title = passed
+    ? (pct >= 0.9 ? '🎉 合格！素晴らしい！' : '✨ 合格！よくできました')
+    : '📖 不合格 — 復習して再挑戦';
   document.getElementById('quiz-finish-title').textContent = title;
   document.getElementById('quiz-finish-score').textContent = `${quizState.correct} / ${QUIZ.length}`;
-  const msgs = {
-    high: '定期試験対策も万全です。Interactive Lab の他のツールも使って理解を深めよう。',
-    mid: '基本は理解できています。間違えた問題の解説を読み直してみよう。',
-    low: '講義資料と教科書 (Brown <i>Genomes 5</i> Ch.1) を見直してから再挑戦してみよう。',
-  };
-  const level = pct >= 0.7 ? 'high' : pct >= 0.5 ? 'mid' : 'low';
-  document.getElementById('quiz-finish-msg').innerHTML = msgs[level];
+  const passReq = Math.ceil(QUIZ.length * PASS_THRESHOLD);
+  const msg = passed
+    ? `合格基準 (${passReq}問以上) をクリアしました。修了証を発行できます。`
+    : `合格には ${passReq} 問以上の正解が必要です (現在 ${quizState.correct} 問)。<br>講義資料と教科書を復習し、「クイズをリセット」して再挑戦してください。<br><small>※リセット時に選択肢の順番が変わります。</small>`;
+  document.getElementById('quiz-finish-msg').innerHTML = msg;
+  // Show certificate section only on pass
+  document.getElementById('quiz-cert-section').style.display = passed ? 'block' : 'none';
+  // On pass, reveal all explanations (including those answered wrong)
+  if (passed) {
+    QUIZ.forEach((q, qi) => {
+      const card = document.querySelector(`.q-card[data-qi="${qi}"]`);
+      if (!card) return;
+      const explain = card.querySelector('.q-explain');
+      explain.innerHTML = `<strong>解説:</strong> ${q.explain}`;
+      explain.style.display = 'block';
+      explain.style.borderLeftColor = '';
+      // Also reveal correct answer for wrong ones
+      if (quizState.answered[qi] !== q.correct) {
+        card.querySelectorAll('.q-opt').forEach(btn => {
+          if (parseInt(btn.dataset.oi) === q.correct) {
+            btn.classList.add('revealed', 'correct-answer');
+          }
+        });
+      }
+    });
+  }
+}
+
+// Generate verification code (HMAC-like hash from student ID + lecture + score + date)
+async function generateVerificationCode(studentId, score, date) {
+  const data = `${studentId}:lec01:${score}/${QUIZ.length}:${date}:molbio2026`;
+  const encoder = new TextEncoder();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 8).toUpperCase();
 }
 
 function saveQuizState() {
-  try {
-    localStorage.setItem('lec01_quiz_state', JSON.stringify(quizState));
-  } catch(e) {}
+  try { localStorage.setItem('lec01_quiz_state', JSON.stringify(quizState)); } catch(e) {}
 }
 
 function loadQuizState() {
-  try {
-    const s = localStorage.getItem('lec01_quiz_state');
-    if (!s) return;
-    const saved = JSON.parse(s);
-    if (!saved.answered || saved.answered.length !== QUIZ.length) return;
-    saved.answered.forEach((oi, qi) => {
-      if (oi !== null) {
-        // Replay the answer
-        const q = QUIZ[qi];
-        const card = document.querySelector(`.q-card[data-qi="${qi}"]`);
-        if (!card) return;
-        const opts = card.querySelectorAll('.q-opt');
-        const isCorrect = oi === q.correct;
-        quizState.answered[qi] = oi;
-        if (isCorrect) quizState.correct++;
-        opts.forEach((btn, i) => {
-          btn.disabled = true;
-          if (i === q.correct) {
-            btn.classList.add(isCorrect ? 'correct' : 'revealed');
-            if (!isCorrect) btn.classList.add('correct-answer');
-          }
-          if (i === oi && !isCorrect) btn.classList.add('wrong');
-        });
-        card.classList.add('answered', isCorrect ? 'correct' : 'incorrect');
-      }
-    });
-    updateQuizHeader();
-    if (quizState.answered.every(x => x !== null)) showFinish();
-  } catch(e) {}
+  // With shuffled options, saved state from a previous shuffle is invalid.
+  // Always start fresh — no state restoration.
+  // This also prevents gaming by inspecting localStorage.
 }
 
 document.getElementById('quiz-reset').addEventListener('click', () => {
@@ -1439,172 +1477,81 @@ document.getElementById('quiz-reset').addEventListener('click', () => {
   renderQuiz();
 });
 
-/* ---- Quiz PDF export ---- */
-document.getElementById('quiz-pdf').addEventListener('click', () => {
+/* ---- Quiz Certificate PDF export ---- */
+document.getElementById('quiz-pdf').addEventListener('click', async () => {
+  const studentId = document.getElementById('cert-student-id').value.trim();
+  if (!studentId) {
+    document.getElementById('cert-error').style.display = 'block';
+    return;
+  }
+  document.getElementById('cert-error').style.display = 'none';
+
   const date = new Date().toLocaleDateString('ja-JP');
+  const datetime = new Date().toLocaleString('ja-JP');
+  const score = quizState.correct;
+  const total = QUIZ.length;
+  const verCode = await generateVerificationCode(studentId, score, date);
+
   let html = `<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>分子生物学 Lec01 復習クイズ — 問題・正解・解説</title>
+<title>分子生物学 Lec01 復習クイズ修了証</title>
 <style>
   @page { size: A4; margin: 18mm 15mm; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
-    color: #1a2633;
-    line-height: 1.6;
-    font-size: 11pt;
-    margin: 0;
-    padding: 0;
-  }
-  header {
-    border-bottom: 3px solid #2b6cb0;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-  }
-  h1 { color: #1a4a80; font-size: 18pt; margin: 0 0 4px 0; }
-  .meta { color: #5a6978; font-size: 10pt; }
-  .intro {
-    background: #f7fafc;
-    border-left: 4px solid #2b6cb0;
-    padding: 10px 14px;
-    margin: 14px 0 20px 0;
-    font-size: 10pt;
-  }
-  .challenge-section {
-    background: #fffaf0;
-    border: 2px dashed #e09f3e;
-    padding: 12px 16px;
-    margin: 20px 0 14px 0;
-    border-radius: 6px;
-    page-break-before: auto;
-  }
-  .challenge-section h2 {
-    color: #744210;
-    font-size: 13pt;
-    margin: 0 0 6px 0;
-  }
-  .challenge-section p { font-size: 10pt; margin: 4px 0; }
-  .q {
-    margin-bottom: 18px;
-    page-break-inside: avoid;
-    border-left: 3px solid #2b6cb0;
-    padding-left: 14px;
-  }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif; color: #1a2633; line-height: 1.6; font-size: 11pt; margin: 0; padding: 0; }
+  .cert-box { border: 3px solid #2b6cb0; border-radius: 12px; padding: 30px 40px; margin: 20px auto; max-width: 600px; text-align: center; }
+  .cert-title { color: #1a4a80; font-size: 22pt; font-weight: 700; margin-bottom: 6px; }
+  .cert-sub { color: #5a6978; font-size: 12pt; margin-bottom: 20px; }
+  .cert-field { margin: 12px 0; font-size: 13pt; }
+  .cert-field .label { color: #5a6978; font-size: 10pt; }
+  .cert-field .value { font-weight: 700; font-size: 16pt; }
+  .cert-score { font-size: 36pt; font-weight: 700; color: #2e8b57; margin: 16px 0; }
+  .cert-code { margin-top: 20px; padding: 10px; background: #f7fafc; border: 1px solid #d7dce5; border-radius: 6px; font-family: monospace; font-size: 14pt; letter-spacing: 2px; }
+  .cert-code .label { font-family: sans-serif; font-size: 9pt; color: #5a6978; letter-spacing: normal; }
+  hr { border: none; border-top: 1px solid #d7dce5; margin: 20px 0; }
+  .q { margin-bottom: 18px; page-break-inside: avoid; border-left: 3px solid #2b6cb0; padding-left: 14px; text-align: left; }
   .q.challenge { border-left-color: #e09f3e; }
-  .q-header {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    margin-bottom: 6px;
-  }
-  .q-num {
-    font-weight: 700;
-    color: #2b6cb0;
-    font-size: 12pt;
-  }
+  .q-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+  .q-num { font-weight: 700; color: #2b6cb0; font-size: 12pt; }
   .q.challenge .q-num { color: #e09f3e; }
-  .q-source {
-    font-size: 9pt;
-    color: #5a6978;
-    background: #edf2f7;
-    padding: 1px 8px;
-    border-radius: 10px;
-  }
-  .q.challenge .q-source {
-    background: #fef5e7;
-    color: #744210;
-    font-weight: 700;
-  }
-  .q-stem {
-    font-weight: 600;
-    margin: 6px 0;
-    font-size: 11pt;
-  }
+  .q-source { font-size: 9pt; color: #5a6978; background: #edf2f7; padding: 1px 8px; border-radius: 10px; }
+  .q.challenge .q-source { background: #fef5e7; color: #744210; font-weight: 700; }
+  .q-stem { font-weight: 600; margin: 6px 0; font-size: 11pt; }
   .q-stem strong { color: #d64545; }
   .opts { list-style: none; padding: 0; margin: 6px 0; }
-  .opts li {
-    padding: 4px 8px 4px 30px;
-    position: relative;
-    font-size: 10.5pt;
-    margin: 3px 0;
-  }
-  .opts li .letter {
-    position: absolute;
-    left: 6px;
-    font-weight: 700;
-    color: #5a6978;
-  }
-  .opts li.correct {
-    background: #c6f6d5;
-    border-left: 3px solid #2e8b57;
-    border-radius: 3px;
-  }
-  .opts li.correct .letter { color: #22543d; }
-  .opts li.correct::after {
-    content: " ✓ 正解";
-    color: #22543d;
-    font-weight: 700;
-    font-size: 9pt;
-  }
-  .explain {
-    background: #f7fafc;
-    border-left: 3px solid #2b6cb0;
-    padding: 8px 12px;
-    font-size: 10pt;
-    margin-top: 8px;
-    line-height: 1.7;
-  }
-  .explain-label {
-    font-weight: 700;
-    color: #2b6cb0;
-  }
-  footer {
-    margin-top: 30px;
-    padding-top: 10px;
-    border-top: 1px solid #d7dce5;
-    font-size: 9pt;
-    color: #5a6978;
-    text-align: center;
-  }
-  .print-btn {
-    background: #2b6cb0;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-size: 13pt;
-    cursor: pointer;
-    font-weight: 700;
-    font-family: inherit;
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  }
-  @media print {
-    .print-btn { display: none; }
-    body { padding: 0; }
-  }
+  .opts li { padding: 4px 8px 4px 30px; position: relative; font-size: 10.5pt; margin: 3px 0; }
+  .opts li .letter { position: absolute; left: 6px; font-weight: 700; color: #5a6978; }
+  .opts li.correct { background: #c6f6d5; border-left: 3px solid #2e8b57; border-radius: 3px; }
+  .opts li.correct::after { content: " \\2713  正解"; color: #22543d; font-weight: 700; font-size: 9pt; }
+  .opts li.wrong { background: #fed7d7; border-left: 3px solid #e09f3e; border-radius: 3px; }
+  .opts li.wrong::after { content: " \\2717  あなたの回答"; color: #d64545; font-weight: 700; font-size: 9pt; }
+  .explain { background: #f7fafc; border-left: 3px solid #2b6cb0; padding: 8px 12px; font-size: 10pt; margin-top: 8px; line-height: 1.7; }
+  .explain-label { font-weight: 700; color: #2b6cb0; }
+  .challenge-section { background: #fffaf0; border: 2px dashed #e09f3e; padding: 12px 16px; margin: 20px 0 14px 0; border-radius: 6px; text-align: left; }
+  .challenge-section h2 { color: #744210; font-size: 13pt; margin: 0 0 6px 0; }
+  .challenge-section p { font-size: 10pt; margin: 4px 0; }
+  footer { margin-top: 30px; padding-top: 10px; border-top: 1px solid #d7dce5; font-size: 9pt; color: #5a6978; text-align: center; }
+  .print-btn { background: #2b6cb0; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 13pt; cursor: pointer; font-weight: 700; font-family: inherit; position: fixed; top: 20px; right: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+  @media print { .print-btn { display: none; } }
 </style>
 </head>
 <body>
 
-<button class="print-btn" onclick="window.print()">🖨️ 印刷 / PDF として保存</button>
+<button class="print-btn" onclick="window.print()">印刷 / PDF として保存</button>
 
-<header>
-  <h1>分子生物学 第1回 — 復習クイズ</h1>
-  <div class="meta">
-    出題 13 問（基本 6 + <i>Genomes 5</i> 章末 4 + 国試チャレンジ 3）&nbsp; · &nbsp;
-    出力日: ${date}&nbsp; · &nbsp;
-    https://kpdbcdt.github.io/molbio-lectures-FY2026/lec01/
-  </div>
-</header>
-
-<div class="intro">
-  <strong>使い方</strong>: 問1-10 は講義内容の必須問題、問11-13 は薬剤師国試過去問を改変した発展問題（解けなくて OK、チャレンジ）です。
-  解説を読んで理解度を確認しましょう。解答は各問題の直下に緑で示してあります。
+<div class="cert-box">
+  <div class="cert-title">分子生物学 復習クイズ修了証</div>
+  <div class="cert-sub">第1回: ゲノムと遺伝情報の基盤</div>
+  <div class="cert-field"><span class="label">学籍番号</span><br><span class="value">${studentId}</span></div>
+  <div class="cert-score">${score} / ${total}</div>
+  <div class="cert-field"><span class="label">合格基準: ${Math.ceil(total * PASS_THRESHOLD)}問以上</span></div>
+  <div class="cert-field"><span class="label">出力日時</span><br>${datetime}</div>
+  <div class="cert-code"><span class="label">検証コード</span><br>${verCode}</div>
 </div>
+
+<hr>
+<h2 style="text-align:center; color:#1a4a80;">問題・回答・解説</h2>
 `;
 
   let challengeBannerShown = false;
@@ -1613,13 +1560,12 @@ document.getElementById('quiz-pdf').addEventListener('click', () => {
       html += `
 <div class="challenge-section">
   <h2>🏆 ここから国試チャレンジ問題（発展）</h2>
-  <p>以下の問題は薬剤師国家試験の過去問を一部改変したものです。Lec01 の内容を超える発展的なトピック
-  （クロマチン構造、ヒストン、トポイソメラーゼ、テロメア等）が含まれます。今の段階では「解けなくても OK」。
-  解説を読んで「こんな問題が国試で出るんだ」と知っておくだけで十分です。</p>
+  <p>以下は薬剤師国家試験の過去問を一部改変した発展問題です。</p>
 </div>
 `;
       challengeBannerShown = true;
     }
+    const studentAnswer = quizState.answered[qi];
     html += `
 <div class="q${q.challenge ? ' challenge' : ''}">
   <div class="q-header">
@@ -1631,19 +1577,20 @@ document.getElementById('quiz-pdf').addEventListener('click', () => {
   <ul class="opts">
 `;
     q.options.forEach((opt, oi) => {
-      const isCorrect = oi === q.correct;
-      html += `    <li class="${isCorrect ? 'correct' : ''}"><span class="letter">${LETTERS[oi]})</span>${opt}</li>\n`;
+      let cls = '';
+      if (oi === q.correct) cls = 'correct';
+      else if (oi === studentAnswer && studentAnswer !== q.correct) cls = 'wrong';
+      html += `    <li class="${cls}"><span class="letter">${LETTERS[oi]})</span>${opt}</li>\n`;
     });
     html += `  </ul>
   <div class="explain"><span class="explain-label">解説:</span> ${q.explain}</div>
 </div>
 `;
   });
-
   html += `
 <footer>
   分子生物学 FY2026 · 慶應義塾大学薬学部 · 高橋大輔<br>
-  CC BY-NC 4.0 · https://github.com/kpdbcdt/molbio-lectures-FY2026
+  検証コード ${verCode} · 学籍番号 ${studentId} · ${datetime}
 </footer>
 
 </body>
@@ -1660,7 +1607,6 @@ document.getElementById('quiz-pdf').addEventListener('click', () => {
 });
 
 renderQuiz();
-loadQuizState();
 
 </script>
 </body>
