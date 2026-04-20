@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分子生物学 第5回 — Interactive Lab</title>
+<style>
+  :root {
+    --bg: #f7f9fc;
+    --card: #ffffff;
+    --border: #d7dce5;
+    --ink: #1a2633;
+    --muted: #5a6978;
+    --primary: #2b6cb0;
+    --accent: #d64545;
+    --ok: #2e8b57;
+    --warn: #e09f3e;
+    --mono: 'SF Mono', 'Consolas', 'Menlo', monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { max-width: 100%; overflow-x: hidden; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+  }
+  header {
+    background: linear-gradient(135deg, #2b6cb0 0%, #1a4a80 100%);
+    color: white;
+    padding: 20px 28px;
+  }
+  header h1 { margin: 0 0 4px 0; font-size: 22px; }
+  header p { margin: 0; opacity: 0.9; font-size: 14px; }
+
+  /* Layout: sidebar + content */
+  .layout {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    min-height: calc(100vh - 82px);
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    aside.sidebar { display: none; }
+  }
+  aside.sidebar {
+    background: #1a2633;
+    color: #cbd5e0;
+    padding: 18px 0;
+    border-right: 1px solid #0f1923;
+  }
+  aside.sidebar h3 {
+    font-size: 11px;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 10px 0;
+    padding: 0 20px;
+    font-weight: 600;
+  }
+  aside.sidebar ul { list-style: none; padding: 0; margin: 0 0 20px 0; }
+  aside.sidebar li a {
+    display: block;
+    padding: 10px 20px 10px 24px;
+    color: #a0aec0;
+    text-decoration: none;
+    font-size: 13px;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+  }
+  aside.sidebar li a:hover:not(.disabled) {
+    background: #2d3748;
+    color: white;
+    border-left-color: #4a90d9;
+  }
+  aside.sidebar li a.active {
+    background: #2b4a6f;
+    color: white;
+    border-left-color: #4a90d9;
+    font-weight: 600;
+  }
+  aside.sidebar li a.disabled {
+    color: #4a5568;
+    cursor: not-allowed;
+    font-style: italic;
+  }
+  aside.sidebar li a .lec-num {
+    display: inline-block;
+    width: 38px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #718096;
+  }
+  aside.sidebar li a.active .lec-num { color: #a0c4ea; }
+  aside.sidebar li a .soon-badge {
+    float: right;
+    background: #2d3748;
+    color: #718096;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+  }
+  .content { background: var(--bg); min-width: 0; overflow-x: hidden; }
+  nav.tabs {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 0 16px;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+  }
+  nav.tabs button {
+    background: none;
+    border: none;
+    padding: 14px 18px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+  nav.tabs button:hover { color: var(--primary); }
+  nav.tabs button.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+  }
+  main { padding: 24px; max-width: 1100px; margin: 0 auto; min-width: 0; overflow-x: hidden; }
+  .tab { display: none; }
+  .tab.active { display: block; animation: fadeIn 0.25s; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  h2 { margin-top: 0; font-size: 20px; color: var(--ink); }
+  .lead { color: var(--muted); margin-bottom: 20px; font-size: 14px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    margin-right: 8px;
+    margin-top: 8px;
+  }
+  .btn:hover { opacity: 0.9; }
+  .btn.secondary { background: #6c757d; }
+  .hint {
+    background: #fffaf0;
+    border-left: 3px solid var(--warn);
+    padding: 10px 14px;
+    margin-top: 12px;
+    font-size: 13px;
+    color: #744210;
+  }
+
+  /* Chromatin Compaction */
+  .compact-levels { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
+  .compact-level {
+    display: grid;
+    grid-template-columns: 44px 1fr 100px 80px;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    background: white;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .compact-level:first-child { border-radius: 8px 8px 0 0; }
+  .compact-level:last-child { border-bottom: 1px solid var(--border); border-radius: 0 0 8px 8px; }
+  .compact-level:hover { background: #f0f7ff; }
+  .compact-level.active { background: #e6f0ff; border-color: var(--primary); }
+  .compact-level .level-icon { font-size: 28px; text-align: center; }
+  .compact-level .level-info h4 { margin: 0 0 2px 0; font-size: 14px; }
+  .compact-level .level-info p { margin: 0; font-size: 12px; color: var(--muted); }
+  .compact-level .level-diameter { font-family: var(--mono); font-weight: 700; font-size: 14px; color: var(--primary); text-align: center; }
+  .compact-level .level-ratio { font-family: var(--mono); font-size: 12px; color: var(--muted); text-align: center; }
+  @media (max-width: 720px) {
+    .compact-level { grid-template-columns: 36px 1fr; }
+    .compact-level .level-diameter, .compact-level .level-ratio { display: none; }
+  }
+  .compact-detail {
+    background: linear-gradient(135deg, #f0f7ff, #fff);
+    border: 2px solid var(--primary);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 16px;
+  }
+  .compact-detail h3 { margin: 0 0 10px 0; color: var(--primary); font-size: 18px; }
+  .compact-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 14px 0; }
+  .compact-stat { background: white; border: 1px solid var(--border); padding: 12px; border-radius: 6px; text-align: center; }
+  .compact-stat .v { font-size: 18px; font-weight: 700; color: var(--primary); font-family: var(--mono); }
+  .compact-stat .l { font-size: 11px; color: var(--muted); }
+  .compact-bar-wrap { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-top: 14px; overflow-x: auto; }
+
+  /* Genome Composition */
+  .genome-chart-wrap { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
+  .genome-legend { flex: 1; min-width: 260px; }
+  .genome-legend-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 6px; cursor: pointer;
+    border: 1.5px solid transparent; transition: all 0.15s;
+    margin-bottom: 4px;
+  }
+  .genome-legend-item:hover { background: #f0f7ff; }
+  .genome-legend-item.active { border-color: var(--primary); background: #e6f0ff; }
+  .genome-legend-item .swatch { width: 16px; height: 16px; border-radius: 3px; flex-shrink: 0; }
+  .genome-legend-item .name { font-size: 13px; font-weight: 600; flex: 1; }
+  .genome-legend-item .pct { font-family: var(--mono); font-size: 13px; color: var(--primary); font-weight: 700; }
+  .genome-sub-detail {
+    background: #f7fafc; border: 1px solid var(--border); border-radius: 6px;
+    padding: 14px; margin-top: 8px; font-size: 13px;
+  }
+  .organism-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px; }
+  .organism-card { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 14px; text-align: center; }
+  .organism-card h4 { margin: 0 0 6px 0; font-size: 14px; }
+  .organism-card .stat { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--primary); }
+  .organism-card .desc { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* Gene Architecture */
+  .gene-svg-wrap { overflow-x: auto; background: #fafbfc; border: 1px solid var(--border); border-radius: 8px; padding: 16px 8px; }
+  .gene-toggles { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .gene-toggles button {
+    background: white; border: 1.5px solid var(--border); padding: 6px 14px;
+    border-radius: 18px; cursor: pointer; font-size: 12px; font-family: inherit; font-weight: 600; color: var(--muted);
+  }
+  .gene-toggles button.active { background: var(--primary); color: white; border-color: var(--primary); }
+  .splice-demo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+  @media (max-width: 820px) { .splice-demo { grid-template-columns: 1fr; } }
+  .splice-panel { background: white; border: 2px solid var(--border); border-radius: 10px; padding: 16px; }
+  .splice-panel h4 { margin: 0 0 8px 0; font-size: 14px; }
+  .splice-panel .product { font-family: var(--mono); font-size: 13px; color: var(--primary); padding: 8px; background: #f0f7ff; border-radius: 6px; margin-top: 8px; }
+
+  /* Quiz */
+  .quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #2b6cb0, #4a90d9);
+    color: white;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  .quiz-header .score-big { font-size: 28px; font-weight: 700; font-family: var(--mono); }
+  .quiz-header .score-lbl { font-size: 12px; opacity: 0.85; }
+  .quiz-header .progress-txt { font-size: 13px; opacity: 0.9; }
+  .q-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .q-card.answered.correct { border-color: var(--ok); background: #f0fff4; }
+  .q-card.answered.incorrect { border-color: var(--accent); background: #fffafa; }
+  .q-num {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .q-card.answered.correct .q-num { background: var(--ok); }
+  .q-card.answered.incorrect .q-num { background: var(--accent); }
+  .q-source {
+    display: inline-block;
+    background: #edf2f7;
+    color: var(--muted);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    margin-left: 8px;
+  }
+  .q-challenge {
+    display: inline-block;
+    background: linear-gradient(135deg, #e09f3e, #d4891c);
+    color: white;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-left: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .q-card.challenge { border-left: 4px solid #e09f3e; background: linear-gradient(to right, #fffaf0 0%, white 60px); }
+  .q-card.challenge.answered.correct { background: #f0fff4; }
+  .q-card.challenge.answered.incorrect { background: #fffafa; }
+  .challenge-banner {
+    background: linear-gradient(135deg, #fffaf0, #fef5e7);
+    border: 2px dashed #e09f3e;
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin: 20px 0 16px 0;
+  }
+  .challenge-banner h3 { margin: 0 0 4px 0; font-size: 15px; color: #744210; }
+  .challenge-banner p { margin: 0; font-size: 12px; color: #744210; line-height: 1.6; }
+  .q-stem { font-size: 15px; font-weight: 500; margin: 8px 0 14px 0; }
+  .q-stem strong { color: var(--accent); }
+  .q-opts { display: flex; flex-direction: column; gap: 8px; }
+  .q-opt {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.15s;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .q-opt:hover:not(:disabled) { border-color: var(--primary); background: #f0f7ff; }
+  .q-opt .opt-letter {
+    flex-shrink: 0;
+    width: 24px; height: 24px;
+    border: 1.5px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .q-opt .opt-text { flex: 1; }
+  .q-opt:disabled { cursor: default; }
+  .q-opt.correct { background: #c6f6d5; border-color: var(--ok); }
+  .q-opt.correct .opt-letter { background: var(--ok); color: white; border-color: var(--ok); }
+  .q-opt.wrong { background: #fed7d7; border-color: var(--accent); }
+  .q-opt.wrong .opt-letter { background: var(--accent); color: white; border-color: var(--accent); }
+  .q-opt.revealed.correct-answer { background: #e6fffa; border-color: var(--ok); border-style: dashed; }
+  .q-explain {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: #f7fafc;
+    border-left: 3px solid var(--primary);
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 1.7;
+    display: none;
+  }
+  .q-card.answered .q-explain { display: block; }
+  .q-explain strong { color: var(--ink); }
+  .quiz-finish {
+    background: linear-gradient(135deg, #2e8b57, #38a169);
+    color: white;
+    padding: 24px;
+    border-radius: 8px;
+    text-align: center;
+    margin-top: 20px;
+    display: none;
+  }
+  .quiz-finish.shown { display: block; }
+  .quiz-finish h3 { margin: 0 0 8px 0; font-size: 22px; }
+  .quiz-finish .final-score { font-size: 40px; font-weight: 700; font-family: var(--mono); margin: 8px 0; }
+  .quiz-finish.low { background: linear-gradient(135deg, #e09f3e, #d4891c); }
+
+  footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--muted);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧬 分子生物学 Interactive Lab</h1>
+  <p>FY2026 · 慶應義塾大学薬学部 · 高橋大輔</p>
+</header>
+
+<div class="layout">
+
+<aside class="sidebar">
+  <h3>講義一覧</h3>
+  <ul>
+    <li><a href="../lec01/"><span class="lec-num">Lec 01</span>概論・遺伝情報を担う分子</a></li>
+    <li><a href="../lec02/"><span class="lec-num">Lec 02</span>化学的基盤</a></li>
+    <li><a href="../lec03/"><span class="lec-num">Lec 03</span>染色体とゲノム</a></li>
+    <li><a href="../lec04/"><span class="lec-num">Lec 04</span>DNA 複製・修復</a></li>
+    <li><a href="../lec05/" class="active"><span class="lec-num">Lec 05</span>転写</a></li>
+    <li><a href="../lec06/"><span class="lec-num">Lec 06</span>転写調節・RNA プロセシング</a></li>
+    <li><a href="../lec07/"><span class="lec-num">Lec 07</span>翻訳と翻訳後修飾</a></li>
+    <li><a href="../lec08/"><span class="lec-num">Lec 08</span>組換え DNA とゲノム編集</a></li>
+  </ul>
+  <h3>Lec05 リソース</h3>
+  <ul>
+    <li><a href="#" class="disabled"><span class="lec-num">📄</span>講義スライド (PDF)<span class="soon-badge">TBD</span></a></li>
+    <li><a href="#" class="disabled"><span class="lec-num">📓</span>NotebookLM<span class="soon-badge">TBD</span></a></li>
+  </ul>
+</aside>
+
+<div class="content">
+
+<div style="padding: 16px 24px 0 24px; border-bottom: 1px solid var(--border); background: white;">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap;">
+    <div>
+      <div style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">LEC 05 · 2026-05-07</div>
+      <h2 style="margin: 0 0 4px 0; font-size: 20px;">転写</h2>
+      <p style="margin: 0 0 12px 0; color: var(--muted); font-size: 13px;">12 問の復習クイズで転写の基本と調節機構を確認</p>
+    </div>
+    <div style="margin: 8px 0; display:flex; gap:10px; flex-wrap:wrap;">
+      <a href="#" onclick="return false;"
+         style="display:inline-flex; align-items:center; gap:8px; background:#999; color:white; padding:10px 18px; border-radius:8px; text-decoration:none; font-weight:600; font-size:14px; box-shadow:0 2px 6px rgba(0,0,0,0.15); cursor:default;">
+        📄 講義スライド (PDF)
+      </a>
+      <a href="#" onclick="return false;"
+         style="display:inline-flex; align-items:center; gap:8px; background:#999; color:white; padding:10px 18px; border-radius:8px; text-decoration:none; font-weight:600; font-size:14px; box-shadow:0 2px 6px rgba(0,0,0,0.15); cursor:default;">
+        📓 NotebookLM
+      </a>
+    </div>
+  </div>
+</div>
+
+<nav class="tabs">
+  <button data-tab="overview" class="active">📚 学習ポイント</button>
+  <button data-tab="quiz">✅ Quiz (12問)</button>
+</nav>
+
+<main>
+
+<!-- ============ TAB 1: CHROMATIN COMPACTION ============ -->
+<section id="overview" class="tab active">
+  <h2>📚 第5回 学習ポイント</h2>
+  <p class="lead">このセッションでは <strong>転写</strong> の中核概念を扱う。<br>
+    右上の「✅ Quiz (12問)」タブから復習クイズに挑戦できる。再度試験対応として、12 問中 10 問以上正解で修了証 PDF を発行する。</p>
+
+  <div class="card">
+    <h3 style="margin-top:0;">📖 このクイズについて</h3>
+    <ul style="line-height:1.9;">
+      <li><strong>全 12 問</strong>: 9 基本問題 + 3 国試チャレンジ問題 (発展)</li>
+      <li><strong>合格基準</strong>: 10/12 (約 80%)</li>
+      <li><strong>修了証</strong>: 合格時に学籍番号と検証コード付き PDF を発行</li>
+      <li><strong>選択肢シャッフル</strong>: クイズをリセットすると選択肢の順番がランダムに変わる</li>
+      <li><strong>解説</strong>: 正解時に詳細解説、不正解時は解説なしで再挑戦可能</li>
+    </ul>
+  </div>
+
+  <div class="card" style="background:#f0f7ff; border-color:#4a90d9;">
+    <h3 style="margin-top:0; font-size:16px; color:#1a4a80;">🎯 学習のコツ</h3>
+    <ul style="font-size:13px; line-height:1.9; margin:6px 0;">
+      <li>まず講義スライド PDF と NotebookLM で内容を復習してから、クイズに挑戦</li>
+      <li>不正解の問題は、解説を見ずに教科書・講義ノートに戻って理解し直す</li>
+      <li>全問正解を目指して 2-3 回繰り返す (選択肢がシャッフルされるので暗記は効かない)</li>
+    </ul>
+  </div>
+
+  <div class="hint">
+    💡 <strong>再度試験対応</strong>: このクイズは再度試験の受験準備ツールとしても使用されます。12 問中 10 問以上正解で修了証が発行され、学籍番号と SHA-256 ハッシュによる検証コードで偽造防止しています。
+  </div>
+</section>
+
+<section id="quiz" class="tab">
+  <h2>✅ 復習クイズ (12 問)</h2>
+  <p class="lead">各問題の選択肢をクリックすると、その場で正解・解説が表示されます。
+    <br>
+    📘 <strong>問1-9</strong>: 基本問題 (染色体構造・ゲノム・遺伝子)<br>
+    🏆 <strong>問10-12</strong>: 薬剤師国試改変 (<strong>発展・チャレンジ</strong>)</p>
+
+  <div class="quiz-header">
+    <div>
+      <div class="progress-txt" id="quiz-progress">0 / 12 問回答済み</div>
+    </div>
+    <div style="text-align:right;">
+      <div class="score-big" id="quiz-score">0 / 0</div>
+      <div class="score-lbl">正答数 / 回答済</div>
+    </div>
+  </div>
+
+  <div id="quiz-list"></div>
+
+  <div class="quiz-finish" id="quiz-finish">
+    <h3 id="quiz-finish-title">結果</h3>
+    <div class="final-score" id="quiz-finish-score">0 / 12</div>
+    <div id="quiz-finish-msg"></div>
+  </div>
+
+  <div id="quiz-cert-section" style="display:none; margin-top:16px; padding:16px; background:#f7fafc; border:2px solid var(--ok); border-radius:8px;">
+    <h4 style="margin:0 0 8px 0; color:var(--ok);">📜 修了証の発行</h4>
+    <p style="font-size:13px; margin:0 0 10px 0;">学籍番号を入力して修了証PDFを出力してください。再度試験の事前課題として K-LMS に提出します。</p>
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <input type="text" id="cert-student-id" placeholder="学籍番号（例: 25-2-001）" style="padding:8px 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; width:200px;">
+      <button class="btn" id="quiz-pdf" style="background:#2e8b57;">📜 修了証 PDF を出力</button>
+    </div>
+    <p id="cert-error" style="color:var(--accent); font-size:12px; margin:6px 0 0 0; display:none;">学籍番号を入力してください。</p>
+  </div>
+
+  <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+    <button class="btn secondary" id="quiz-reset">🔄 クイズをリセット</button>
+  </div>
+  <p style="font-size:12px; color:var(--muted); margin-top:8px;">
+    💡 合格基準: 12問中10問以上正解で修了証を発行できます。不合格の場合はリセットして再挑戦してください（選択肢の順番が毎回変わります）。
+  </p>
+</section>
+
+</main>
+
+</div> <!-- /.content -->
+</div> <!-- /.layout -->
+
+<footer>
+  分子生物学 第5回 Interactive Lab · FY2026 · Keio University Faculty of Pharmacy<br>
+  Static HTML, no tracking, no server-side state. localStorage に進捗が保存されます。
+</footer>
+
+<script>
+'use strict';
+
+/* ========== Sidebar disabled links ========== */
+document.querySelectorAll('aside.sidebar a.disabled').forEach(a => {
+  a.addEventListener('click', e => e.preventDefault());
+});
+
+/* ========== Tab switching ========== */
+document.querySelectorAll('nav.tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ========== 1. Chromatin Compaction Calculator ========== */
+const COMPACTION_LEVELS = [
+  {
+    id: 'naked', icon: '〰️', name: '裸の DNA', nameEn: 'Naked DNA',
+    diameter: '2 nm', ratio: '1x', color: '#e53e3e',
+    proteins: 'なし (B-form DNA 二重らせん)',
+    desc: 'B 型 DNA 二重らせん。直径 2 nm、10.5 bp/回転、ピッチ 3.4 nm。ヒトゲノム全長は約 2 m。',
+    lengthFactor: 1.0 // 0.34 nm/bp
+  },
+  {
+    id: 'nucleosome', icon: '🔵', name: 'ヌクレオソーム', nameEn: 'Nucleosome (beads-on-a-string)',
+    diameter: '11 nm', ratio: '~7x', color: '#2b6cb0',
+    proteins: 'コアヒストン八量体 (H2A, H2B, H3, H4 各2分子) + リンカーヒストン H1',
+    desc: 'DNA が 146 bp ずつコアヒストン八量体に約 1.67 回巻きつく。リンカー DNA (~50 bp) を挟んで「数珠つなぎ」構造。CENP-A (H3 バリアント) はセントロメアに局在。',
+    lengthFactor: 1/7
+  },
+  {
+    id: 'fiber30', icon: '🟢', name: '30 nm ファイバー', nameEn: '30 nm Fiber',
+    diameter: '30 nm', ratio: '~40x', color: '#2e8b57',
+    proteins: 'ヒストン H1 (リンカーヒストン) がヌクレオソームを束ねる',
+    desc: 'ヌクレオソームが密に折り畳まれる。ソレノイドモデル (6個/回転) とジグザグモデルの2つが提唱。in vivo での存在は議論中。H1 のリン酸化で弛緩/凝縮を制御。',
+    lengthFactor: 1/40
+  },
+  {
+    id: 'loop', icon: '🟡', name: 'ループドメイン', nameEn: 'Loop Domain',
+    diameter: '300 nm', ratio: '~1,000x', color: '#e09f3e',
+    proteins: 'コンデンシン、コヒーシン、CTCF、非ヒストンスキャフォールドタンパク質',
+    desc: '30 nm ファイバーが 40-90 kb のループを形成し、タンパク質性の骨格 (スキャフォールド) に付着。トポロジカル関連ドメイン (TAD) として遺伝子発現の単位を構成。',
+    lengthFactor: 1/1000
+  },
+  {
+    id: 'metaphase', icon: '🔴', name: 'メタフェーズ染色体', nameEn: 'Metaphase Chromosome',
+    diameter: '1,400 nm', ratio: '~10,000x', color: '#d64545',
+    proteins: 'コンデンシン I/II (ATP 依存性) + トポイソメラーゼ II',
+    desc: '最大凝縮状態。有糸分裂時のみ出現。セントロメア (動原体)、テロメア (TTAGGG 反復)、複製起点を含む。ヒトゲノム 2 m の DNA が 46 本の染色体に収まる。',
+    lengthFactor: 1/10000
+  }
+];
+
+let selectedLevel = 0;
+
+function renderCompaction() {
+  const genomeMbp = parseFloat(document.getElementById('genome-size').value) || 3200;
+  const totalBp = genomeMbp * 1e6;
+  const nakedLengthM = totalBp * 0.34e-9; // 0.34 nm/bp in meters
+
+  const container = document.getElementById('compact-levels');
+  container.innerHTML = '';
+  COMPACTION_LEVELS.forEach((lv, i) => {
+    const div = document.createElement('div');
+    div.className = 'compact-level' + (i === selectedLevel ? ' active' : '');
+    div.innerHTML = `
+      <div class="level-icon">${lv.icon}</div>
+      <div class="level-info">
+        <h4>${lv.name} <span style="font-size:11px; color:var(--muted); font-weight:400;">(${lv.nameEn})</span></h4>
+        <p>${lv.proteins}</p>
+      </div>
+      <div class="level-diameter">${lv.diameter}</div>
+      <div class="level-ratio">${lv.ratio}</div>
+    `;
+    div.addEventListener('click', () => {
+      selectedLevel = i;
+      renderCompaction();
+    });
+    container.appendChild(div);
+  });
+
+  // Detail panel
+  const lv = COMPACTION_LEVELS[selectedLevel];
+  const lengthM = nakedLengthM * lv.lengthFactor;
+  const detail = document.getElementById('compact-detail');
+  let lengthStr;
+  if (lengthM >= 1) lengthStr = lengthM.toFixed(2) + ' m';
+  else if (lengthM >= 0.001) lengthStr = (lengthM * 1000).toFixed(1) + ' mm';
+  else if (lengthM >= 1e-6) lengthStr = (lengthM * 1e6).toFixed(1) + ' \u00B5m';
+  else lengthStr = (lengthM * 1e9).toFixed(0) + ' nm';
+
+  detail.innerHTML = `
+    <div class="compact-detail">
+      <h3>${lv.icon} ${lv.name}</h3>
+      <p style="font-size:13px;">${lv.desc}</p>
+      <div class="compact-stats">
+        <div class="compact-stat"><div class="v">${lv.diameter}</div><div class="l">直径</div></div>
+        <div class="compact-stat"><div class="v">${lv.ratio}</div><div class="l">圧縮率</div></div>
+        <div class="compact-stat"><div class="v">${lengthStr}</div><div class="l">DNA 全長 (${genomeMbp} Mbp)</div></div>
+        <div class="compact-stat"><div class="v">${nakedLengthM.toFixed(2)} m</div><div class="l">裸の DNA 全長</div></div>
+      </div>
+    </div>
+  `;
+
+  // Step bar diagram
+  renderCompactionBar();
+}
+
+function renderCompactionBar() {
+  const svg = document.getElementById('compaction-bar');
+  const ns = 'http://www.w3.org/2000/svg';
+  svg.innerHTML = '';
+  const W = 800, H = 120;
+  const n = COMPACTION_LEVELS.length;
+  const barH = 40;
+  const barY = 50;
+  const gap = 12;
+  const totalGap = gap * (n - 1);
+  const barW = (W - 60 - totalGap) / n;
+
+  COMPACTION_LEVELS.forEach((lv, i) => {
+    const x = 30 + i * (barW + gap);
+    // bar
+    const rect = document.createElementNS(ns, 'rect');
+    rect.setAttribute('x', x);
+    rect.setAttribute('y', barY);
+    rect.setAttribute('width', barW);
+    rect.setAttribute('height', barH);
+    rect.setAttribute('rx', 6);
+    rect.setAttribute('fill', lv.color);
+    rect.setAttribute('opacity', i === selectedLevel ? '1' : '0.4');
+    svg.appendChild(rect);
+    // diameter label
+    const txt1 = document.createElementNS(ns, 'text');
+    txt1.setAttribute('x', x + barW / 2);
+    txt1.setAttribute('y', barY + barH / 2 + 4);
+    txt1.setAttribute('text-anchor', 'middle');
+    txt1.setAttribute('fill', 'white');
+    txt1.setAttribute('font-size', '12');
+    txt1.setAttribute('font-weight', '700');
+    txt1.textContent = lv.diameter;
+    svg.appendChild(txt1);
+    // name below
+    const txt2 = document.createElementNS(ns, 'text');
+    txt2.setAttribute('x', x + barW / 2);
+    txt2.setAttribute('y', barY + barH + 18);
+    txt2.setAttribute('text-anchor', 'middle');
+    txt2.setAttribute('fill', '#1a2633');
+    txt2.setAttribute('font-size', '10');
+    txt2.textContent = lv.name;
+    svg.appendChild(txt2);
+    // ratio above
+    const txt3 = document.createElementNS(ns, 'text');
+    txt3.setAttribute('x', x + barW / 2);
+    txt3.setAttribute('y', barY - 8);
+    txt3.setAttribute('text-anchor', 'middle');
+    txt3.setAttribute('fill', lv.color);
+    txt3.setAttribute('font-size', '11');
+    txt3.setAttribute('font-weight', '700');
+    txt3.textContent = lv.ratio;
+    svg.appendChild(txt3);
+    // arrow between bars
+    if (i < n - 1) {
+      const arrX = x + barW + 2;
+      const arr = document.createElementNS(ns, 'text');
+      arr.setAttribute('x', arrX + gap / 2);
+      arr.setAttribute('y', barY + barH / 2 + 5);
+      arr.setAttribute('text-anchor', 'middle');
+      arr.setAttribute('fill', '#718096');
+      arr.setAttribute('font-size', '16');
+      arr.textContent = '\u2192';
+      svg.appendChild(arr);
+    }
+  });
+  // Title
+  const title = document.createElementNS(ns, 'text');
+  title.setAttribute('x', W / 2);
+  title.setAttribute('y', 16);
+  title.setAttribute('text-anchor', 'middle');
+  title.setAttribute('fill', '#1a4a80');
+  title.setAttribute('font-size', '13');
+  title.setAttribute('font-weight', '700');
+  title.textContent = 'DNA \u2192 ヌクレオソーム \u2192 30nm \u2192 ループ \u2192 メタフェーズ';
+  svg.appendChild(title);
+}
+
+document.getElementById('genome-size').addEventListener('input', renderCompaction);
+renderCompaction();
+
+/* ========== 2. Genome Composition Explorer ========== */
+const GENOME_SEGMENTS = [
+  { id: 'exon', name: 'エキソン (コーディング)', pct: 1.5, color: '#2b6cb0',
+    detail: 'タンパク質をコードする領域。ヒトゲノムのわずか ~1.5%。20,442 遺伝子 → 選択的スプライシングで 78,120 種のタンパク質。' },
+  { id: 'intron', name: 'イントロン', pct: 25, color: '#4a90d9',
+    detail: '遺伝子内の非コーディング領域。スプライシングで除去される。制御配列 (スプライシングエンハンサー/サイレンサー) を含む。ジストロフィン遺伝子では 99.4% がイントロン。' },
+  { id: 'intergenic', name: '遺伝子間領域', pct: 25, color: '#68d391',
+    detail: '遺伝子と遺伝子の間の領域。エンハンサー、サイレンサー、インスレーター、lncRNA 遺伝子を含む。かつては "junk DNA" と呼ばれたが、ENCODE プロジェクトで多くに生化学的機能があることが判明。' },
+  { id: 'repeat', name: '反復配列', pct: 45, color: '#e09f3e',
+    detail: 'トランスポゾン由来の反復配列が約 45%。LINE (~20%), SINE (~13%), LTR レトロトランスポゾン (~8%), DNA トランスポゾン (~3%)。ゲノム進化の原動力。',
+    sub: [
+      { name: 'LINE (L1 等)', pct: 20, color: '#d4891c' },
+      { name: 'SINE (Alu 等)', pct: 13, color: '#e09f3e' },
+      { name: 'LTR レトロトランスポゾン', pct: 8, color: '#f6c85f' },
+      { name: 'DNA トランスポゾン', pct: 3, color: '#fce588' },
+      { name: 'その他反復', pct: 1, color: '#fef3c7' }
+    ]
+  },
+  { id: 'other', name: 'その他 (ncRNA, テロメア等)', pct: 3.5, color: '#a0aec0',
+    detail: 'テロメア反復 (TTAGGG)、セントロメアのサテライト DNA、rRNA/tRNA/snRNA 遺伝子、マイクロサテライト、ncRNA (miRNA, lncRNA) など。' }
+];
+
+let activeSegment = null;
+
+function renderGenomeDonut() {
+  const svg = document.getElementById('genome-donut');
+  const ns = 'http://www.w3.org/2000/svg';
+  svg.innerHTML = '';
+  const cx = 150, cy = 150, R = 120, r = 70;
+  let startAngle = -Math.PI / 2;
+
+  GENOME_SEGMENTS.forEach((seg, i) => {
+    const angle = (seg.pct / 100) * 2 * Math.PI;
+    const endAngle = startAngle + angle;
+    const midAngle = startAngle + angle / 2;
+    const largeArc = angle > Math.PI ? 1 : 0;
+
+    const x1o = cx + R * Math.cos(startAngle);
+    const y1o = cy + R * Math.sin(startAngle);
+    const x2o = cx + R * Math.cos(endAngle);
+    const y2o = cy + R * Math.sin(endAngle);
+    const x1i = cx + r * Math.cos(endAngle);
+    const y1i = cy + r * Math.sin(endAngle);
+    const x2i = cx + r * Math.cos(startAngle);
+    const y2i = cy + r * Math.sin(startAngle);
+
+    const d = `M ${x1o} ${y1o} A ${R} ${R} 0 ${largeArc} 1 ${x2o} ${y2o} L ${x1i} ${y1i} A ${r} ${r} 0 ${largeArc} 0 ${x2i} ${y2i} Z`;
+    const path = document.createElementNS(ns, 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('fill', seg.color);
+    path.setAttribute('stroke', 'white');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('opacity', activeSegment === null || activeSegment === i ? '1' : '0.3');
+    path.style.cursor = 'pointer';
+    path.style.transition = 'opacity 0.2s';
+    path.addEventListener('click', () => {
+      activeSegment = activeSegment === i ? null : i;
+      renderGenomeDonut();
+      renderGenomeLegend();
+      renderGenomeSubDetail();
+    });
+    svg.appendChild(path);
+
+    // Label on larger segments
+    if (seg.pct >= 10) {
+      const labelR = (R + r) / 2;
+      const lx = cx + labelR * Math.cos(midAngle);
+      const ly = cy + labelR * Math.sin(midAngle);
+      const txt = document.createElementNS(ns, 'text');
+      txt.setAttribute('x', lx);
+      txt.setAttribute('y', ly + 4);
+      txt.setAttribute('text-anchor', 'middle');
+      txt.setAttribute('fill', 'white');
+      txt.setAttribute('font-size', '11');
+      txt.setAttribute('font-weight', '700');
+      txt.style.pointerEvents = 'none';
+      txt.textContent = seg.pct + '%';
+      svg.appendChild(txt);
+    }
+
+    startAngle = endAngle;
+  });
+}
+
+function renderGenomeLegend() {
+  const legend = document.getElementById('genome-legend');
+  legend.innerHTML = '';
+  GENOME_SEGMENTS.forEach((seg, i) => {
+    const div = document.createElement('div');
+    div.className = 'genome-legend-item' + (activeSegment === i ? ' active' : '');
+    div.innerHTML = `
+      <div class="swatch" style="background:${seg.color};"></div>
+      <div class="name">${seg.name}</div>
+      <div class="pct">${seg.pct}%</div>
+    `;
+    div.addEventListener('click', () => {
+      activeSegment = activeSegment === i ? null : i;
+      renderGenomeDonut();
+      renderGenomeLegend();
+      renderGenomeSubDetail();
+    });
+    legend.appendChild(div);
+  });
+}
+
+function renderGenomeSubDetail() {
+  const container = document.getElementById('genome-sub-detail');
+  if (activeSegment === null) { container.innerHTML = ''; return; }
+  const seg = GENOME_SEGMENTS[activeSegment];
+  let html = `<div class="genome-sub-detail"><strong>${seg.name}</strong> (${seg.pct}%)<br>${seg.detail}`;
+  if (seg.sub) {
+    html += '<div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">';
+    seg.sub.forEach(s => {
+      html += `<span style="display:inline-block; background:${s.color}; color:${s.pct > 5 ? 'white' : '#744210'}; padding:4px 10px; border-radius:14px; font-size:11px; font-weight:600;">${s.name}: ${s.pct}%</span>`;
+    });
+    html += '</div>';
+  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+renderGenomeDonut();
+renderGenomeLegend();
+
+/* ========== 3. Gene Architecture Visualizer ========== */
+const GENE_ELEMENTS = {
+  enhancer: true, promoter: true, utr5: true, exon: true, intron: true, utr3: true, polya: true
+};
+
+function renderGene() {
+  const svg = document.getElementById('gene-diagram');
+  const ns = 'http://www.w3.org/2000/svg';
+  svg.innerHTML = '';
+  const W = 900, H = 200;
+  const lineY = 100;
+
+  // Genomic line
+  const line = document.createElementNS(ns, 'line');
+  line.setAttribute('x1', 20); line.setAttribute('y1', lineY);
+  line.setAttribute('x2', W - 20); line.setAttribute('y2', lineY);
+  line.setAttribute('stroke', '#cbd5e0'); line.setAttribute('stroke-width', '2');
+  svg.appendChild(line);
+
+  // Direction arrow
+  const defs = document.createElementNS(ns, 'defs');
+  defs.innerHTML = `<marker id="genearrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><polygon points="0 0, 10 5, 0 10" fill="#2b6cb0"/></marker>`;
+  svg.appendChild(defs);
+  const arr = document.createElementNS(ns, 'line');
+  arr.setAttribute('x1', 120); arr.setAttribute('y1', 28);
+  arr.setAttribute('x2', 780); arr.setAttribute('y2', 28);
+  arr.setAttribute('stroke', '#2b6cb0'); arr.setAttribute('stroke-width', '2');
+  arr.setAttribute('marker-end', 'url(#genearrow)');
+  svg.appendChild(arr);
+  const arrLbl = document.createElementNS(ns, 'text');
+  arrLbl.setAttribute('x', 450); arrLbl.setAttribute('y', 22);
+  arrLbl.setAttribute('text-anchor', 'middle'); arrLbl.setAttribute('fill', '#2b6cb0');
+  arrLbl.setAttribute('font-size', '12'); arrLbl.setAttribute('font-weight', '700');
+  arrLbl.textContent = "5\u2032 \u2192 3\u2032 \u8EE2\u5199\u65B9\u5411";
+  svg.appendChild(arrLbl);
+
+  const elements = [];
+
+  // Enhancer (far upstream)
+  if (GENE_ELEMENTS.enhancer) {
+    elements.push({ x: 40, w: 60, y: lineY - 18, h: 36, color: '#805ad5', label: 'Enhancer', labelY: lineY + 38 });
+  }
+  // Promoter (TATA box)
+  if (GENE_ELEMENTS.promoter) {
+    elements.push({ x: 150, w: 50, y: lineY - 15, h: 30, color: '#d64545', label: 'Promoter\n(TATA box)', labelY: lineY + 38 });
+  }
+  // 5' UTR
+  if (GENE_ELEMENTS.utr5) {
+    elements.push({ x: 210, w: 40, y: lineY - 12, h: 24, color: '#a0aec0', label: "5\u2032 UTR", labelY: lineY - 22 });
+  }
+  // Exon 1
+  if (GENE_ELEMENTS.exon) {
+    elements.push({ x: 260, w: 55, y: lineY - 20, h: 40, color: '#2b6cb0', label: 'Exon 1', labelY: lineY - 28 });
+  }
+  // Intron 1
+  if (GENE_ELEMENTS.intron) {
+    elements.push({ x: 325, w: 80, y: lineY - 6, h: 12, color: '#e2e8f0', label: 'Intron 1', labelY: lineY + 30, labelColor: '#718096' });
+  }
+  // Exon 2
+  if (GENE_ELEMENTS.exon) {
+    elements.push({ x: 415, w: 55, y: lineY - 20, h: 40, color: '#2b6cb0', label: 'Exon 2', labelY: lineY - 28 });
+  }
+  // Intron 2
+  if (GENE_ELEMENTS.intron) {
+    elements.push({ x: 480, w: 80, y: lineY - 6, h: 12, color: '#e2e8f0', label: 'Intron 2', labelY: lineY + 30, labelColor: '#718096' });
+  }
+  // Exon 3
+  if (GENE_ELEMENTS.exon) {
+    elements.push({ x: 570, w: 55, y: lineY - 20, h: 40, color: '#2b6cb0', label: 'Exon 3', labelY: lineY - 28 });
+  }
+  // Intron 3
+  if (GENE_ELEMENTS.intron) {
+    elements.push({ x: 635, w: 60, y: lineY - 6, h: 12, color: '#e2e8f0', label: 'Intron 3', labelY: lineY + 30, labelColor: '#718096' });
+  }
+  // Exon 4
+  if (GENE_ELEMENTS.exon) {
+    elements.push({ x: 705, w: 55, y: lineY - 20, h: 40, color: '#2b6cb0', label: 'Exon 4', labelY: lineY - 28 });
+  }
+  // 3' UTR
+  if (GENE_ELEMENTS.utr3) {
+    elements.push({ x: 770, w: 40, y: lineY - 12, h: 24, color: '#a0aec0', label: "3\u2032 UTR", labelY: lineY - 22 });
+  }
+  // PolyA signal
+  if (GENE_ELEMENTS.polya) {
+    elements.push({ x: 820, w: 50, y: lineY - 10, h: 20, color: '#e09f3e', label: 'AAUAAA\n(PolyA)', labelY: lineY + 34 });
+  }
+
+  elements.forEach(el => {
+    const rect = document.createElementNS(ns, 'rect');
+    rect.setAttribute('x', el.x);
+    rect.setAttribute('y', el.y);
+    rect.setAttribute('width', el.w);
+    rect.setAttribute('height', el.h);
+    rect.setAttribute('rx', 4);
+    rect.setAttribute('fill', el.color);
+    rect.setAttribute('stroke', el.color === '#e2e8f0' ? '#cbd5e0' : el.color);
+    rect.setAttribute('stroke-width', '1');
+    svg.appendChild(rect);
+
+    // Label (handle multiline)
+    const lines = el.label.split('\n');
+    lines.forEach((line, li) => {
+      const txt = document.createElementNS(ns, 'text');
+      txt.setAttribute('x', el.x + el.w / 2);
+      txt.setAttribute('y', el.labelY + li * 13);
+      txt.setAttribute('text-anchor', 'middle');
+      txt.setAttribute('fill', el.labelColor || '#1a2633');
+      txt.setAttribute('font-size', '10');
+      txt.setAttribute('font-weight', '600');
+      txt.textContent = line;
+      svg.appendChild(txt);
+    });
+  });
+
+  // Enhancer-Promoter loop (dashed arc)
+  if (GENE_ELEMENTS.enhancer && GENE_ELEMENTS.promoter) {
+    const arc = document.createElementNS(ns, 'path');
+    arc.setAttribute('d', 'M 70 ' + (lineY - 18) + ' Q 110 ' + (lineY - 65) + ' 175 ' + (lineY - 15));
+    arc.setAttribute('fill', 'none');
+    arc.setAttribute('stroke', '#805ad5');
+    arc.setAttribute('stroke-width', '1.5');
+    arc.setAttribute('stroke-dasharray', '4,3');
+    svg.appendChild(arc);
+    const loopLbl = document.createElementNS(ns, 'text');
+    loopLbl.setAttribute('x', 115);
+    loopLbl.setAttribute('y', lineY - 58);
+    loopLbl.setAttribute('text-anchor', 'middle');
+    loopLbl.setAttribute('fill', '#805ad5');
+    loopLbl.setAttribute('font-size', '9');
+    loopLbl.textContent = 'DNA loop';
+    svg.appendChild(loopLbl);
+  }
+
+  // GT...AG labels on introns
+  if (GENE_ELEMENTS.intron) {
+    [[325, 405], [480, 560], [635, 695]].forEach(([start, end]) => {
+      const gt = document.createElementNS(ns, 'text');
+      gt.setAttribute('x', start + 2);
+      gt.setAttribute('y', lineY - 10);
+      gt.setAttribute('fill', '#718096');
+      gt.setAttribute('font-size', '8');
+      gt.setAttribute('font-family', 'monospace');
+      gt.textContent = 'GT';
+      svg.appendChild(gt);
+      const ag = document.createElementNS(ns, 'text');
+      ag.setAttribute('x', end - 14);
+      ag.setAttribute('y', lineY - 10);
+      ag.setAttribute('fill', '#718096');
+      ag.setAttribute('font-size', '8');
+      ag.setAttribute('font-family', 'monospace');
+      ag.textContent = 'AG';
+      svg.appendChild(ag);
+    });
+  }
+
+  // TSS arrow
+  if (GENE_ELEMENTS.promoter) {
+    const tss = document.createElementNS(ns, 'text');
+    tss.setAttribute('x', 205);
+    tss.setAttribute('y', lineY + 54);
+    tss.setAttribute('text-anchor', 'middle');
+    tss.setAttribute('fill', '#d64545');
+    tss.setAttribute('font-size', '9');
+    tss.setAttribute('font-weight', '700');
+    tss.textContent = '\u2191 TSS (+1)';
+    svg.appendChild(tss);
+  }
+}
+
+document.querySelectorAll('#gene-toggles button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.classList.toggle('active');
+    GENE_ELEMENTS[btn.dataset.elem] = btn.classList.contains('active');
+    renderGene();
+  });
+});
+renderGene();
+
+/* ========== 4. Quiz ========== */
+const QUIZ = [
+  // Q1 — DNA→mRNA 配列問題 (2024 Q9, 2025 Q25 改変: 過去問では"すべて選べ"、ここでは"最も適切な1つ")
+  {
+    source: '基本',
+    stem: '以下の二本鎖 DNA の上の鎖が鋳型鎖として転写される場合、生成される mRNA 配列として<strong>正しい</strong>ものはどれか。<br>5\u2032-ATGCCTAG-3\u2032 (上の鎖 = 鋳型)<br>3\u2032-TACGGATC-5\u2032 (下の鎖)',
+    options: [
+      '5\u2032-AUGCCUAG-3\u2032 (上の鎖と同じ、T→U)',
+      '5\u2032-CUAGGCAU-3\u2032 (鋳型鎖 3\u2032\u21925\u2032 を読み、相補 RNA を 5\u2032\u21925\u2032 で書く)',
+      '5\u2032-GAUCGGUA-3\u2032',
+      '5\u2032-UACGGAUC-3\u2032 (下の鎖 T→U)',
+    ],
+    correct: 1,
+    explain: '<strong>b が正解</strong>。RNA ポリメラーゼは鋳型鎖 (上の鎖) を 3\u2032\u21925\u2032 方向に読み、mRNA を 5\u2032\u21923\u2032 方向に合成。上の鎖 5\u2032-ATGCCTAG-3\u2032 を 3\u2032→5\u2032 で読むと G-A-T-C-C-G-T-A、その相補 RNA は 5\u2032-CUAGGCAU-3\u2032。a は「コード鎖」(上の鎖がコード鎖の場合) の RNA 版であり、今回は上が<u>鋳型鎖</u>なので誤り。鋳型鎖/コード鎖どちらか判断するのが最初の関門。',
+  },
+
+  // Q2 — 真核・原核共通 (2024 Q10, 2025 Q26)
+  {
+    source: '基本',
+    stem: '真核生物と原核生物の転写において<strong>共通する性質</strong>はどれか。',
+    options: [
+      'RNA ポリメラーゼには校正機能がある',
+      '隣接する複数の遺伝子が 1 つの mRNA として転写される (ポリシストロニック)',
+      'RNA ポリメラーゼの活性には Mg²⁺ を必要とする',
+      '転写後プロセシングは核様体で行われる',
+    ],
+    correct: 2,
+    explain: '<strong>c が正解</strong>。RNA ポリメラーゼ (真核・原核とも) は Mg²⁺ 依存性 — 活性中心の 2 個の Mg²⁺ が NTP の α-リン酸を触媒攻撃。a は誤り — RNA pol は校正機能が<u>弱く</u> (エラー率 ~10⁻⁴)、DNA 複製 (~10⁻⁹) より桁違いに高い。b は原核のみ (真核はモノシストロニック)。d は核様体は原核の概念であり真核細胞にはない (真核は核内でプロセシング)。その他の共通点: プロモーター認識、5\u2032\u21923\u2032 合成、転写終結シグナル。',
+  },
+
+  // Q3 — 転写の特徴 (2024 Q12, 2025 Q28)
+  {
+    source: '基本',
+    stem: '転写について<strong>正しい</strong>ものはどれか。',
+    options: [
+      '間違って転写された mRNA はヌクレオチド除去修復により修復される',
+      '原核 mRNA の転写後プロセシングは核様体で行われる',
+      '真核生物の 5\u2032CAP 構造の付加は mRNA の合成中に行われる',
+      '真核生物、原核生物ともに RNA 合成酵素は 1 種類である',
+    ],
+    correct: 2,
+    explain: '<strong>c が正解</strong>。5\u2032キャップ (m⁷G) は転写開始直後 (転写産物が~25 nt の時点) で RNA pol II の CTD に結合したキャッピング酵素により共転写的に付加される。a は誤り — mRNA は修復対象外 (寿命が短く新規合成すればよい)。b は原核はリボソームが同時に翻訳開始するためプロセシングそのものがほぼない。d は誤り — 原核は RNA pol 1 種類だが、<u>真核は 3 種類 (Pol I: rRNA, II: mRNA, III: tRNA+5S)</u>。',
+  },
+
+  // Q4 — σ因子 vs TFIID
+  {
+    source: '基本',
+    stem: '大腸菌の σ70 プロモーター認識について<strong>正しい</strong>ものはどれか。',
+    options: [
+      '-10 領域 (TATAAT) と -35 領域 (TTGACA) を認識し、最適間隔は 17 bp である',
+      '-10 領域は TATAAA、-35 領域は CAATCA である',
+      'σ 因子はコア酵素に結合すると DNA 結合特異性を失う',
+      'σ70 は熱ショック応答専用の因子である',
+    ],
+    correct: 0,
+    explain: '<strong>a が正解</strong>。σ70 プロモーター: -10 領域 = TATAAT (Pribnow box、AT-rich で解離しやすい)、-35 領域 = TTGACA、間隔は 17±1 bp (DNA らせん 1.5 回転)。σ 因子の region 2.4 が -10、region 4.2 が -35 を認識。σ70 は最もメジャー (細胞増殖時)。σ32 が熱ショック、σ54 が窒素飢餓、σS が定常期などに切り替わる。',
+  },
+
+  // Q5 — lac オペロン (2024 Q11, 2025 Q27)
+  {
+    source: '基本',
+    stem: 'lac オペロンによる転写制御について<strong>正しい</strong>のはどれか。',
+    options: [
+      'グルコース存在下において、カタボライト活性化タンパク質 (CAP) が活性化する',
+      'モノシストロニックな転写制御である',
+      'ラクトース代謝物 (アロラクトース) はリプレッサーのオペレーターへの結合を阻害する',
+      'ラクトース存在下ではリプレッサーがオペロンに結合することで、転写が開始される',
+    ],
+    correct: 2,
+    explain: '<strong>c が正解</strong>。ラクトース代謝物アロラクトースが LacI リプレッサーに結合 → リプレッサー構造変化 → オペレーターから解離 → 転写 ON。a は<u>逆</u>: グルコース存在下は cAMP 低下 → CAP は不活性 (カタボライト抑制)。グルコース不足+ラクトース存在で両条件そろって完全活性化。b は誤り — lac オペロンは<u>ポリシストロニック</u> (lacZ, lacY, lacA が1本のmRNA)。d も逆 (リプレッサーが解離することで転写開始)。薬学部国試の頻出題。',
+  },
+
+  // Q6 — Rho 非依存性終結
+  {
+    source: '基本',
+    stem: 'Rho 非依存性終結 (intrinsic termination) のシグナルとして<strong>正しい</strong>ものはどれか。',
+    options: [
+      'GC リッチな回文配列によるヘアピン構造 + その直後のポリ U 配列',
+      'AT リッチな配列 + Rho 因子結合配列',
+      'TATA box + ポリ A シグナル (AAUAAA)',
+      'σ 因子結合配列 + ポリ A テール',
+    ],
+    correct: 0,
+    explain: '<strong>a が正解</strong>。Rho 非依存性終結 = 転写産物 RNA が GC リッチな回文配列によるヘアピン (ステムループ) + 直後の U4-8 のポリ U。ヘアピンが RNA exit channel でストレスを与え、rU-dA 対 (水素結合 2 + 弱スタッキング) が解離 → 終結。b は Rho 依存性終結の記述。c のポリ A シグナルと d のポリ A テールは真核 mRNA 3\u2032末端プロセシングのシグナル (この問題は原核の話)。',
+  },
+
+  // Q7 — 真核3種のRNA polymerase
+  {
+    source: '基本',
+    stem: '真核生物の 3 つの RNA ポリメラーゼと転写産物の組合せとして<strong>正しい</strong>ものはどれか。',
+    options: [
+      'Pol I: mRNA, Pol II: rRNA, Pol III: tRNA',
+      'Pol I: rRNA 前駆体 (45S), Pol II: mRNA・snRNA, Pol III: tRNA・5S rRNA',
+      'Pol I: tRNA, Pol II: rRNA, Pol III: mRNA',
+      'Pol I, II, III はすべて同じ RNA を冗長的に転写する',
+    ],
+    correct: 1,
+    explain: '<strong>b が正解</strong>。Pol I は核小体で 45S rRNA 前駆体 (→28S, 18S, 5.8S) を転写。Pol II は mRNA + snRNA、miRNA、lncRNA。Pol III は tRNA、<u>5S rRNA</u> (28/18/5.8S は Pol I だが 5S だけ Pol III、頻出ひっかけ)、U6 snRNA、7SL RNA。α-アマニチンに対する感受性: Pol II 高 > Pol III 中 > Pol I 低。',
+  },
+
+  // Q8 — CTD リン酸化
+  {
+    source: '基本',
+    stem: '真核生物 RNA Pol II の CTD (C末端ドメイン) のリン酸化について<strong>正しい</strong>ものはどれか。',
+    options: [
+      'CTD は 1 コピーの YSPTSPS モチーフからなる',
+      'TFIIH の CDK7 キナーゼが Ser5 をリン酸化し、プロモータークリアランスのトリガーとなる',
+      'CTD のリン酸化は転写開始後に脱リン酸化される必要がない',
+      'CTD リン酸化は翻訳因子のリクルートに使われる',
+    ],
+    correct: 1,
+    explain: '<strong>b が正解</strong>。CTD は哺乳類で <u>52 コピー</u> の YSPTSPS 七量体反復 (a は誤り)。TFIIH の CDK7/サイクリン H が Ser5 リン酸化 → プロモータークリアランス、P-TEFb の CDK9 が Ser2 リン酸化 → 伸長促進。Ser5-P は 5\u2032 キャップ酵素を、Ser2-P はスプライシング・3\u2032末端プロセシング因子をリクルート (CTD コード)。c は誤り (終結時に脱リン酸化)。d は転写機構リクルートで、翻訳ではない。',
+  },
+
+  // Q9 — 真核プロモーター
+  {
+    source: '基本',
+    stem: '真核生物 RNA Pol II の転写開始複合体 (PIC) で TFIID の役割として<strong>最も適切</strong>なのはどれか。',
+    options: [
+      'TATA box に TBP サブユニットが結合し、PIC 形成の核となる',
+      'RNA Pol II のヘリカーゼ活性を提供する',
+      'CTD のキナーゼ活性でリン酸化を行う',
+      'ポリアデニル化を触媒する',
+    ],
+    correct: 0,
+    explain: '<strong>a が正解</strong>。TFIID は TBP (TATA-binding protein) + TAF (TBP-associated factors) 約13個から構成。TBP が TATA box (-25〜-30) に結合し DNA を湾曲させ、他の GTF (TFIIA/B/F/E/H) と RNA Pol II を順次リクルート。b のヘリカーゼ活性は TFIIH (XPB/XPD)、c のキナーゼ活性も TFIIH (CDK7)。d はポリアデニル化で別の複合体。',
+  },
+
+  // Q10 — 国試チャレンジ: リファンピシン
+  {
+    source: '国試改変',
+    challenge: true,
+    stem: '結核治療薬リファンピシンの作用機序と薬物動態学的特徴について<strong>正しい</strong>ものはどれか。',
+    options: [
+      'ヒト RNA Pol II の β\u2032 サブユニットに結合して宿主の mRNA 合成を阻害する',
+      '細菌 RNA ポリメラーゼのβサブユニット (rpoB) に結合して転写開始段階で RNA 伸長を阻害し、肝 CYP3A4 を強力に誘導するため多数の薬物相互作用を示す',
+      '細菌の 30S リボソームに結合してタンパク質合成を阻害する',
+      'DNA gyrase (トポイソメラーゼ II) を阻害して DNA 複製を停止させる',
+    ],
+    correct: 1,
+    explain: '<strong>b が正解</strong>。リファンピシンは細菌 RNA pol の β サブユニット (rpoB) の RNA exit channel に結合し、新生 RNA の 2-3 nt 伸長を物理的ブロック。ヒト RNA pol とは構造が異なるため選択毒性。核内受容体 PXR を活性化 → CYP3A4 誘導 → ワルファリン、経口避妊薬、HIV プロテアーゼ阻害薬、タクロリムスの血中濃度低下 (薬剤師国試頻出)。c はアミノグリコシド、d はニューキノロン系の機序。耐性は rpoB RRDR 領域 (Ser531Leu) の変異。',
+  },
+
+  // Q11 — 国試チャレンジ: α-アマニチン
+  {
+    source: '国試改変',
+    challenge: true,
+    stem: 'タマゴテングタケ (Amanita phalloides) 中毒について<strong>正しい</strong>のはどれか。',
+    options: [
+      '毒素 α-アマニチンは細菌 RNA ポリメラーゼを特異的に阻害するため、ヒトには無害である',
+      'α-アマニチンは RNA Pol II を低濃度で選択的に阻害して mRNA 合成を停止させ、肝細胞壊死による急性肝不全を起こす',
+      'α-アマニチンは RNA Pol I のみを阻害し、rRNA 合成停止でリボソーム機能が破綻する',
+      '治療は直ちに胃洗浄のみで十分で、シリビニン等は無効である',
+    ],
+    correct: 1,
+    explain: '<strong>b が正解</strong>。α-アマニチンは RNA Pol II のブリッジヘリックスに結合してトランスロケーションを阻害 → mRNA 合成停止 → 半減期の短い解毒酵素群から枯渇 → 肝壊死。臨床経過: 摂取 6-12h 無症状 (walking ghost) → 消化器症状 → 2-3 日後に肝不全。致死量 0.1 mg/kg (成人キノコ 1 本分 ~7 mg)。a は逆 (ヒトPol II 選択毒性)、c は Pol I 耐性, Pol II 高感受性, Pol III 中, d も誤り (シリビニン静注、NAC、支持療法、肝移植)。',
+  },
+
+  // Q12 — 国試チャレンジ: 転写 vs 翻訳阻害薬の識別
+  {
+    source: '国試改変',
+    challenge: true,
+    stem: '以下の薬物のうち「転写 (RNA 合成) を直接阻害」するものの組合せとして<strong>正しい</strong>のはどれか。<br>(1) リファンピシン (2) ストレプトマイシン (3) アクチノマイシン D (4) クロラムフェニコール (5) フィダキソマイシン',
+    options: [
+      '(1), (2), (4)',
+      '(1), (3), (5)',
+      '(2), (3), (4)',
+      '(2), (4), (5)',
+    ],
+    correct: 1,
+    explain: '<strong>b が正解</strong>。転写阻害: (1) リファンピシン (細菌 RNA pol β)、(3) アクチノマイシン D/ダクチノマイシン (DNA GC 塩基対間にインターカレート → RNA pol 進行阻害、Wilms腫瘍等)、(5) フィダキソマイシン (細菌 RNA pol、C. difficile 治療)。翻訳阻害: (2) ストレプトマイシン (30S)、(4) クロラムフェニコール (50S ペプチジルトランスフェラーゼ)。「リボソーム = 翻訳」「RNA pol/DNA結合 = 転写」で整理。',
+  },
+];
+
+const quizState = { answered: [], correct: 0, shuffleMaps: [] };
+const LETTERS = ['a', 'b', 'c', 'd', 'e'];
+const PASS_THRESHOLD = 0.8;
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function renderQuiz() {
+  quizState.answered = new Array(QUIZ.length).fill(null);
+  quizState.correct = 0;
+  quizState.shuffleMaps = [];
+  const list = document.getElementById('quiz-list');
+  list.innerHTML = '';
+  let challengeBannerShown = false;
+  QUIZ.forEach((q, qi) => {
+    if (q.challenge && !challengeBannerShown) {
+      const banner = document.createElement('div');
+      banner.className = 'challenge-banner';
+      banner.innerHTML = `
+        <h3>🏆 ここから国試チャレンジ問題 (発展)</h3>
+        <p>以下の問題は<strong>薬剤師国家試験の過去問</strong>を一部改変したものです。染リファンピシン・α-アマニチン・転写阻害薬など、Lec05 の内容と密接に関連する臨床応用トピックです。解説を読んで「染色体・ゲノムの知識がどう医療に生きているか」を体感してください。</p>
+      `;
+      list.appendChild(banner);
+      challengeBannerShown = true;
+    }
+    const indices = q.options.map((_, i) => i);
+    const shuffled = shuffleArray(indices);
+    quizState.shuffleMaps[qi] = shuffled;
+    const card = document.createElement('div');
+    card.className = 'q-card' + (q.challenge ? ' challenge' : '');
+    card.dataset.qi = qi;
+    card.innerHTML = `
+      <div>
+        <span class="q-num">問 ${qi + 1}</span>
+        ${q.challenge ? '<span class="q-challenge">🏆 国試チャレンジ</span>' : ''}
+        ${q.source ? `<span class="q-source">📚 ${q.source}</span>` : ''}
+      </div>
+      <div class="q-stem">${q.stem}</div>
+      <div class="q-opts">
+        ${shuffled.map((origIdx, displayPos) => `
+          <button class="q-opt" data-oi="${origIdx}">
+            <span class="opt-letter">${LETTERS[displayPos]}</span>
+            <span class="opt-text">${q.options[origIdx]}</span>
+          </button>
+        `).join('')}
+      </div>
+      <div class="q-explain"><strong>解説:</strong> ${q.explain}</div>
+    `;
+    card.querySelectorAll('.q-opt').forEach(btn => {
+      btn.addEventListener('click', () => answerQuestion(qi, parseInt(btn.dataset.oi)));
+    });
+    list.appendChild(card);
+  });
+  updateQuizHeader();
+  document.getElementById('quiz-finish').classList.remove('shown');
+  document.getElementById('quiz-cert-section').style.display = 'none';
+}
+
+function answerQuestion(qi, oi) {
+  if (quizState.answered[qi] !== null) return;
+  const q = QUIZ[qi];
+  const card = document.querySelector(`.q-card[data-qi="${qi}"]`);
+  const opts = card.querySelectorAll('.q-opt');
+  const isCorrect = oi === q.correct;
+  quizState.answered[qi] = oi;
+  if (isCorrect) quizState.correct++;
+  opts.forEach(btn => {
+    btn.disabled = true;
+    const origIdx = parseInt(btn.dataset.oi);
+    if (isCorrect && origIdx === q.correct) {
+      btn.classList.add('correct');
+    }
+    if (origIdx === oi && !isCorrect) btn.classList.add('wrong');
+  });
+  card.classList.add('answered', isCorrect ? 'correct' : 'incorrect');
+  if (!isCorrect) {
+    const explain = card.querySelector('.q-explain');
+    explain.innerHTML = '<strong>不正解です。</strong> 講義資料・教科書を復習して、リセット後に再挑戦してください。';
+    explain.style.display = 'block';
+    explain.style.borderLeftColor = 'var(--accent)';
+  }
+  updateQuizHeader();
+  saveQuizState();
+  if (quizState.answered.every(x => x !== null)) showFinish();
+}
+
+function updateQuizHeader() {
+  const done = quizState.answered.filter(x => x !== null).length;
+  document.getElementById('quiz-progress').textContent = `${done} / ${QUIZ.length} 問回答済み`;
+  document.getElementById('quiz-score').textContent = `${quizState.correct} / ${done}`;
+}
+
+function showFinish() {
+  const answeredCount = quizState.answered.filter(x => x !== null).length;
+  if (answeredCount < QUIZ.length) return;
+  const box = document.getElementById('quiz-finish');
+  const pct = quizState.correct / QUIZ.length;
+  const passed = pct >= PASS_THRESHOLD;
+  box.classList.add('shown');
+  box.classList.toggle('low', !passed);
+  const title = passed
+    ? (pct >= 0.9 ? '🎉 合格！素晴らしい！' : '✨ 合格！よくできました')
+    : '📖 不合格 — 復習して再挑戦';
+  document.getElementById('quiz-finish-title').textContent = title;
+  document.getElementById('quiz-finish-score').textContent = `${quizState.correct} / ${QUIZ.length}`;
+  const passReq = Math.ceil(QUIZ.length * PASS_THRESHOLD);
+  const msg = passed
+    ? `合格基準 (${passReq}問以上) をクリアしました。修了証を発行できます。`
+    : `合格には ${passReq} 問以上の正解が必要です (現在 ${quizState.correct} 問)。<br>講義資料と教科書を復習し、「クイズをリセット」して再挑戦してください。<br><small>※リセット時に選択肢の順番が変わります。</small>`;
+  document.getElementById('quiz-finish-msg').innerHTML = msg;
+  document.getElementById('quiz-cert-section').style.display = passed ? 'block' : 'none';
+  if (passed) {
+    QUIZ.forEach((q, qi) => {
+      const card = document.querySelector(`.q-card[data-qi="${qi}"]`);
+      if (!card) return;
+      const explain = card.querySelector('.q-explain');
+      explain.innerHTML = `<strong>解説:</strong> ${q.explain}`;
+      explain.style.display = 'block';
+      explain.style.borderLeftColor = '';
+      if (quizState.answered[qi] !== q.correct) {
+        card.querySelectorAll('.q-opt').forEach(btn => {
+          if (parseInt(btn.dataset.oi) === q.correct) {
+            btn.classList.add('revealed', 'correct-answer');
+          }
+        });
+      }
+    });
+  }
+}
+
+async function generateVerificationCode(studentId, score, date) {
+  const data = `${studentId}:lec05:${score}/${QUIZ.length}:${date}:molbio2026`;
+  const encoder = new TextEncoder();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 8).toUpperCase();
+}
+
+function saveQuizState() {
+  try { localStorage.setItem('lec05_quiz_state', JSON.stringify(quizState)); } catch(e) {}
+}
+
+function loadQuizState() {
+  // With shuffled options, saved state from a previous shuffle is invalid.
+  // Always start fresh.
+}
+
+document.getElementById('quiz-reset').addEventListener('click', () => {
+  localStorage.removeItem('lec05_quiz_state');
+  renderQuiz();
+});
+
+/* ---- Quiz Certificate PDF export ---- */
+document.getElementById('quiz-pdf').addEventListener('click', async () => {
+  const studentId = document.getElementById('cert-student-id').value.trim();
+  if (!studentId) {
+    document.getElementById('cert-error').style.display = 'block';
+    return;
+  }
+  document.getElementById('cert-error').style.display = 'none';
+
+  const date = new Date().toLocaleDateString('ja-JP');
+  const datetime = new Date().toLocaleString('ja-JP');
+  const score = quizState.correct;
+  const total = QUIZ.length;
+  const verCode = await generateVerificationCode(studentId, score, date);
+
+  let html = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>分子生物学 Lec05 復習クイズ修了証</title>
+<style>
+  @page { size: A4; margin: 18mm 15mm; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif; color: #1a2633; line-height: 1.6; font-size: 11pt; margin: 0; padding: 0; }
+  .cert-box { border: 3px solid #2b6cb0; border-radius: 12px; padding: 30px 40px; margin: 20px auto; max-width: 600px; text-align: center; }
+  .cert-title { color: #1a4a80; font-size: 22pt; font-weight: 700; margin-bottom: 6px; }
+  .cert-sub { color: #5a6978; font-size: 12pt; margin-bottom: 20px; }
+  .cert-field { margin: 12px 0; font-size: 13pt; }
+  .cert-field .label { color: #5a6978; font-size: 10pt; }
+  .cert-field .value { font-weight: 700; font-size: 16pt; }
+  .cert-score { font-size: 36pt; font-weight: 700; color: #2e8b57; margin: 16px 0; }
+  .cert-code { margin-top: 20px; padding: 10px; background: #f7fafc; border: 1px solid #d7dce5; border-radius: 6px; font-family: monospace; font-size: 14pt; letter-spacing: 2px; }
+  .cert-code .label { font-family: sans-serif; font-size: 9pt; color: #5a6978; letter-spacing: normal; }
+  hr { border: none; border-top: 1px solid #d7dce5; margin: 20px 0; }
+  .q { margin-bottom: 18px; page-break-inside: avoid; border-left: 3px solid #2b6cb0; padding-left: 14px; text-align: left; }
+  .q.challenge { border-left-color: #e09f3e; }
+  .q-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+  .q-num { font-weight: 700; color: #2b6cb0; font-size: 12pt; }
+  .q.challenge .q-num { color: #e09f3e; }
+  .q-source { font-size: 9pt; color: #5a6978; background: #edf2f7; padding: 1px 8px; border-radius: 10px; }
+  .q.challenge .q-source { background: #fef5e7; color: #744210; font-weight: 700; }
+  .q-stem { font-weight: 600; margin: 6px 0; font-size: 11pt; }
+  .q-stem strong { color: #d64545; }
+  .opts { list-style: none; padding: 0; margin: 6px 0; }
+  .opts li { padding: 4px 8px 4px 30px; position: relative; font-size: 10.5pt; margin: 3px 0; }
+  .opts li .letter { position: absolute; left: 6px; font-weight: 700; color: #5a6978; }
+  .opts li.correct { background: #c6f6d5; border-left: 3px solid #2e8b57; border-radius: 3px; }
+  .opts li.correct::after { content: " \\2713  正解"; color: #22543d; font-weight: 700; font-size: 9pt; }
+  .opts li.wrong { background: #fed7d7; border-left: 3px solid #e09f3e; border-radius: 3px; }
+  .opts li.wrong::after { content: " \\2717  あなたの回答"; color: #d64545; font-weight: 700; font-size: 9pt; }
+  .explain { background: #f7fafc; border-left: 3px solid #2b6cb0; padding: 8px 12px; font-size: 10pt; margin-top: 8px; line-height: 1.7; }
+  .explain-label { font-weight: 700; color: #2b6cb0; }
+  .challenge-section { background: #fffaf0; border: 2px dashed #e09f3e; padding: 12px 16px; margin: 20px 0 14px 0; border-radius: 6px; text-align: left; }
+  .challenge-section h2 { color: #744210; font-size: 13pt; margin: 0 0 6px 0; }
+  .challenge-section p { font-size: 10pt; margin: 4px 0; }
+  footer { margin-top: 30px; padding-top: 10px; border-top: 1px solid #d7dce5; font-size: 9pt; color: #5a6978; text-align: center; }
+  .print-btn { background: #2b6cb0; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 13pt; cursor: pointer; font-weight: 700; font-family: inherit; position: fixed; top: 20px; right: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+  @media print { .print-btn { display: none; } }
+</style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">印刷 / PDF として保存</button>
+
+<div class="cert-box">
+  <div class="cert-title">分子生物学 復習クイズ修了証</div>
+  <div class="cert-sub">Certificate of Completion — 第5回 転写</div>
+  <div class="cert-field"><span class="label">学籍番号</span><br><span class="value">${studentId}</span></div>
+  <div class="cert-score">${score} / ${total}</div>
+  <div class="cert-field"><span class="label">合格基準: ${Math.ceil(total * PASS_THRESHOLD)}問以上</span></div>
+  <div class="cert-field"><span class="label">出力日時</span><br>${datetime}</div>
+  <div class="cert-code"><span class="label">検証コード</span><br>${verCode}</div>
+</div>
+
+<hr>
+<h2 style="text-align:center; color:#1a4a80;">問題・回答・解説</h2>
+`;
+
+  let challengeBannerShown = false;
+  QUIZ.forEach((q, qi) => {
+    if (q.challenge && !challengeBannerShown) {
+      html += `
+<div class="challenge-section">
+  <h2>🏆 ここから国試チャレンジ問題 (発展)</h2>
+  <p>以下は薬剤師国家試験の過去問を一部改変した発展問題です。</p>
+</div>
+`;
+      challengeBannerShown = true;
+    }
+    const studentAnswer = quizState.answered[qi];
+    html += `
+<div class="q${q.challenge ? ' challenge' : ''}">
+  <div class="q-header">
+    <span class="q-num">問 ${qi + 1}</span>
+    ${q.challenge ? '<span class="q-source">🏆 国試チャレンジ</span>' : ''}
+    ${q.source ? `<span class="q-source">📚 ${q.source}</span>` : ''}
+  </div>
+  <div class="q-stem">${q.stem}</div>
+  <ul class="opts">
+`;
+    q.options.forEach((opt, oi) => {
+      let cls = '';
+      if (oi === q.correct) cls = 'correct';
+      else if (oi === studentAnswer && studentAnswer !== q.correct) cls = 'wrong';
+      html += `    <li class="${cls}"><span class="letter">${LETTERS[oi]})</span>${opt}</li>\n`;
+    });
+    html += `  </ul>
+  <div class="explain"><span class="explain-label">解説:</span> ${q.explain}</div>
+</div>
+`;
+  });
+  html += `
+<footer>
+  分子生物学 FY2026 · 慶應義塾大学薬学部 · 高橋大輔<br>
+  検証コード ${verCode} · 学籍番号 ${studentId} · ${datetime}
+</footer>
+
+</body>
+</html>`;
+
+  const w = window.open('', '_blank');
+  if (!w) {
+    alert('ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
+    return;
+  }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+});
+
+renderQuiz();
+
+</script>
+</body>
+</html>
