@@ -23,7 +23,7 @@ service cloud.firestore {
       allow read: if true;
       allow write: if request.time.toMillis() >= 1777512600000
                 && request.time.toMillis() <= 1777519800000
-                && pollId in ['q1', 'q2', 'q3']
+                && pollId in ['q1', 'q2']
                 && validPollWrite(request.resource.data);
     }
 

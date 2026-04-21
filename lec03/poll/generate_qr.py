@@ -13,9 +13,8 @@ BASE_URL = "https://kpdbcdt.github.io/molbio-lectures-FY2026/lec03/poll/student.
 OUT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 QUESTIONS = {
-    1: ("S02", "ヌクレオソームの数はおよそ？"),
-    2: ("S03", "ゲノムサイズが最も大きい生物は？"),
-    3: ("S04", "SNP は何塩基に 1 つ？"),
+    1: ("S04", "ヒトの体細胞の染色体数は？"),
+    2: ("S12", "新生児テロメアの長さは？"),
 }
 
 
