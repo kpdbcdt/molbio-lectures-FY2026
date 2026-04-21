@@ -21,21 +21,13 @@ service cloud.firestore {
 
     match /polls_lec03/{pollId} {
       allow read: if true;
-      allow write: if request.time.toMillis() >= 1776907800000
-                && request.time.toMillis() <= 1776915000000
-                && pollId in ['q1', 'q2', 'q3']
-                && validPollWrite(request.resource.data);
-    }
-
-    match /polls_lec04/{pollId} {
-      allow read: if true;
       allow write: if request.time.toMillis() >= 1777512600000
                 && request.time.toMillis() <= 1777519800000
                 && pollId in ['q1', 'q2', 'q3']
                 && validPollWrite(request.resource.data);
     }
 
-    match /polls_lec05/{pollId} {
+    match /polls_lec04/{pollId} {
       allow read: if true;
       allow write: if request.time.toMillis() >= 1778117400000
                 && request.time.toMillis() <= 1778124600000
@@ -43,7 +35,7 @@ service cloud.firestore {
                 && validPollWrite(request.resource.data);
     }
 
-    match /polls_lec06/{pollId} {
+    match /polls_lec05/{pollId} {
       allow read: if true;
       allow write: if request.time.toMillis() >= 1778722200000
                 && request.time.toMillis() <= 1778729400000
@@ -51,7 +43,7 @@ service cloud.firestore {
                 && validPollWrite(request.resource.data);
     }
 
-    match /polls_lec07/{pollId} {
+    match /polls_lec06/{pollId} {
       allow read: if true;
       allow write: if request.time.toMillis() >= 1779327000000
                 && request.time.toMillis() <= 1779334200000
@@ -59,10 +51,18 @@ service cloud.firestore {
                 && validPollWrite(request.resource.data);
     }
 
-    match /polls_lec08/{pollId} {
+    match /polls_lec07/{pollId} {
       allow read: if true;
       allow write: if request.time.toMillis() >= 1779931800000
                 && request.time.toMillis() <= 1779939000000
+                && pollId in ['q1', 'q2', 'q3']
+                && validPollWrite(request.resource.data);
+    }
+
+    match /polls_lec08/{pollId} {
+      allow read: if true;
+      allow write: if request.time.toMillis() >= 1780536600000
+                && request.time.toMillis() <= 1780543800000
                 && pollId in ['q1', 'q2', 'q3']
                 && validPollWrite(request.resource.data);
     }
