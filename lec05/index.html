@@ -496,7 +496,7 @@
   <h2>✅ 復習クイズ (12 問)</h2>
   <p class="lead">各問題の選択肢をクリックすると、その場で正解・解説が表示されます。
     <br>
-    📘 <strong>問1-9</strong>: 基本問題 (染色体構造・ゲノム・遺伝子)<br>
+    📘 <strong>問1-9</strong>: 基本問題 (転写)<br>
     🏆 <strong>問10-12</strong>: 薬剤師国試改変 (<strong>発展・チャレンジ</strong>)</p>
 
   <div class="quiz-header">
@@ -546,14 +546,7 @@
 </footer>
 
 <script>
-'use strict';
-
-/* ========== Sidebar disabled links ========== */
-document.querySelectorAll('aside.sidebar a.disabled').forEach(a => {
-  a.addEventListener('click', e => e.preventDefault());
-});
-
-/* ========== Tab switching ========== */
+// Tab switching
 document.querySelectorAll('nav.tabs button').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
@@ -563,484 +556,7 @@ document.querySelectorAll('nav.tabs button').forEach(btn => {
   });
 });
 
-/* ========== 1. Chromatin Compaction Calculator ========== */
-const COMPACTION_LEVELS = [
-  {
-    id: 'naked', icon: '〰️', name: '裸の DNA', nameEn: 'Naked DNA',
-    diameter: '2 nm', ratio: '1x', color: '#e53e3e',
-    proteins: 'なし (B-form DNA 二重らせん)',
-    desc: 'B 型 DNA 二重らせん。直径 2 nm、10.5 bp/回転、ピッチ 3.4 nm。ヒトゲノム全長は約 2 m。',
-    lengthFactor: 1.0 // 0.34 nm/bp
-  },
-  {
-    id: 'nucleosome', icon: '🔵', name: 'ヌクレオソーム', nameEn: 'Nucleosome (beads-on-a-string)',
-    diameter: '11 nm', ratio: '~7x', color: '#2b6cb0',
-    proteins: 'コアヒストン八量体 (H2A, H2B, H3, H4 各2分子) + リンカーヒストン H1',
-    desc: 'DNA が 146 bp ずつコアヒストン八量体に約 1.67 回巻きつく。リンカー DNA (~50 bp) を挟んで「数珠つなぎ」構造。CENP-A (H3 バリアント) はセントロメアに局在。',
-    lengthFactor: 1/7
-  },
-  {
-    id: 'fiber30', icon: '🟢', name: '30 nm ファイバー', nameEn: '30 nm Fiber',
-    diameter: '30 nm', ratio: '~40x', color: '#2e8b57',
-    proteins: 'ヒストン H1 (リンカーヒストン) がヌクレオソームを束ねる',
-    desc: 'ヌクレオソームが密に折り畳まれる。ソレノイドモデル (6個/回転) とジグザグモデルの2つが提唱。in vivo での存在は議論中。H1 のリン酸化で弛緩/凝縮を制御。',
-    lengthFactor: 1/40
-  },
-  {
-    id: 'loop', icon: '🟡', name: 'ループドメイン', nameEn: 'Loop Domain',
-    diameter: '300 nm', ratio: '~1,000x', color: '#e09f3e',
-    proteins: 'コンデンシン、コヒーシン、CTCF、非ヒストンスキャフォールドタンパク質',
-    desc: '30 nm ファイバーが 40-90 kb のループを形成し、タンパク質性の骨格 (スキャフォールド) に付着。トポロジカル関連ドメイン (TAD) として遺伝子発現の単位を構成。',
-    lengthFactor: 1/1000
-  },
-  {
-    id: 'metaphase', icon: '🔴', name: 'メタフェーズ染色体', nameEn: 'Metaphase Chromosome',
-    diameter: '1,400 nm', ratio: '~10,000x', color: '#d64545',
-    proteins: 'コンデンシン I/II (ATP 依存性) + トポイソメラーゼ II',
-    desc: '最大凝縮状態。有糸分裂時のみ出現。セントロメア (動原体)、テロメア (TTAGGG 反復)、複製起点を含む。ヒトゲノム 2 m の DNA が 46 本の染色体に収まる。',
-    lengthFactor: 1/10000
-  }
-];
-
-let selectedLevel = 0;
-
-function renderCompaction() {
-  const genomeMbp = parseFloat(document.getElementById('genome-size').value) || 3200;
-  const totalBp = genomeMbp * 1e6;
-  const nakedLengthM = totalBp * 0.34e-9; // 0.34 nm/bp in meters
-
-  const container = document.getElementById('compact-levels');
-  container.innerHTML = '';
-  COMPACTION_LEVELS.forEach((lv, i) => {
-    const div = document.createElement('div');
-    div.className = 'compact-level' + (i === selectedLevel ? ' active' : '');
-    div.innerHTML = `
-      <div class="level-icon">${lv.icon}</div>
-      <div class="level-info">
-        <h4>${lv.name} <span style="font-size:11px; color:var(--muted); font-weight:400;">(${lv.nameEn})</span></h4>
-        <p>${lv.proteins}</p>
-      </div>
-      <div class="level-diameter">${lv.diameter}</div>
-      <div class="level-ratio">${lv.ratio}</div>
-    `;
-    div.addEventListener('click', () => {
-      selectedLevel = i;
-      renderCompaction();
-    });
-    container.appendChild(div);
-  });
-
-  // Detail panel
-  const lv = COMPACTION_LEVELS[selectedLevel];
-  const lengthM = nakedLengthM * lv.lengthFactor;
-  const detail = document.getElementById('compact-detail');
-  let lengthStr;
-  if (lengthM >= 1) lengthStr = lengthM.toFixed(2) + ' m';
-  else if (lengthM >= 0.001) lengthStr = (lengthM * 1000).toFixed(1) + ' mm';
-  else if (lengthM >= 1e-6) lengthStr = (lengthM * 1e6).toFixed(1) + ' \u00B5m';
-  else lengthStr = (lengthM * 1e9).toFixed(0) + ' nm';
-
-  detail.innerHTML = `
-    <div class="compact-detail">
-      <h3>${lv.icon} ${lv.name}</h3>
-      <p style="font-size:13px;">${lv.desc}</p>
-      <div class="compact-stats">
-        <div class="compact-stat"><div class="v">${lv.diameter}</div><div class="l">直径</div></div>
-        <div class="compact-stat"><div class="v">${lv.ratio}</div><div class="l">圧縮率</div></div>
-        <div class="compact-stat"><div class="v">${lengthStr}</div><div class="l">DNA 全長 (${genomeMbp} Mbp)</div></div>
-        <div class="compact-stat"><div class="v">${nakedLengthM.toFixed(2)} m</div><div class="l">裸の DNA 全長</div></div>
-      </div>
-    </div>
-  `;
-
-  // Step bar diagram
-  renderCompactionBar();
-}
-
-function renderCompactionBar() {
-  const svg = document.getElementById('compaction-bar');
-  const ns = 'http://www.w3.org/2000/svg';
-  svg.innerHTML = '';
-  const W = 800, H = 120;
-  const n = COMPACTION_LEVELS.length;
-  const barH = 40;
-  const barY = 50;
-  const gap = 12;
-  const totalGap = gap * (n - 1);
-  const barW = (W - 60 - totalGap) / n;
-
-  COMPACTION_LEVELS.forEach((lv, i) => {
-    const x = 30 + i * (barW + gap);
-    // bar
-    const rect = document.createElementNS(ns, 'rect');
-    rect.setAttribute('x', x);
-    rect.setAttribute('y', barY);
-    rect.setAttribute('width', barW);
-    rect.setAttribute('height', barH);
-    rect.setAttribute('rx', 6);
-    rect.setAttribute('fill', lv.color);
-    rect.setAttribute('opacity', i === selectedLevel ? '1' : '0.4');
-    svg.appendChild(rect);
-    // diameter label
-    const txt1 = document.createElementNS(ns, 'text');
-    txt1.setAttribute('x', x + barW / 2);
-    txt1.setAttribute('y', barY + barH / 2 + 4);
-    txt1.setAttribute('text-anchor', 'middle');
-    txt1.setAttribute('fill', 'white');
-    txt1.setAttribute('font-size', '12');
-    txt1.setAttribute('font-weight', '700');
-    txt1.textContent = lv.diameter;
-    svg.appendChild(txt1);
-    // name below
-    const txt2 = document.createElementNS(ns, 'text');
-    txt2.setAttribute('x', x + barW / 2);
-    txt2.setAttribute('y', barY + barH + 18);
-    txt2.setAttribute('text-anchor', 'middle');
-    txt2.setAttribute('fill', '#1a2633');
-    txt2.setAttribute('font-size', '10');
-    txt2.textContent = lv.name;
-    svg.appendChild(txt2);
-    // ratio above
-    const txt3 = document.createElementNS(ns, 'text');
-    txt3.setAttribute('x', x + barW / 2);
-    txt3.setAttribute('y', barY - 8);
-    txt3.setAttribute('text-anchor', 'middle');
-    txt3.setAttribute('fill', lv.color);
-    txt3.setAttribute('font-size', '11');
-    txt3.setAttribute('font-weight', '700');
-    txt3.textContent = lv.ratio;
-    svg.appendChild(txt3);
-    // arrow between bars
-    if (i < n - 1) {
-      const arrX = x + barW + 2;
-      const arr = document.createElementNS(ns, 'text');
-      arr.setAttribute('x', arrX + gap / 2);
-      arr.setAttribute('y', barY + barH / 2 + 5);
-      arr.setAttribute('text-anchor', 'middle');
-      arr.setAttribute('fill', '#718096');
-      arr.setAttribute('font-size', '16');
-      arr.textContent = '\u2192';
-      svg.appendChild(arr);
-    }
-  });
-  // Title
-  const title = document.createElementNS(ns, 'text');
-  title.setAttribute('x', W / 2);
-  title.setAttribute('y', 16);
-  title.setAttribute('text-anchor', 'middle');
-  title.setAttribute('fill', '#1a4a80');
-  title.setAttribute('font-size', '13');
-  title.setAttribute('font-weight', '700');
-  title.textContent = 'DNA \u2192 ヌクレオソーム \u2192 30nm \u2192 ループ \u2192 メタフェーズ';
-  svg.appendChild(title);
-}
-
-document.getElementById('genome-size').addEventListener('input', renderCompaction);
-renderCompaction();
-
-/* ========== 2. Genome Composition Explorer ========== */
-const GENOME_SEGMENTS = [
-  { id: 'exon', name: 'エキソン (コーディング)', pct: 1.5, color: '#2b6cb0',
-    detail: 'タンパク質をコードする領域。ヒトゲノムのわずか ~1.5%。20,442 遺伝子 → 選択的スプライシングで 78,120 種のタンパク質。' },
-  { id: 'intron', name: 'イントロン', pct: 25, color: '#4a90d9',
-    detail: '遺伝子内の非コーディング領域。スプライシングで除去される。制御配列 (スプライシングエンハンサー/サイレンサー) を含む。ジストロフィン遺伝子では 99.4% がイントロン。' },
-  { id: 'intergenic', name: '遺伝子間領域', pct: 25, color: '#68d391',
-    detail: '遺伝子と遺伝子の間の領域。エンハンサー、サイレンサー、インスレーター、lncRNA 遺伝子を含む。かつては "junk DNA" と呼ばれたが、ENCODE プロジェクトで多くに生化学的機能があることが判明。' },
-  { id: 'repeat', name: '反復配列', pct: 45, color: '#e09f3e',
-    detail: 'トランスポゾン由来の反復配列が約 45%。LINE (~20%), SINE (~13%), LTR レトロトランスポゾン (~8%), DNA トランスポゾン (~3%)。ゲノム進化の原動力。',
-    sub: [
-      { name: 'LINE (L1 等)', pct: 20, color: '#d4891c' },
-      { name: 'SINE (Alu 等)', pct: 13, color: '#e09f3e' },
-      { name: 'LTR レトロトランスポゾン', pct: 8, color: '#f6c85f' },
-      { name: 'DNA トランスポゾン', pct: 3, color: '#fce588' },
-      { name: 'その他反復', pct: 1, color: '#fef3c7' }
-    ]
-  },
-  { id: 'other', name: 'その他 (ncRNA, テロメア等)', pct: 3.5, color: '#a0aec0',
-    detail: 'テロメア反復 (TTAGGG)、セントロメアのサテライト DNA、rRNA/tRNA/snRNA 遺伝子、マイクロサテライト、ncRNA (miRNA, lncRNA) など。' }
-];
-
-let activeSegment = null;
-
-function renderGenomeDonut() {
-  const svg = document.getElementById('genome-donut');
-  const ns = 'http://www.w3.org/2000/svg';
-  svg.innerHTML = '';
-  const cx = 150, cy = 150, R = 120, r = 70;
-  let startAngle = -Math.PI / 2;
-
-  GENOME_SEGMENTS.forEach((seg, i) => {
-    const angle = (seg.pct / 100) * 2 * Math.PI;
-    const endAngle = startAngle + angle;
-    const midAngle = startAngle + angle / 2;
-    const largeArc = angle > Math.PI ? 1 : 0;
-
-    const x1o = cx + R * Math.cos(startAngle);
-    const y1o = cy + R * Math.sin(startAngle);
-    const x2o = cx + R * Math.cos(endAngle);
-    const y2o = cy + R * Math.sin(endAngle);
-    const x1i = cx + r * Math.cos(endAngle);
-    const y1i = cy + r * Math.sin(endAngle);
-    const x2i = cx + r * Math.cos(startAngle);
-    const y2i = cy + r * Math.sin(startAngle);
-
-    const d = `M ${x1o} ${y1o} A ${R} ${R} 0 ${largeArc} 1 ${x2o} ${y2o} L ${x1i} ${y1i} A ${r} ${r} 0 ${largeArc} 0 ${x2i} ${y2i} Z`;
-    const path = document.createElementNS(ns, 'path');
-    path.setAttribute('d', d);
-    path.setAttribute('fill', seg.color);
-    path.setAttribute('stroke', 'white');
-    path.setAttribute('stroke-width', '2');
-    path.setAttribute('opacity', activeSegment === null || activeSegment === i ? '1' : '0.3');
-    path.style.cursor = 'pointer';
-    path.style.transition = 'opacity 0.2s';
-    path.addEventListener('click', () => {
-      activeSegment = activeSegment === i ? null : i;
-      renderGenomeDonut();
-      renderGenomeLegend();
-      renderGenomeSubDetail();
-    });
-    svg.appendChild(path);
-
-    // Label on larger segments
-    if (seg.pct >= 10) {
-      const labelR = (R + r) / 2;
-      const lx = cx + labelR * Math.cos(midAngle);
-      const ly = cy + labelR * Math.sin(midAngle);
-      const txt = document.createElementNS(ns, 'text');
-      txt.setAttribute('x', lx);
-      txt.setAttribute('y', ly + 4);
-      txt.setAttribute('text-anchor', 'middle');
-      txt.setAttribute('fill', 'white');
-      txt.setAttribute('font-size', '11');
-      txt.setAttribute('font-weight', '700');
-      txt.style.pointerEvents = 'none';
-      txt.textContent = seg.pct + '%';
-      svg.appendChild(txt);
-    }
-
-    startAngle = endAngle;
-  });
-}
-
-function renderGenomeLegend() {
-  const legend = document.getElementById('genome-legend');
-  legend.innerHTML = '';
-  GENOME_SEGMENTS.forEach((seg, i) => {
-    const div = document.createElement('div');
-    div.className = 'genome-legend-item' + (activeSegment === i ? ' active' : '');
-    div.innerHTML = `
-      <div class="swatch" style="background:${seg.color};"></div>
-      <div class="name">${seg.name}</div>
-      <div class="pct">${seg.pct}%</div>
-    `;
-    div.addEventListener('click', () => {
-      activeSegment = activeSegment === i ? null : i;
-      renderGenomeDonut();
-      renderGenomeLegend();
-      renderGenomeSubDetail();
-    });
-    legend.appendChild(div);
-  });
-}
-
-function renderGenomeSubDetail() {
-  const container = document.getElementById('genome-sub-detail');
-  if (activeSegment === null) { container.innerHTML = ''; return; }
-  const seg = GENOME_SEGMENTS[activeSegment];
-  let html = `<div class="genome-sub-detail"><strong>${seg.name}</strong> (${seg.pct}%)<br>${seg.detail}`;
-  if (seg.sub) {
-    html += '<div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">';
-    seg.sub.forEach(s => {
-      html += `<span style="display:inline-block; background:${s.color}; color:${s.pct > 5 ? 'white' : '#744210'}; padding:4px 10px; border-radius:14px; font-size:11px; font-weight:600;">${s.name}: ${s.pct}%</span>`;
-    });
-    html += '</div>';
-  }
-  html += '</div>';
-  container.innerHTML = html;
-}
-
-renderGenomeDonut();
-renderGenomeLegend();
-
-/* ========== 3. Gene Architecture Visualizer ========== */
-const GENE_ELEMENTS = {
-  enhancer: true, promoter: true, utr5: true, exon: true, intron: true, utr3: true, polya: true
-};
-
-function renderGene() {
-  const svg = document.getElementById('gene-diagram');
-  const ns = 'http://www.w3.org/2000/svg';
-  svg.innerHTML = '';
-  const W = 900, H = 200;
-  const lineY = 100;
-
-  // Genomic line
-  const line = document.createElementNS(ns, 'line');
-  line.setAttribute('x1', 20); line.setAttribute('y1', lineY);
-  line.setAttribute('x2', W - 20); line.setAttribute('y2', lineY);
-  line.setAttribute('stroke', '#cbd5e0'); line.setAttribute('stroke-width', '2');
-  svg.appendChild(line);
-
-  // Direction arrow
-  const defs = document.createElementNS(ns, 'defs');
-  defs.innerHTML = `<marker id="genearrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><polygon points="0 0, 10 5, 0 10" fill="#2b6cb0"/></marker>`;
-  svg.appendChild(defs);
-  const arr = document.createElementNS(ns, 'line');
-  arr.setAttribute('x1', 120); arr.setAttribute('y1', 28);
-  arr.setAttribute('x2', 780); arr.setAttribute('y2', 28);
-  arr.setAttribute('stroke', '#2b6cb0'); arr.setAttribute('stroke-width', '2');
-  arr.setAttribute('marker-end', 'url(#genearrow)');
-  svg.appendChild(arr);
-  const arrLbl = document.createElementNS(ns, 'text');
-  arrLbl.setAttribute('x', 450); arrLbl.setAttribute('y', 22);
-  arrLbl.setAttribute('text-anchor', 'middle'); arrLbl.setAttribute('fill', '#2b6cb0');
-  arrLbl.setAttribute('font-size', '12'); arrLbl.setAttribute('font-weight', '700');
-  arrLbl.textContent = "5\u2032 \u2192 3\u2032 \u8EE2\u5199\u65B9\u5411";
-  svg.appendChild(arrLbl);
-
-  const elements = [];
-
-  // Enhancer (far upstream)
-  if (GENE_ELEMENTS.enhancer) {
-    elements.push({ x: 40, w: 60, y: lineY - 18, h: 36, color: '#805ad5', label: 'Enhancer', labelY: lineY + 38 });
-  }
-  // Promoter (TATA box)
-  if (GENE_ELEMENTS.promoter) {
-    elements.push({ x: 150, w: 50, y: lineY - 15, h: 30, color: '#d64545', label: 'Promoter\n(TATA box)', labelY: lineY + 38 });
-  }
-  // 5' UTR
-  if (GENE_ELEMENTS.utr5) {
-    elements.push({ x: 210, w: 40, y: lineY - 12, h: 24, color: '#a0aec0', label: "5\u2032 UTR", labelY: lineY - 22 });
-  }
-  // Exon 1
-  if (GENE_ELEMENTS.exon) {
-    elements.push({ x: 260, w: 55, y: lineY - 20, h: 40, color: '#2b6cb0', label: 'Exon 1', labelY: lineY - 28 });
-  }
-  // Intron 1
-  if (GENE_ELEMENTS.intron) {
-    elements.push({ x: 325, w: 80, y: lineY - 6, h: 12, color: '#e2e8f0', label: 'Intron 1', labelY: lineY + 30, labelColor: '#718096' });
-  }
-  // Exon 2
-  if (GENE_ELEMENTS.exon) {
-    elements.push({ x: 415, w: 55, y: lineY - 20, h: 40, color: '#2b6cb0', label: 'Exon 2', labelY: lineY - 28 });
-  }
-  // Intron 2
-  if (GENE_ELEMENTS.intron) {
-    elements.push({ x: 480, w: 80, y: lineY - 6, h: 12, color: '#e2e8f0', label: 'Intron 2', labelY: lineY + 30, labelColor: '#718096' });
-  }
-  // Exon 3
-  if (GENE_ELEMENTS.exon) {
-    elements.push({ x: 570, w: 55, y: lineY - 20, h: 40, color: '#2b6cb0', label: 'Exon 3', labelY: lineY - 28 });
-  }
-  // Intron 3
-  if (GENE_ELEMENTS.intron) {
-    elements.push({ x: 635, w: 60, y: lineY - 6, h: 12, color: '#e2e8f0', label: 'Intron 3', labelY: lineY + 30, labelColor: '#718096' });
-  }
-  // Exon 4
-  if (GENE_ELEMENTS.exon) {
-    elements.push({ x: 705, w: 55, y: lineY - 20, h: 40, color: '#2b6cb0', label: 'Exon 4', labelY: lineY - 28 });
-  }
-  // 3' UTR
-  if (GENE_ELEMENTS.utr3) {
-    elements.push({ x: 770, w: 40, y: lineY - 12, h: 24, color: '#a0aec0', label: "3\u2032 UTR", labelY: lineY - 22 });
-  }
-  // PolyA signal
-  if (GENE_ELEMENTS.polya) {
-    elements.push({ x: 820, w: 50, y: lineY - 10, h: 20, color: '#e09f3e', label: 'AAUAAA\n(PolyA)', labelY: lineY + 34 });
-  }
-
-  elements.forEach(el => {
-    const rect = document.createElementNS(ns, 'rect');
-    rect.setAttribute('x', el.x);
-    rect.setAttribute('y', el.y);
-    rect.setAttribute('width', el.w);
-    rect.setAttribute('height', el.h);
-    rect.setAttribute('rx', 4);
-    rect.setAttribute('fill', el.color);
-    rect.setAttribute('stroke', el.color === '#e2e8f0' ? '#cbd5e0' : el.color);
-    rect.setAttribute('stroke-width', '1');
-    svg.appendChild(rect);
-
-    // Label (handle multiline)
-    const lines = el.label.split('\n');
-    lines.forEach((line, li) => {
-      const txt = document.createElementNS(ns, 'text');
-      txt.setAttribute('x', el.x + el.w / 2);
-      txt.setAttribute('y', el.labelY + li * 13);
-      txt.setAttribute('text-anchor', 'middle');
-      txt.setAttribute('fill', el.labelColor || '#1a2633');
-      txt.setAttribute('font-size', '10');
-      txt.setAttribute('font-weight', '600');
-      txt.textContent = line;
-      svg.appendChild(txt);
-    });
-  });
-
-  // Enhancer-Promoter loop (dashed arc)
-  if (GENE_ELEMENTS.enhancer && GENE_ELEMENTS.promoter) {
-    const arc = document.createElementNS(ns, 'path');
-    arc.setAttribute('d', 'M 70 ' + (lineY - 18) + ' Q 110 ' + (lineY - 65) + ' 175 ' + (lineY - 15));
-    arc.setAttribute('fill', 'none');
-    arc.setAttribute('stroke', '#805ad5');
-    arc.setAttribute('stroke-width', '1.5');
-    arc.setAttribute('stroke-dasharray', '4,3');
-    svg.appendChild(arc);
-    const loopLbl = document.createElementNS(ns, 'text');
-    loopLbl.setAttribute('x', 115);
-    loopLbl.setAttribute('y', lineY - 58);
-    loopLbl.setAttribute('text-anchor', 'middle');
-    loopLbl.setAttribute('fill', '#805ad5');
-    loopLbl.setAttribute('font-size', '9');
-    loopLbl.textContent = 'DNA loop';
-    svg.appendChild(loopLbl);
-  }
-
-  // GT...AG labels on introns
-  if (GENE_ELEMENTS.intron) {
-    [[325, 405], [480, 560], [635, 695]].forEach(([start, end]) => {
-      const gt = document.createElementNS(ns, 'text');
-      gt.setAttribute('x', start + 2);
-      gt.setAttribute('y', lineY - 10);
-      gt.setAttribute('fill', '#718096');
-      gt.setAttribute('font-size', '8');
-      gt.setAttribute('font-family', 'monospace');
-      gt.textContent = 'GT';
-      svg.appendChild(gt);
-      const ag = document.createElementNS(ns, 'text');
-      ag.setAttribute('x', end - 14);
-      ag.setAttribute('y', lineY - 10);
-      ag.setAttribute('fill', '#718096');
-      ag.setAttribute('font-size', '8');
-      ag.setAttribute('font-family', 'monospace');
-      ag.textContent = 'AG';
-      svg.appendChild(ag);
-    });
-  }
-
-  // TSS arrow
-  if (GENE_ELEMENTS.promoter) {
-    const tss = document.createElementNS(ns, 'text');
-    tss.setAttribute('x', 205);
-    tss.setAttribute('y', lineY + 54);
-    tss.setAttribute('text-anchor', 'middle');
-    tss.setAttribute('fill', '#d64545');
-    tss.setAttribute('font-size', '9');
-    tss.setAttribute('font-weight', '700');
-    tss.textContent = '\u2191 TSS (+1)';
-    svg.appendChild(tss);
-  }
-}
-
-document.querySelectorAll('#gene-toggles button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    btn.classList.toggle('active');
-    GENE_ELEMENTS[btn.dataset.elem] = btn.classList.contains('active');
-    renderGene();
-  });
-});
-renderGene();
-
-/* ========== 4. Quiz ========== */
+// Quiz data
 const QUIZ = [
   // Q1 — DNA→mRNA 配列問題 (2024 Q9, 2025 Q25 改変: 過去問では"すべて選べ"、ここでは"最も適切な1つ")
   {
@@ -1214,6 +730,7 @@ const QUIZ = [
   },
 ];
 
+// Quiz logic + certificate
 const quizState = { answered: [], correct: 0, shuffleMaps: [] };
 const LETTERS = ['a', 'b', 'c', 'd', 'e'];
 const PASS_THRESHOLD = 0.8;
@@ -1240,7 +757,7 @@ function renderQuiz() {
       banner.className = 'challenge-banner';
       banner.innerHTML = `
         <h3>🏆 ここから国試チャレンジ問題 (発展)</h3>
-        <p>以下の問題は<strong>薬剤師国家試験の過去問</strong>を一部改変したものです。染リファンピシン・α-アマニチン・転写阻害薬など、Lec05 の内容と密接に関連する臨床応用トピックです。解説を読んで「染色体・ゲノムの知識がどう医療に生きているか」を体感してください。</p>
+        <p>以下の問題は<strong>薬剤師国家試験の過去問</strong>を一部改変したものです。染色体異常・スプライシング治療薬・エピジェネティクス治療など、Lec03 の内容と密接に関連する臨床応用トピックです。解説を読んで「染色体・ゲノムの知識がどう医療に生きているか」を体感してください。</p>
       `;
       list.appendChild(banner);
       challengeBannerShown = true;
@@ -1351,7 +868,7 @@ function showFinish() {
 }
 
 async function generateVerificationCode(studentId, score, date) {
-  const data = `${studentId}:lec05:${score}/${QUIZ.length}:${date}:molbio2026`;
+  const data = `${studentId}:lec03:${score}/${QUIZ.length}:${date}:molbio2026`;
   const encoder = new TextEncoder();
   const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
   const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -1359,7 +876,7 @@ async function generateVerificationCode(studentId, score, date) {
 }
 
 function saveQuizState() {
-  try { localStorage.setItem('lec05_quiz_state', JSON.stringify(quizState)); } catch(e) {}
+  try { localStorage.setItem('lec03_quiz_state', JSON.stringify(quizState)); } catch(e) {}
 }
 
 function loadQuizState() {
@@ -1368,7 +885,7 @@ function loadQuizState() {
 }
 
 document.getElementById('quiz-reset').addEventListener('click', () => {
-  localStorage.removeItem('lec05_quiz_state');
+  localStorage.removeItem('lec03_quiz_state');
   renderQuiz();
 });
 
@@ -1391,7 +908,7 @@ document.getElementById('quiz-pdf').addEventListener('click', async () => {
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>分子生物学 Lec05 復習クイズ修了証</title>
+<title>分子生物学 Lec03 復習クイズ修了証</title>
 <style>
   @page { size: A4; margin: 18mm 15mm; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif; color: #1a2633; line-height: 1.6; font-size: 11pt; margin: 0; padding: 0; }
@@ -1437,7 +954,7 @@ document.getElementById('quiz-pdf').addEventListener('click', async () => {
 
 <div class="cert-box">
   <div class="cert-title">分子生物学 復習クイズ修了証</div>
-  <div class="cert-sub">Certificate of Completion — 第5回 転写</div>
+  <div class="cert-sub">Certificate of Completion — 第3回 染色体とゲノム</div>
   <div class="cert-field"><span class="label">学籍番号</span><br><span class="value">${studentId}</span></div>
   <div class="cert-score">${score} / ${total}</div>
   <div class="cert-field"><span class="label">合格基準: ${Math.ceil(total * PASS_THRESHOLD)}問以上</span></div>
@@ -1502,7 +1019,6 @@ document.getElementById('quiz-pdf').addEventListener('click', async () => {
 });
 
 renderQuiz();
-
 </script>
 </body>
 </html>
