@@ -13,8 +13,8 @@ BASE_URL = "https://kpdbcdt.github.io/molbio-lectures-FY2026/lec03/poll/student.
 OUT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 QUESTIONS = {
-    1: ("S04", "ヒトの体細胞の染色体数は？"),
-    2: ("S12", "新生児テロメアの長さは？"),
+    1: ("S04", "染色体数が最も多い生物は？"),
+    2: ("S13", "新生児テロメアの長さは？"),
 }
 
 
