@@ -405,10 +405,10 @@
     <li><a href="../lec02/"><span class="lec-num">Lec 02</span>化学的基盤</a></li>
     <li><a href="../lec03/"><span class="lec-num">Lec 03</span>染色体とゲノム</a></li>
     <li><a href="../lec04/" class="active"><span class="lec-num">Lec 04</span>DNA 複製・修復</a></li>
-    <li><a href="../lec05/"><span class="lec-num">Lec 05</span>転写</a></li>
-    <li><a href="../lec06/"><span class="lec-num">Lec 06</span>転写調節・RNA プロセシング</a></li>
-    <li><a href="../lec07/"><span class="lec-num">Lec 07</span>翻訳と翻訳後修飾</a></li>
-    <li><a href="../lec08/"><span class="lec-num">Lec 08</span>組換え DNA とゲノム編集</a></li>
+    <li><a href="#" class="disabled"><span class="lec-num">Lec 05</span>転写<span class="soon-badge">SOON</span></a></li>
+    <li><a href="#" class="disabled"><span class="lec-num">Lec 06</span>転写調節・RNA プロセシング<span class="soon-badge">SOON</span></a></li>
+    <li><a href="#" class="disabled"><span class="lec-num">Lec 07</span>翻訳と翻訳後修飾<span class="soon-badge">SOON</span></a></li>
+    <li><a href="#" class="disabled"><span class="lec-num">Lec 08</span>組換え DNA とゲノム編集<span class="soon-badge">SOON</span></a></li>
   </ul>
   <h3>Lec04 リソース</h3>
   <ul>
@@ -452,6 +452,20 @@
     <br>
     📘 <strong>問1-9</strong>: 基本問題 (DNA 複製・修復)<br>
     🏆 <strong>問10-12</strong>: 薬剤師国試改変 (<strong>発展・チャレンジ</strong>)</p>
+  <div class="card retake-only" style="background:#fffaf0; border-color:#e09f3e; border-width:2px; display:none;">
+    <h3 style="margin-top:0; font-size:16px; color:#744210;">📋 再度試験受験者: 提出手順</h3>
+    <ol style="font-size:13px; line-height:1.9; margin:6px 0;">
+      <li>下の 12 問を解く (不合格なら「クイズをリセット」で再挑戦)</li>
+      <li><strong>10/12 以上正解で合格</strong> → 下部に学籍番号入力欄が表示される</li>
+      <li>学籍番号を入力 → 「修了証を PDF で出力」をクリック</li>
+      <li>新しいタブで修了証が開く → <strong>ブラウザの印刷メニュー (Cmd+P / Ctrl+P) で「PDF として保存」</strong></li>
+      <li>Canvas の <a href="https://lms.keio.jp/courses/144965/assignments/1262394" target="_blank"><strong>「第4回 復習クイズ修了証 提出 (DNA 複製・修復)」</strong></a> 課題に PDF をアップロード</li>
+    </ol>
+    <p style="font-size:12px; color:#744210; margin:10px 0 0 0;">
+      📌 修了証には<strong>学籍番号 + SHA-256 検証コード</strong>が記載されます (改ざん検出用)。
+    </p>
+  </div>
+
   <div class="quiz-header">
     <div>
       <div class="progress-txt" id="quiz-progress">0 / 12 問回答済み</div>
@@ -972,6 +986,19 @@ document.getElementById('quiz-pdf').addEventListener('click', async () => {
 });
 
 renderQuiz();
+</script>
+<script>
+(function(){
+  try {
+    var p = new URLSearchParams(location.search);
+    var isRetake = p.get('retake') === '1' ||
+                   (document.referrer && /(?:lms\.keio\.jp\/courses\/)144965/.test(document.referrer));
+    if (isRetake) {
+      document.querySelectorAll('.retake-only').forEach(function(el){ el.style.display = ''; });
+      document.body.classList.add('is-retake');
+    }
+  } catch (e) { /* no-op */ }
+})();
 </script>
 </body>
 </html>
