@@ -1651,10 +1651,26 @@ renderQuiz();
     var p = new URLSearchParams(location.search);
     var isRetake = p.get('retake') === '1' ||
                    (document.referrer && /(?:lms\.keio\.jp\/courses\/)144965/.test(document.referrer));
-    if (isRetake) {
-      document.querySelectorAll('.retake-only').forEach(function(el){ el.style.display = ''; });
-      document.body.classList.add('is-retake');
-    }
+    if (!isRetake) return;
+    document.body.classList.add('is-retake');
+    document.querySelectorAll('.retake-only').forEach(function(el){ el.style.display = ''; });
+    document.querySelectorAll('.sidebar a.disabled').forEach(function(a){
+      var label = a.querySelector('.lec-num');
+      var t = label && label.textContent ? label.textContent.trim() : '';
+      var m = t.match(/^Lec\s*0?(\d+)$/);
+      if (!m) return;
+      var n = m[1].padStart(2,'0');
+      a.classList.remove('disabled');
+      a.setAttribute('href', '../lec' + n + '/?retake=1');
+      var soon = a.querySelector('.soon-badge');
+      if (soon) soon.remove();
+    });
+    document.querySelectorAll('.sidebar a[href*="../lec0"]').forEach(function(a){
+      var h = a.getAttribute('href');
+      if (h && !h.includes('retake=1') && !h.startsWith('#')) {
+        a.setAttribute('href', h + (h.includes('?') ? '&' : '?') + 'retake=1');
+      }
+    });
   } catch (e) { /* no-op */ }
 })();
 </script>
