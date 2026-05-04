@@ -15,7 +15,7 @@ OUT_DIR = os.path.dirname(os.path.abspath(__file__))
 QUESTIONS = {
     1: ("S04", "ヒトゲノム複製のエラー率"),
     2: ("S09", "大腸菌の全ゲノム複製時間"),
-    3: ("S21", "あなたの DNA に蓄積した変異"),
+    3: ("S22", "あなたの DNA に蓄積した変異"),
 }
 
 

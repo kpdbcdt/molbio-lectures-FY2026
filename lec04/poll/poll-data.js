@@ -30,7 +30,7 @@ export const POLLS = {
   },
   q3: {
     id: 'q3',
-    slide: 'S21',
+    slide: 'S22',
     stem: 'あなたが両親から受け継いだ DNA には、両親の生殖細胞 DNA と比べて何個の変異があるでしょうか？',
     options: [
       'A) 1 個未満',
