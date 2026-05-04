@@ -13,9 +13,9 @@ BASE_URL = "https://kpdbcdt.github.io/molbio-lectures-FY2026/lec04/poll/student.
 OUT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 QUESTIONS = {
-    1: ("S02", "ヒトゲノム複製のエラー率"),
-    2: ("S13", "DNA pol III の合成速度"),
-    3: ("S27", "1日の自然発生 DNA 損傷数"),
+    1: ("S04", "ヒトゲノム複製のエラー率"),
+    2: ("S09", "大腸菌の全ゲノム複製時間"),
+    3: ("S21", "あなたの DNA に蓄積した変異"),
 }
 
 
