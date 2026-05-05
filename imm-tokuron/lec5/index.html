@@ -121,7 +121,7 @@
 
 <header>
   <h1>免疫学・代謝生化学特論 — 第5回</h1>
-  <div class="sub">腸上皮、腸内細菌、腸免疫システム / 復習クイズ (20 問) / 2026-05-07</div>
+  <div class="sub">腸上皮、腸内細菌、腸免疫システム / 復習クイズ (21 問) / 2026-05-07</div>
 </header>
 
 <main id="main">
@@ -129,7 +129,7 @@
 <div class="card">
   <h3 style="margin-top:0;">復習クイズの進め方</h3>
   <p style="font-size:14px; color:var(--sub); margin: 0 0 8px 0;">
-    全 20 問。各問の選択肢をクリックして解答すると、即時に正解と解説が表示されます。
+    全 21 問。各問の選択肢をクリックして解答すると、即時に正解と解説が表示されます。
     全問解答後、得点と修了証が表示されます (合格基準なし、全員に修了証発行)。
   </p>
   <p style="font-size:13px; color:var(--sub); margin: 0;">
@@ -140,9 +140,9 @@
 <div class="quiz-header">
   <div>
     <div class="score-big" id="quiz-score">0</div>
-    <div class="score-lbl">正解 / 20</div>
+    <div class="score-lbl">正解 / 21</div>
   </div>
-  <div class="progress-txt" id="quiz-progress">0 / 20 問回答済み</div>
+  <div class="progress-txt" id="quiz-progress">0 / 21 問回答済み</div>
 </div>
 
 <div class="reset-area">
@@ -151,7 +151,7 @@
 
 <div class="quiz-finish" id="quiz-finish">
   <h3 id="quiz-finish-title">お疲れさまでした！</h3>
-  <div class="final-score" id="quiz-finish-score">0 / 20</div>
+  <div class="final-score" id="quiz-finish-score">0 / 21</div>
   <div class="msg" id="quiz-finish-msg"></div>
   <button class="btn" id="cert-show-btn">📜 修了証を表示</button>
   <button class="btn btn-outline" id="cert-print-btn">🖨️ 印刷 / PDF 保存</button>
@@ -170,8 +170,8 @@
   </div>
   <div class="cert-body">
     本者は、慶應義塾大学薬学部 薬科学科 修士課程<br>
-    <b>免疫学・代謝生化学特論 第5回</b> 復習クイズ (全 20 問) を完了しました。
-    <div class="cert-score" id="cert-score">0 / 20</div>
+    <b>免疫学・代謝生化学特論 第5回</b> 復習クイズ (全 21 問) を完了しました。
+    <div class="cert-score" id="cert-score">0 / 21</div>
   </div>
   <div class="cert-meta">
     <div><b>講義日</b> 2026-05-07 (Thu)</div>
@@ -361,6 +361,17 @@ const QUIZ = [
     ],
     correct: 1,
     explain: '<b>正解: B</b>。Zheng ら <i>Nature</i> 2020。母親が体内で作る腸内共生細菌に対する <b>natural antibody</b> が母乳に分泌され、これが <b>ETEC (Enterotoxigenic Escherichia coli、毒素原性大腸菌)</b> など病原性大腸菌に交差性を示し新生児の腸管感染防御に貢献する。胎盤伝達の IgG とは別経路の防御。'
+  },
+  {
+    stem: '日本のプロバイオティクス製剤「ビオスリー」(配合菌) の構成菌の組み合わせとして正しいのはどれか。',
+    options: [
+      '糖化菌 (Bacillus polyfermenticus、好気性) + 乳酸菌 (嫌気性) + 酪酸菌 (Clostridium butyricum、嫌気性)',
+      '大腸菌 + ビフィズス菌 + 乳酸桿菌',
+      'Akkermansia muciniphila + Faecalibacterium prausnitzii + Roseburia',
+      '黄色ブドウ球菌 + 緑膿菌 + 大腸菌 (病原性 3 種)'
+    ],
+    correct: 0,
+    explain: '<b>正解: A</b>。ビオスリーは 3 菌種配合のプロバイオティクス製剤で、<b>糖化菌 (Bacillus polyfermenticus)</b> = 偏性好気性桿菌、小腸上部で増殖、アミラーゼ産生でデンプン → 糖へ分解。<b>乳酸菌 (4 菌種)</b> = 偏性嫌気性、小腸下部〜大腸、乳酸産生で pH 低下により有害菌増殖抑制。<b>酪酸菌 (Clostridium butyricum)</b> = 偏性嫌気性、酪酸 + 酢酸など SCFA 産生 → 大腸上皮細胞のエネルギー源 + 抗炎症効果。SCFA・粘液層・腸内細菌叢の概念がそのまま臨床応用された製剤。'
   },
 ];
 
