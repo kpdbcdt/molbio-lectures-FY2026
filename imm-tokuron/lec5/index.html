@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>免疫学・代謝生化学特論 第5回 復習クイズ</title>
+<style>
+  * { box-sizing: border-box; }
+  :root {
+    --bg: #f7fafc;
+    --card: #ffffff;
+    --ink: #1a2633;
+    --sub: #5a6978;
+    --line: #e2e8f0;
+    --primary: #2b6cb0;
+    --primary-dark: #1e4d80;
+    --green: #2f855a;
+    --green-light: #d4edda;
+    --red: #c53030;
+    --red-light: #f8d7da;
+    --yellow: #d4891c;
+    --mono: 'SF Mono', Menlo, Monaco, Consolas, monospace;
+  }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.65;
+  }
+  header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white; padding: 30px 20px; text-align: center;
+  }
+  header h1 { margin: 0 0 8px 0; font-size: 24px; }
+  header .sub { font-size: 14px; opacity: 0.9; }
+  main { max-width: 880px; margin: 30px auto; padding: 0 20px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 24px; margin-bottom: 20px;
+  }
+  .quiz-header {
+    display: flex; justify-content: space-between; align-items: center;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white;
+    padding: 16px 20px; border-radius: 12px; margin-bottom: 20px;
+  }
+  .quiz-header .score-big { font-size: 32px; font-weight: 700; font-family: var(--mono); }
+  .quiz-header .score-lbl { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+  .quiz-header .progress-txt { font-size: 14px; opacity: 0.9; }
+  .qcard {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 18px; margin-bottom: 14px;
+  }
+  .qcard .qnum { display: inline-block; background: var(--primary); color: white;
+    padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+  .qcard .qstem { font-weight: 600; margin: 4px 0 12px 0; }
+  .qcard .opts { display: flex; flex-direction: column; gap: 8px; }
+  .qcard button.opt {
+    text-align: left; padding: 10px 14px; border: 1.5px solid var(--line);
+    background: white; border-radius: 8px; cursor: pointer; font-size: 14px; font-family: inherit;
+    transition: all 0.15s; line-height: 1.5;
+  }
+  .qcard button.opt:hover:not(:disabled) { border-color: var(--primary); background: #ebf4fc; }
+  .qcard button.opt.correct { background: var(--green-light); border-color: var(--green); color: var(--green); font-weight: 600; }
+  .qcard button.opt.wrong { background: var(--red-light); border-color: var(--red); color: var(--red); }
+  .qcard button.opt:disabled { cursor: default; opacity: 0.85; }
+  .qcard .explain {
+    margin-top: 12px; padding: 10px 14px; background: #f0f7fc;
+    border-left: 4px solid var(--primary); border-radius: 4px; font-size: 13px; line-height: 1.7; display: none;
+  }
+  .qcard .explain.shown { display: block; }
+  .quiz-finish {
+    display: none; background: linear-gradient(135deg, var(--green), #225f44); color: white;
+    padding: 26px; border-radius: 12px; text-align: center; margin-bottom: 20px;
+  }
+  .quiz-finish.shown { display: block; }
+  .quiz-finish h3 { margin: 0 0 8px 0; font-size: 22px; }
+  .quiz-finish .final-score { font-size: 40px; font-weight: 700; font-family: var(--mono); margin: 8px 0; }
+  .quiz-finish .msg { font-size: 14px; opacity: 0.95; margin-bottom: 16px; line-height: 1.7; }
+  .btn {
+    background: white; color: var(--primary); border: none; padding: 10px 20px;
+    border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; margin: 0 6px;
+  }
+  .btn:hover { background: #ebf4fc; }
+  .btn-outline {
+    background: transparent; color: white; border: 1.5px solid white;
+  }
+  .btn-outline:hover { background: rgba(255,255,255,0.15); }
+  .reset-area { text-align: right; margin-bottom: 12px; }
+  .reset-btn { background: white; color: var(--sub); border: 1px solid var(--line);
+    padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+  .reset-btn:hover { background: #fff5f5; color: var(--red); border-color: var(--red); }
+  .cert-page {
+    display: none; background: white; max-width: 900px; margin: 30px auto;
+    padding: 60px 50px; border: 8px double var(--primary); border-radius: 12px;
+    text-align: center;
+  }
+  .cert-page.shown { display: block; }
+  .cert-title { font-size: 30px; font-weight: 700; color: var(--primary); margin: 0; letter-spacing: 2px; }
+  .cert-sub { font-size: 18px; color: var(--sub); margin: 8px 0 30px 0; }
+  .cert-name {
+    font-size: 26px; font-weight: 700; margin: 30px 0 4px 0; padding-bottom: 8px;
+    border-bottom: 2px solid var(--ink); display: inline-block; min-width: 320px;
+  }
+  .cert-name-lbl { font-size: 12px; color: var(--sub); margin-bottom: 10px; }
+  .cert-body { margin: 30px 0; font-size: 16px; line-height: 1.9; }
+  .cert-score {
+    font-size: 28px; font-weight: 700; color: var(--primary); margin: 16px 0;
+    font-family: var(--mono);
+  }
+  .cert-meta { display: flex; justify-content: space-around; margin-top: 30px; font-size: 13px; flex-wrap: wrap; gap: 16px; }
+  .cert-meta div { text-align: left; }
+  .cert-meta b { display: block; font-size: 11px; color: var(--sub); margin-bottom: 4px; }
+  .cert-code { font-family: var(--mono); font-size: 11px; }
+  .actions-bar { text-align: center; margin: 20px 0; }
+  @media print {
+    body { background: white; }
+    header, main, .actions-bar, .reset-area { display: none !important; }
+    .cert-page { display: block !important; box-shadow: none; border: 6px double var(--primary); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>免疫学・代謝生化学特論 — 第5回</h1>
+  <div class="sub">腸上皮、腸内細菌、腸免疫システム / 復習クイズ (20 問) / 2026-05-07</div>
+</header>
+
+<main id="main">
+
+<div class="card">
+  <h3 style="margin-top:0;">復習クイズの進め方</h3>
+  <p style="font-size:14px; color:var(--sub); margin: 0 0 8px 0;">
+    全 20 問。各問の選択肢をクリックして解答すると、即時に正解と解説が表示されます。
+    全問解答後、得点と修了証が表示されます (合格基準なし、全員に修了証発行)。
+  </p>
+  <p style="font-size:13px; color:var(--sub); margin: 0;">
+    「修了証を表示」→「印刷 / PDF 保存」で PDF として保存できます。Canvas のレポート課題提出にお使いください。
+  </p>
+</div>
+
+<div class="quiz-header">
+  <div>
+    <div class="score-big" id="quiz-score">0</div>
+    <div class="score-lbl">正解 / 20</div>
+  </div>
+  <div class="progress-txt" id="quiz-progress">0 / 20 問回答済み</div>
+</div>
+
+<div class="reset-area">
+  <button class="reset-btn" id="quiz-reset">クイズをリセット</button>
+</div>
+
+<div class="quiz-finish" id="quiz-finish">
+  <h3 id="quiz-finish-title">お疲れさまでした！</h3>
+  <div class="final-score" id="quiz-finish-score">0 / 20</div>
+  <div class="msg" id="quiz-finish-msg"></div>
+  <button class="btn" id="cert-show-btn">📜 修了証を表示</button>
+  <button class="btn btn-outline" id="cert-print-btn">🖨️ 印刷 / PDF 保存</button>
+</div>
+
+<div id="quiz-list"></div>
+
+</main>
+
+<div class="cert-page" id="cert-page">
+  <div class="cert-title">修了証</div>
+  <div class="cert-sub">Certificate of Completion — 第5回 腸上皮、腸内細菌、腸免疫システム</div>
+  <div>
+    <div class="cert-name-lbl">学生名 (Name)</div>
+    <div class="cert-name" id="cert-name">_______________</div>
+  </div>
+  <div class="cert-body">
+    本者は、慶應義塾大学薬学部 薬科学科 修士課程<br>
+    <b>免疫学・代謝生化学特論 第5回</b> 復習クイズ (全 20 問) を完了しました。
+    <div class="cert-score" id="cert-score">0 / 20</div>
+  </div>
+  <div class="cert-meta">
+    <div><b>講義日</b> 2026-05-07 (Thu)</div>
+    <div><b>担当</b> 髙橋 大輔</div>
+    <div><b>完了日</b> <span id="cert-date">—</span></div>
+    <div><b>認証コード</b> <span class="cert-code" id="cert-code">—</span></div>
+  </div>
+</div>
+
+<div class="actions-bar">
+  <button class="btn btn-outline" id="cert-back-btn" style="display:none; color:var(--primary); border-color:var(--primary);">← クイズに戻る</button>
+</div>
+
+<script>
+const QUIZ = [
+  {
+    stem: 'ヒトの腸内に存在する腸内細菌の総数 (個体数) として最も近いのはどれか。',
+    options: ['約 4 億', '約 4 兆', '約 40 兆', '約 400 兆'],
+    correct: 2,
+    explain: '<b>正解: C) 約 40 兆</b>。ヒトの腸内には約 40 兆個の腸内細菌が棲息する。種類は一個人あたり数百種類、ヒト全体では 1,000 種類に及ぶ。腸内細菌叢のゲノムサイズはヒトゲノムの約 150 倍、遺伝子数は約 1,000 万個 (ヒト 25,000 個に対して)。'
+  },
+  {
+    stem: '腸管 (小腸 + 大腸) を広げた時の表面積として最も近いのはどれか。',
+    options: ['約 1 m²', '約 10 m²', 'テニスコート 1 面分 (約 200 m²)', 'サッカー場 1 面分 (約 7,000 m²)'],
+    correct: 2,
+    explain: '<b>正解: C) テニスコート 1 面分 (約 200 m²)</b>。小腸の絨毛・微絨毛により表面積が極端に拡大される。腸管腔は「内なる外」と呼ばれ、外界と最も広く接する場所。'
+  },
+  {
+    stem: '全身の免疫細胞のうち、腸 (腸管粘膜) に存在する割合として最も近いのはどれか。',
+    options: ['約 10%', '約 30%', '約 50%', '約 70%'],
+    correct: 3,
+    explain: '<b>正解: D) 約 70%</b>。腸管は外界 (内なる外) に最も接する場所で、全身免疫細胞の約 7 割がここに存在する。腸管免疫が全身免疫の中核を担う理由。'
+  },
+  {
+    stem: '大腸の粘液層の構造に関する記述として正しいのはどれか。',
+    options: [
+      '一層構造で内外の区別はない',
+      '内粘液層は強固なムチンゲルで腸内細菌をほとんど含まない',
+      '外粘液層は完全に無菌である',
+      '粘液は主に小腸で分泌される'
+    ],
+    correct: 1,
+    explain: '<b>正解: B</b>。大腸の粘液層は二層構造。内粘液層は強固なムチンゲル + 抗菌ペプチドで腸内細菌をほぼ排除し、外粘液層は腸内細菌の格好の生息環境となる。Muc2 欠損マウスでは腸内細菌が上皮細胞直上まで近接する。'
+  },
+  {
+    stem: '腸管粘液の主成分であるムチンタンパク質はどれか。',
+    options: ['Muc1', 'Muc2', 'Muc5AC', 'Muc6'],
+    correct: 1,
+    explain: '<b>正解: B) Muc2</b>。Muc2 は杯細胞 (goblet cell) から分泌される大腸粘液の主要成分。多数の O 型糖鎖を持つゲル形成型ムチン。Muc1 (細胞膜結合)、Muc5AC (胃)、Muc6 (胃) と区別される。'
+  },
+  {
+    stem: '大腸の内粘液層に高濃度で存在する抗菌タンパク質の例として正しいのはどれか。',
+    options: ['Lypd8 (および カテリシジン)', 'アルブミン', 'ヘモグロビン', 'インスリン'],
+    correct: 0,
+    explain: '<b>正解: A) Lypd8</b>。Lypd8 やカテリシジンが内粘液層に豊富で、抗菌活性により腸内細菌の上皮細胞への接触を阻止する。Lypd8 欠損マウスでは内粘液層への細菌侵入が起こり、上皮細胞直上まで腸内細菌が近接する。'
+  },
+  {
+    stem: '腸管粘膜で最も豊富な免疫グロブリン (抗体) クラスはどれか。',
+    options: ['IgG', 'IgM', '分泌型 IgA (二量体)', 'IgE'],
+    correct: 2,
+    explain: '<b>正解: C) 分泌型 IgA</b>。粘膜固有層で形質細胞が分泌する二量体 IgA が J 鎖と分泌片 (SC) を伴って粘液層に分泌される。腸内細菌・病原体・食事抗原の中和、腸内細菌叢構成の制御に働く。'
+  },
+  {
+    stem: 'B 細胞から IgA 産生形質細胞への分化を促す代謝物・サイトカインの組み合わせとして正しいのはどれか。',
+    options: [
+      'グルコース と インスリン',
+      'all-trans retinoic acid (atRA、ビタミン A 由来) と 活性型 TGF-β',
+      'コレステロール と インターロイキン-2',
+      'パルミチン酸 と TNF-α'
+    ],
+    correct: 1,
+    explain: '<b>正解: B</b>。CD103⁺ 樹状細胞がビタミン A から <b>atRA</b> を産生し、<b>活性型 TGF-β</b> と組み合わせて B 細胞の IgA クラススイッチと粘膜ホーミング (CCR9, α4β7 発現) を誘導する。粘膜免疫の組織特異性の核心。'
+  },
+  {
+    stem: 'IgA 産生に関わる粘膜固有層の樹状細胞のマーカーはどれか。',
+    options: ['CD4', 'CD8', 'CD103⁺ (αE インテグリン)', 'F4/80'],
+    correct: 2,
+    explain: '<b>正解: C) CD103⁺ 樹状細胞</b>。粘膜固有層から腸間膜リンパ節へ移動する CD103⁺ DC が腸内細菌抗原を取り込み、ビタミン A → atRA 産生 → IgA クラススイッチを誘導。腸管特異的免疫応答の中心 DC。'
+  },
+  {
+    stem: '大腸管腔の酸素分圧 (oxygen tension) の値として最も近いのはどれか。',
+    options: [
+      '大気と同じ約 160 mmHg',
+      '約 50 mmHg',
+      '約 32 mmHg (十二指腸と同程度)',
+      '1 mmHg 未満 (約 0.1%、嫌気的)'
+    ],
+    correct: 3,
+    explain: '<b>正解: D) < 1 mmHg (嫌気的)</b>。大腸管腔は腸内細菌の代謝 + 大腸上皮細胞の血中酸素消費 (酪酸を主エネルギー源とすることで管腔へ拡散させない) で極端な低酸素環境になる。これが偏性嫌気性菌の SCFA 産生の前提。十二指腸 ~32 mmHg、回腸 ~22 mmHg、大腸 < 1 mmHg と勾配がある。'
+  },
+  {
+    stem: '短鎖脂肪酸 (SCFAs) に<b>含まれない</b>ものはどれか。',
+    options: [
+      '酢酸 (acetate, C2)',
+      'プロピオン酸 (propionate, C3)',
+      '酪酸 (butyrate, C4)',
+      'パルミチン酸 (palmitate, C16、長鎖脂肪酸)'
+    ],
+    correct: 3,
+    explain: '<b>正解: D) パルミチン酸</b>。SCFA は炭素数 6 以下の脂肪酸で、酢酸 (C2)、プロピオン酸 (C3)、酪酸 (C4) が主要 3 種。パルミチン酸 (C16) は長鎖脂肪酸 (LCFA) で、SCFA とは異なる代謝経路と機能を持つ。'
+  },
+  {
+    stem: '大腸上皮細胞 (colonocyte) の主要なエネルギー源として正しいのはどれか。',
+    options: ['グルコース', 'パルミチン酸', '酪酸 (butyrate)', 'ケトン体'],
+    correct: 2,
+    explain: '<b>正解: C) 酪酸</b>。小腸上皮はグルコースを主に使うが、大腸にはグルコースがほとんど流入しないため、大腸上皮細胞は酪酸を主要なエネルギー源として進化した。これがミトコンドリアでの β 酸化 + 血中酸素の積極的消費を通じて嫌気的環境構築にも寄与。潰瘍性大腸炎では colonocyte のミトコンドリアが減少し、この経路が破綻している。'
+  },
+  {
+    stem: '腸内細菌叢のエンテロタイプ 3 種に<b>含まれない</b>ものはどれか。',
+    options: ['Bacteroides 型 (肉食系)', 'Prevotella 型 (草食系)', 'Ruminococcus 型 (雑食系)', 'Lactobacillus 型'],
+    correct: 3,
+    explain: '<b>正解: D) Lactobacillus 型</b>。Arumugam et al. <i>Nature</i> 2011 で提唱されたエンテロタイプは <b>Bacteroides・Prevotella・Ruminococcus</b> の 3 型。性別・人種・居住地より長期食習慣で決まる。日本人は Ruminococcus 型 (雑食系) が多い。'
+  },
+  {
+    stem: '腸内細菌が関与する <b>TMAO (trimethylamine N-oxide)</b> の生成経路として正しいのはどれか。',
+    options: [
+      '食物繊維 → 大腸菌 → TMAO',
+      '食事中のレシチン・カルニチン → 腸内細菌で TMA 産生 → 肝臓で TMAO へ変換',
+      'ブドウ糖 → 大腸 → TMAO',
+      '乳酸 → 腸内細菌 → TMAO'
+    ],
+    correct: 1,
+    explain: '<b>正解: B</b>。赤身肉のカルニチン・卵黄のレシチン → 腸内細菌が TMA (魚の腐敗臭の主成分) に代謝 → 肝臓で <b>TMAO</b> へ酸化。TMAO はマクロファージのコレステロール取り込みを亢進 → アテローム性動脈硬化のリスク。Prevotella 型 (TMA 産生菌が多い) でリスク増。Wang <i>Nature</i> 2011、Koeth <i>Nat Med</i> 2013。'
+  },
+  {
+    stem: '腸管部位ごとの細菌密度 (CFU/g) の関係として正しいのはどれか。',
+    options: [
+      '十二指腸 ≫ 大腸',
+      '小腸 = 大腸',
+      '大腸 (~10¹²) ≫ 回腸 (~10⁹) ≫ 十二指腸 (~10⁵)',
+      '部位による差はほとんどない'
+    ],
+    correct: 2,
+    explain: '<b>正解: C</b>。胆汁酸・低 pH・蠕動で上部消化管は細菌が少なく、嫌気的環境が整う大腸で 10¹²/g と地球上最も高密度な細菌生態系を持つ。十二指腸 ~10⁵ → 回腸 ~10⁹ → 大腸 ~10¹² と腸管下流ほど高密度。'
+  },
+  {
+    stem: '無菌マウス (germ-free mouse) の特徴として正しいのはどれか。',
+    options: [
+      '通常マウスより短命である',
+      '通常マウスより長生きするが、粘膜免疫システムの発達が著しく不十分である',
+      '腸の細胞の寿命は通常と完全に同じ',
+      '腸内細菌叢が人工的に完全な状態で維持される'
+    ],
+    correct: 1,
+    explain: '<b>正解: B</b>。無菌マウスは病原体・抗原刺激がなく通常飼育より <b>1.3-1.5 倍長生き</b>するが、粘膜免疫システム (Peyer 板、IgA 産生、Th17 分化) が著しく未熟。腸内細菌が免疫系の発達に必須である決定的証拠。腸の細胞の寿命で死ぬとされる。'
+  },
+  {
+    stem: 'FMT (糞便微生物移植、Fecal Microbiota Transplant) が最も確立した適応症はどれか。',
+    options: [
+      '高血圧',
+      '再発性 Clostridioides difficile 感染症 (rCDI)',
+      'アトピー性皮膚炎',
+      '1 型糖尿病'
+    ],
+    correct: 1,
+    explain: '<b>正解: B) rCDI</b>。再発性 <i>C. difficile</i> 感染症は標準抗菌薬 (バンコマイシン・フィダキソマイシン) でも再発する難治例が存在し、FMT で約 90% 治癒する。これが世界的に最初に確立した FMT 適応で、後の LBP (live biotherapeutic product) 承認にも繋がった。'
+  },
+  {
+    stem: '2022 年 11 月に FDA が世界初のマイクロバイオーム製剤 (LBP) として承認したのはどれか。',
+    options: [
+      'Vowst (SER-109、経口カプセル)',
+      'Rebyota (Fecal Microbiota, live-jslm、Ferring 社、直腸投与)',
+      'MRx0518 (Microbiotica)',
+      'パチシラン (Patisiran、Onpattro)'
+    ],
+    correct: 1,
+    explain: '<b>正解: B) Rebyota</b>。Ferring 社の Rebyota が 2022 年 11 月 FDA 承認、世界初の FDA 承認マイクロバイオーム製剤。糞便由来・直腸投与。続いて Vowst (SER-109、経口カプセル、Firmicutes 胞子 50 菌株) が 2023 年 4 月承認 (世界初の経口 LBP)。両者とも rCDI 治療。'
+  },
+  {
+    stem: '抗 PD-1 抗体 (ペムブロリズマブ等) と FMT の関係について正しいものはどれか。',
+    options: [
+      'FMT は抗 PD-1 抗体の効果を完全に阻害する',
+      'FMT と抗 PD-1 抗体は無関係である',
+      'FMT 後に anti-PD-1 抵抗性のメラノーマが感受性に転換しうる (Baruch 2021、Davar 2021 等)',
+      'FMT は抗 PD-1 抗体の効果を 100% 増強し全例で奏効する'
+    ],
+    correct: 2,
+    explain: '<b>正解: C</b>。Baruch ら <i>Science</i> 2021、Davar ら <i>Science</i> 2021 で、anti-PD-1 抵抗性メラノーマに FMT を併用すると一部 (15 例中 6 例) で奏効。Routy ら <i>Nat Med</i> 2023 では FMT + ニボルマブで 65% ORR (奏効率)。腸内細菌叢が免疫チェックポイント阻害薬の効果を左右する。Microbiotica の MRx0518 など合理設計の単一菌株製剤も第 I/II 相進行中。'
+  },
+  {
+    stem: '母児抗体伝達と腸管感染防御に関する記述として正しいのはどれか。',
+    options: [
+      '母乳は新生児には不要である',
+      '母親の母乳に分泌される抗体には腸内共生細菌に対する自然抗体 (natural antibody) が含まれ、ETEC (毒素原性大腸菌) など病原性大腸菌の感染防御に寄与する',
+      '抗体は胎盤のみで伝達される',
+      '母乳中の抗体は胃酸で完全に分解されるため意味がない'
+    ],
+    correct: 1,
+    explain: '<b>正解: B</b>。Zheng ら <i>Nature</i> 2020。母親が体内で作る腸内共生細菌に対する <b>natural antibody</b> が母乳に分泌され、これが <b>ETEC (Enterotoxigenic Escherichia coli、毒素原性大腸菌)</b> など病原性大腸菌に交差性を示し新生児の腸管感染防御に貢献する。胎盤伝達の IgG とは別経路の防御。'
+  },
+];
+
+let state = {
+  answered: new Array(QUIZ.length).fill(null),
+  correct: 0,
+  done: false,
+};
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('imm_tokuron_lec5_state');
+    if (s) state = JSON.parse(s);
+  } catch (e) { /* ignore */ }
+}
+
+function saveState() {
+  try { localStorage.setItem('imm_tokuron_lec5_state', JSON.stringify(state)); } catch (e) {}
+}
+
+function renderQuiz() {
+  const root = document.getElementById('quiz-list');
+  root.innerHTML = '';
+  QUIZ.forEach((q, qi) => {
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    const ans = state.answered[qi];
+    card.innerHTML = `
+      <div class="qnum">Q${qi + 1}</div>
+      <div class="qstem">${q.stem}</div>
+      <div class="opts" id="opts-${qi}"></div>
+      <div class="explain ${ans !== null ? 'shown' : ''}" id="explain-${qi}">${q.explain}</div>
+    `;
+    root.appendChild(card);
+
+    const opts = document.getElementById(`opts-${qi}`);
+    q.options.forEach((opt, oi) => {
+      const btn = document.createElement('button');
+      btn.className = 'opt';
+      btn.innerHTML = String.fromCharCode(65 + oi) + ') ' + opt;
+      if (ans !== null) {
+        btn.disabled = true;
+        if (oi === q.correct) btn.classList.add('correct');
+        else if (oi === ans) btn.classList.add('wrong');
+      }
+      btn.onclick = () => answer(qi, oi);
+      opts.appendChild(btn);
+    });
+  });
+  updateProgress();
+  if (state.answered.every(a => a !== null)) showFinish();
+}
+
+function answer(qi, oi) {
+  if (state.answered[qi] !== null) return;
+  state.answered[qi] = oi;
+  if (oi === QUIZ[qi].correct) state.correct++;
+  saveState();
+  renderQuiz();
+}
+
+function updateProgress() {
+  const done = state.answered.filter(a => a !== null).length;
+  document.getElementById('quiz-score').textContent = state.correct;
+  document.getElementById('quiz-progress').textContent = `${done} / ${QUIZ.length} 問回答済み`;
+}
+
+function showFinish() {
+  state.done = true;
+  saveState();
+  const box = document.getElementById('quiz-finish');
+  box.classList.add('shown');
+  document.getElementById('quiz-finish-score').textContent = `${state.correct} / ${QUIZ.length}`;
+  const pct = Math.round(state.correct / QUIZ.length * 100);
+  document.getElementById('quiz-finish-msg').innerHTML = `
+    お疲れさまでした。正答率 <b>${pct}%</b>。<br>
+    全員に修了証が発行されます。修了証を表示して印刷 / PDF 保存し、Canvas のレポート課題に提出してください。
+  `;
+}
+
+document.getElementById('quiz-reset').addEventListener('click', () => {
+  if (!confirm('クイズの解答をリセットしますか?')) return;
+  localStorage.removeItem('imm_tokuron_lec5_state');
+  state = { answered: new Array(QUIZ.length).fill(null), correct: 0, done: false };
+  document.getElementById('quiz-finish').classList.remove('shown');
+  renderQuiz();
+});
+
+document.getElementById('cert-show-btn').addEventListener('click', async () => {
+  const name = prompt('修了証に記載する氏名 (フルネーム) を入力してください:', '');
+  if (!name || !name.trim()) return;
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  const code = await generateCode(name.trim(), state.correct, dateStr);
+  document.getElementById('cert-name').textContent = name.trim();
+  document.getElementById('cert-score').textContent = `${state.correct} / ${QUIZ.length}`;
+  document.getElementById('cert-date').textContent = dateStr;
+  document.getElementById('cert-code').textContent = code;
+  document.getElementById('cert-page').classList.add('shown');
+  document.getElementById('cert-back-btn').style.display = '';
+  document.getElementById('cert-page').scrollIntoView({ behavior: 'smooth' });
+});
+
+document.getElementById('cert-print-btn').addEventListener('click', () => {
+  if (!document.getElementById('cert-page').classList.contains('shown')) {
+    alert('先に「修了証を表示」ボタンで氏名を入力してください。');
+    return;
+  }
+  window.print();
+});
+
+document.getElementById('cert-back-btn').addEventListener('click', () => {
+  document.getElementById('cert-page').classList.remove('shown');
+  document.getElementById('cert-back-btn').style.display = 'none';
+  document.getElementById('main').scrollIntoView({ behavior: 'smooth' });
+});
+
+async function generateCode(studentId, score, date) {
+  const data = `${studentId}:imm-tokuron-lec5:${score}/${QUIZ.length}:${date}:imm2026`;
+  const encoder = new TextEncoder();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 8).toUpperCase();
+}
+
+loadState();
+renderQuiz();
+</script>
+</body>
+</html>
