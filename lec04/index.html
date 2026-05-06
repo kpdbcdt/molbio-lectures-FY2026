@@ -248,6 +248,114 @@
   .splice-panel h4 { margin: 0 0 8px 0; font-size: 14px; }
   .splice-panel .product { font-family: var(--mono); font-size: 13px; color: var(--primary); padding: 8px; background: #f0f7ff; border-radius: 6px; margin-top: 8px; }
 
+  /* Replication Speed (Tool 1) */
+  .organism-buttons { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .organism-buttons button {
+    background: white; border: 1.5px solid var(--border); padding: 10px 18px;
+    border-radius: 8px; cursor: pointer; font-size: 13px; font-family: inherit; font-weight: 600; color: var(--muted);
+    transition: all 0.15s;
+  }
+  .organism-buttons button:hover { border-color: var(--primary); background: #f0f7ff; }
+  .organism-buttons button.active { background: var(--primary); color: white; border-color: var(--primary); }
+  .replication-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 14px 0; }
+  .replication-stats .compact-stat .v.warn { color: var(--accent); }
+  .replication-stats .compact-stat .v.ok { color: var(--ok); }
+  .replication-svg-wrap { background: #fafbfc; border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; }
+  .calc-input { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+  .calc-input label { font-size: 13px; color: var(--muted); font-weight: 600; }
+  .calc-input input[type=number] {
+    padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 6px;
+    font-family: var(--mono); font-size: 14px; width: 120px;
+  }
+  .calc-input .unit { font-size: 13px; color: var(--muted); }
+  .paradox-box {
+    background: linear-gradient(135deg, #fffaf0, #fef5e7);
+    border: 2px dashed #e09f3e; border-radius: 8px; padding: 14px 18px; margin: 16px 0;
+  }
+  .paradox-box h4 { margin: 0 0 6px 0; color: #744210; font-size: 14px; }
+  .paradox-box p { margin: 0; font-size: 13px; color: #744210; line-height: 1.7; }
+
+  /* Mutation Hierarchy (Tool 2) */
+  .hierarchy-controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  .hierarchy-toggle {
+    flex: 1; min-width: 200px;
+    background: white; border: 2px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; cursor: pointer; transition: all 0.2s;
+  }
+  .hierarchy-toggle:hover { border-color: var(--primary); }
+  .hierarchy-toggle.active { background: linear-gradient(135deg, #f0f7ff, #fff); border-color: var(--primary); }
+  .hierarchy-toggle h4 { margin: 0 0 4px 0; font-size: 14px; }
+  .hierarchy-toggle p { margin: 0; font-size: 11px; color: var(--muted); }
+  .hierarchy-toggle .factor {
+    font-family: var(--mono); font-size: 14px; color: var(--primary);
+    font-weight: 700; margin-top: 4px;
+  }
+  .hierarchy-bars-wrap {
+    background: white; border: 1px solid var(--border); border-radius: 8px; padding: 18px; margin-top: 14px;
+  }
+  .hierarchy-bar-row {
+    display: grid; grid-template-columns: 180px 1fr 130px;
+    gap: 12px; align-items: center; margin: 8px 0;
+  }
+  @media (max-width: 720px) { .hierarchy-bar-row { grid-template-columns: 1fr; } }
+  .hierarchy-bar-row .lbl { font-size: 13px; font-weight: 600; }
+  .hierarchy-bar-row .bar-track {
+    height: 28px; background: #f0f7ff; border-radius: 4px; position: relative; overflow: hidden;
+  }
+  .hierarchy-bar-row .bar-fill {
+    height: 100%; border-radius: 4px;
+    transition: width 0.4s, background 0.2s;
+  }
+  .hierarchy-bar-row .bar-label {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    font-family: var(--mono); font-size: 12px; font-weight: 700; color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+  .hierarchy-bar-row .err-count {
+    font-family: var(--mono); font-size: 13px; color: var(--accent); font-weight: 700; text-align: right;
+  }
+  .clinical-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 12px; }
+  .clinical-card {
+    background: white; border: 1.5px solid var(--border); border-radius: 8px; padding: 14px; transition: all 0.15s;
+  }
+  .clinical-card.msi { border-color: var(--accent); background: linear-gradient(135deg, #fffafa, #fff); }
+  .clinical-card h4 { margin: 0 0 6px 0; font-size: 13px; color: var(--accent); }
+  .clinical-card .num { font-family: var(--mono); font-size: 20px; color: var(--accent); font-weight: 700; }
+  .clinical-card p { margin: 6px 0 0 0; font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  /* Drug Matcher (Tool 3) */
+  .drug-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .drug-card {
+    background: white; border: 2px solid var(--border); border-radius: 10px; padding: 16px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .drug-card:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(43,108,176,0.1); transform: translateY(-2px); }
+  .drug-card.active { border-color: var(--primary); background: linear-gradient(135deg, #f0f7ff, #fff); box-shadow: 0 4px 12px rgba(43,108,176,0.15); }
+  .drug-card .drug-emoji { font-size: 28px; margin-bottom: 4px; }
+  .drug-card h4 { margin: 0 0 4px 0; font-size: 15px; color: var(--primary); }
+  .drug-card .drug-class { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .drug-card .drug-target { font-size: 12px; color: var(--ink); font-weight: 600; }
+  .drug-card .drug-biomarker { font-size: 11px; color: var(--accent); font-weight: 600; margin-top: 4px; }
+  .drug-detail {
+    background: linear-gradient(135deg, #f0f7ff, #fff); border: 2px solid var(--primary);
+    border-radius: 10px; padding: 22px; margin-top: 16px;
+  }
+  .drug-detail h3 { margin: 0 0 8px 0; color: var(--primary); font-size: 18px; }
+  .drug-detail .drug-class-tag {
+    display: inline-block; background: var(--primary); color: white; font-size: 11px;
+    padding: 2px 10px; border-radius: 12px; font-weight: 600; margin-bottom: 12px;
+  }
+  .drug-detail .field { margin: 10px 0; }
+  .drug-detail .field-label {
+    font-size: 11px; color: var(--muted); font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;
+  }
+  .drug-detail .field-value { font-size: 14px; line-height: 1.6; }
+  .drug-detail .biomarker-box {
+    background: #fffafa; border-left: 3px solid var(--accent);
+    padding: 10px 14px; border-radius: 4px; margin-top: 8px; font-size: 13px;
+  }
+
   /* Quiz */
   .quiz-header {
     display: flex;
@@ -441,13 +549,159 @@
 </div>
 
 <nav class="tabs">
-  <button data-tab="quiz" class="active">✅ Quiz (12問)</button>
+  <button data-tab="replication" class="active">🔬 Replication Speed</button>
+  <button data-tab="hierarchy">🎯 Mutation Hierarchy</button>
+  <button data-tab="drugs">💊 DNA Damage Drug Matcher</button>
+  <button data-tab="quiz">✅ Quiz (12問)</button>
 </nav>
 
 <main>
 
-<!-- ============ TAB 1: CHROMATIN COMPACTION ============ -->
-<section id="quiz" class="tab active">
+<!-- ============ TAB 1: REPLICATION SPEED CALCULATOR ============ -->
+<section id="replication" class="tab active">
+  <h2>🔬 Replication Speed Calculator + Multifork Visualizer</h2>
+  <p class="lead">DNA 複製は意外に遅い。1 つのフォークが 1 秒に進む距離は限られていて、生物は<strong>複数の複製起点 (origin) を同時に発火</strong>させて間に合わせている。生物を選んで複製時間と origin 数を体感しよう。</p>
+
+  <div class="card">
+    <div class="organism-buttons" id="org-buttons"></div>
+    <div class="calc-input">
+      <label>ゲノムサイズ:</label>
+      <input type="number" id="rep-genome" value="4.6" min="0.1" max="200000" step="0.1">
+      <span class="unit">Mbp</span>
+      <label style="margin-left:18px;">フォーク速度:</label>
+      <input type="number" id="rep-rate" value="1000" min="10" max="2000" step="10">
+      <span class="unit">nt/秒</span>
+      <label style="margin-left:18px;">Origin 数:</label>
+      <input type="number" id="rep-origins" value="1" min="1" max="100000" step="1">
+    </div>
+
+    <div class="replication-stats" id="rep-stats"></div>
+
+    <div class="paradox-box" id="rep-paradox" style="display:none;">
+      <h4 id="rep-paradox-title">⚡ multifork パラドックス</h4>
+      <p id="rep-paradox-body"></p>
+    </div>
+
+    <div class="replication-svg-wrap">
+      <svg id="rep-svg" viewBox="0 0 800 280" preserveAspectRatio="xMidYMid meet" style="width:100%; max-width:800px; display:block; margin:0 auto;"></svg>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0; font-size:16px;">⚙️ DNA polymerase 分担 (真核生物)</h3>
+    <div class="organism-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:10px;">
+      <div class="organism-card"><h4>Pol α</h4><div class="stat" style="font-size:14px;">開始</div><div class="desc">RNA プライマー後の最初の DNA 合成。プライマーゼ活性持つ複合体。</div></div>
+      <div class="organism-card"><h4>Pol δ</h4><div class="stat" style="font-size:14px;">ラギング鎖</div><div class="desc">PCNA クランプと共に岡崎フラグメント合成。校正活性あり。</div></div>
+      <div class="organism-card"><h4>Pol ε</h4><div class="stat" style="font-size:14px;">リーディング鎖</div><div class="desc">CMG ヘリカーゼと共に進む。校正活性あり。</div></div>
+      <div class="organism-card"><h4>Pol γ</h4><div class="stat" style="font-size:14px;">mtDNA</div><div class="desc">ミトコンドリア DNA を複製。NRTI 系抗 HIV 薬の標的副作用 (神経毒性)。</div></div>
+      <div class="organism-card"><h4>Pol β</h4><div class="stat" style="font-size:14px;">BER</div><div class="desc">塩基除去修復のギャップフィリング。校正活性なし → エラー多い。</div></div>
+    </div>
+  </div>
+
+  <div class="hint">
+    💡 <b>multifork replication (大腸菌の paradox)</b>: 大腸菌の世代時間 ~20 分なのに、ゲノム複製には ~40 分かかる。**oriC 配列はゲノムに 1 か所のみ**だが、前回の複製が終わる前に次の複製を**reinitiation** で起こすことで、1 細胞内に物理コピーが 2-4 か所同時発火する。これは BNID 100051、Phillips & Milo 2016 (CBN p.315-317)。
+  </div>
+</section>
+
+<!-- ============ TAB 2: MUTATION HIERARCHY ============ -->
+<section id="hierarchy" class="tab">
+  <h2>🎯 Mutation Hierarchy Tracker</h2>
+  <p class="lead">DNA pol III の素のエラー率は 10⁻⁵。これに 3'→5' エキソヌクレアーゼ校正と Mismatch Repair (MMR) を重ねて、最終的に 10⁻⁹⁻¹⁰ の超精度に到達する。各層を ON/OFF してエラー率の変化を見よう。</p>
+
+  <div class="card">
+    <h3 style="margin-top:0; font-size:16px;">3 つの精度層 (クリックで ON/OFF)</h3>
+    <div class="hierarchy-controls">
+      <div class="hierarchy-toggle active" data-layer="pol">
+        <h4>① Pol III 単独</h4>
+        <p>Watson-Crick 塩基対形成のみ</p>
+        <div class="factor">10⁻⁵ /塩基</div>
+      </div>
+      <div class="hierarchy-toggle active" data-layer="proof">
+        <h4>② + 校正 (3'→5' エキソ)</h4>
+        <p>Pol ε デルタ ε に内蔵。誤った塩基を切断除去</p>
+        <div class="factor">×10⁻² (100倍精度)</div>
+      </div>
+      <div class="hierarchy-toggle active" data-layer="mmr">
+        <h4>③ + MMR (post-replication)</h4>
+        <p>MutS/MutL → MSH2/MLH1。鋳型と新生鎖の区別はメチル化 (大腸菌) / Pol δ ニック (真核)</p>
+        <div class="factor">×10⁻³ (1,000倍精度)</div>
+      </div>
+    </div>
+
+    <div class="calc-input" style="margin-top:14px;">
+      <label>ゲノムサイズ:</label>
+      <input type="number" id="hier-genome" value="3000" min="1" max="200000" step="100">
+      <span class="unit">Mbp (デフォルト: ヒト 3 Gb)</span>
+      <button class="btn secondary" style="font-size:11px; padding:6px 10px;" onclick="document.getElementById('hier-genome').value=4.6; renderHierarchy();">大腸菌 (4.6 Mb)</button>
+      <button class="btn secondary" style="font-size:11px; padding:6px 10px;" onclick="document.getElementById('hier-genome').value=3000; renderHierarchy();">ヒト (3 Gb)</button>
+    </div>
+
+    <div class="hierarchy-bars-wrap" id="hier-bars"></div>
+  </div>
+
+  <div class="card" style="background:#fffafa; border-color:#d64545;">
+    <h3 style="margin-top:0; font-size:16px; color:#a02828;">🏥 臨床応用: MMR 欠損 (MSI-H) と免疫チェックポイント阻害薬</h3>
+    <p style="font-size:13px;">
+      MMR 関連遺伝子 (<strong>MLH1, MSH2, MSH6, PMS2</strong>) が体細胞変異 or germline 変異 (Lynch 症候群) で機能喪失すると、第③層が外れて変異率が約 1,000 倍に跳ね上がる。
+      これが <strong>MSI-H (microsatellite instability-high)</strong> 腫瘍。
+    </p>
+    <div class="clinical-card-grid">
+      <div class="clinical-card msi">
+        <h4>MSI-H 腫瘍の変異数</h4>
+        <div class="num">~1,000-10,000</div>
+        <p>体細胞変異 / 腫瘍 (TMB-high)。健常組織 ~数百 に対して 10-100 倍多い。</p>
+      </div>
+      <div class="clinical-card msi">
+        <h4>ネオアンチゲン</h4>
+        <div class="num">高頻度</div>
+        <p>変異タンパク質 → MHC class I に提示 → CD8⁺ T 細胞が認識。免疫療法応答性の根拠。</p>
+      </div>
+      <div class="clinical-card msi">
+        <h4>ペムブロリズマブ承認</h4>
+        <div class="num">2017 (世界初)</div>
+        <p>抗 PD-1 抗体。<strong>MSI-H/dMMR の固形腫瘍</strong>で<strong>組織横断的承認</strong>(臓器を問わない)。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="hint">
+    💡 <b>「精度の階層」は使い回しの設計思想</b>: DNA 複製 (Lec04) も翻訳 (Lec07) も、同じ「初期選択 → kinetic proofreading → 後段修復」のアーキテクチャ。
+    エラー率 10⁻⁹ は印刷物に例えると「1,000 冊の本に typo 1 個」(CBN p.305)。
+  </div>
+</section>
+
+<!-- ============ TAB 3: DNA DAMAGE DRUG MATCHER ============ -->
+<section id="drugs" class="tab">
+  <h2>💊 DNA Damage Repair Drug Matcher</h2>
+  <p class="lead">DNA 修復経路を理解すると、抗がん薬の作用機序とコンパニオン診断が一貫して見える。薬剤をクリックして、<strong>何の損傷を作るか × どの修復経路が標的か × どの biomarker で適応判定するか</strong>を確認しよう。</p>
+
+  <div class="card">
+    <div class="drug-grid" id="drug-grid"></div>
+    <div id="drug-detail-panel"></div>
+  </div>
+
+  <div class="card" style="background:#f0f7ff; border-color:#4a90d9;">
+    <h3 style="margin-top:0; font-size:16px; color:#1a4a80;">🔬 修復経路 × 薬剤の対応マップ</h3>
+    <div class="organism-grid" style="grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));">
+      <div class="organism-card"><h4>BER</h4><div class="stat" style="font-size:14px;">塩基除去</div><div class="desc">脱アミノ化、酸化損傷 (8-oxoG)、メチル化を Pol β がギャップフィリング。<strong>PARP1</strong> が SSB センサー。</div></div>
+      <div class="organism-card"><h4>NER</h4><div class="stat" style="font-size:14px;">ヌクレオチド除去</div><div class="desc">UV 由来ピリミジンダイマー、シスプラチン付加体を XPC/XPA が認識して 25-30 nt 切除。<strong>シスプラチン耐性</strong>と関係。</div></div>
+      <div class="organism-card"><h4>MMR</h4><div class="stat" style="font-size:14px;">ミスマッチ</div><div class="desc">MutS/MutL → MSH2/MLH1。複製後の mismatch を除去。欠損 → MSI-H → <strong>抗 PD-1</strong>。</div></div>
+      <div class="organism-card"><h4>HR</h4><div class="stat" style="font-size:14px;">相同組換え</div><div class="desc">DSB 修復、S/G2 期。BRCA1/2、RAD51。BRCA 欠損 → <strong>PARP 阻害薬で合成致死</strong>。</div></div>
+      <div class="organism-card"><h4>NHEJ</h4><div class="stat" style="font-size:14px;">非相同末端結合</div><div class="desc">DSB 修復の主経路 (G1 期含む全期)。Ku70/80 + DNA-PKcs。CRISPR の indel 形成も NHEJ。</div></div>
+      <div class="organism-card"><h4>直接修復</h4><div class="stat" style="font-size:14px;">MGMT</div><div class="desc">O⁶-MeG を一段反応で脱メチル化。MGMT が <strong>テモゾロミドへの抵抗性</strong>を決める。</div></div>
+    </div>
+  </div>
+
+  <div class="hint">
+    💡 <b>合成致死 (synthetic lethality)</b>: 単独欠損では生存できるが、2 つの遺伝子が同時欠損で致死になる関係。
+    BRCA 変異がん細胞 (HR 欠損) に PARP 阻害薬 (BER 阻害) を投与すると、健常細胞は HR で代償できるが BRCA 欠損細胞は代償不能 → 選択的に死滅。
+    <strong>4 つのオラパリブ系阻害薬</strong> (オラパリブ、ルカパリブ、ニラパリブ、タラゾパリブ) が承認済み。
+    コンパニオン診断は <strong>BRACAnalysis CDx</strong> (BRCA1/2 病的変異の検出)。
+  </div>
+</section>
+
+<!-- ============ TAB 4: QUIZ ============ -->
+<section id="quiz" class="tab">
   <h2>✅ 復習クイズ (12 問)</h2>
   <p class="lead">各問題の選択肢をクリックすると、その場で正解・解説が表示されます。
     <br>
@@ -502,6 +756,13 @@
 </footer>
 
 <script>
+'use strict';
+
+// Sidebar disabled links
+document.querySelectorAll('aside.sidebar a.disabled').forEach(a => {
+  a.addEventListener('click', e => e.preventDefault());
+});
+
 // Tab switching
 document.querySelectorAll('nav.tabs button').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -511,6 +772,434 @@ document.querySelectorAll('nav.tabs button').forEach(btn => {
     document.getElementById(btn.dataset.tab).classList.add('active');
   });
 });
+
+/* ========== 1. Replication Speed Calculator ========== */
+const ORGANISMS = [
+  { id: 'ecoli',  name: '🦠 大腸菌',     genomeMbp: 4.6,    rate: 1000, origins: 1,     generationMin: 20,
+    note: 'rate ≈ 1000 nt/秒 (BNID 109251)。世代時間 20 分なのに複製 ~40 分 → multifork replication で reinitiation。' },
+  { id: 'yeast',  name: '🍞 出芽酵母',   genomeMbp: 12,     rate: 50,   origins: 400,   generationMin: 90,
+    note: 'rate ≈ 50 nt/秒。~400 origins で並列発火。S 期 ~30 分。' },
+  { id: 'human',  name: '🧑 ヒト',       genomeMbp: 3200,   rate: 30,   origins: 30000, generationMin: 1440,
+    note: 'rate ≈ 30 nt/秒 (mammalian)。~30,000-50,000 origins。S 期 ~8 時間。' },
+  { id: 'lungfish', name: '🐟 ハイギョ', genomeMbp: 130000, rate: 30,   origins: 30000, generationMin: 1440,
+    note: 'ヒトの 40 倍のゲノムサイズ。同じ rate/origin 数だと S 期は ~330 時間 → 実際は origin 数を増やして対応。' },
+];
+
+let selectedOrg = 0;
+
+function renderOrgButtons() {
+  const cont = document.getElementById('org-buttons');
+  cont.innerHTML = '';
+  ORGANISMS.forEach((o, i) => {
+    const btn = document.createElement('button');
+    btn.textContent = o.name;
+    if (i === selectedOrg) btn.classList.add('active');
+    btn.addEventListener('click', () => {
+      selectedOrg = i;
+      document.getElementById('rep-genome').value = o.genomeMbp;
+      document.getElementById('rep-rate').value = o.rate;
+      document.getElementById('rep-origins').value = o.origins;
+      renderReplication();
+    });
+    cont.appendChild(btn);
+  });
+}
+
+function renderReplication() {
+  const genomeMbp = parseFloat(document.getElementById('rep-genome').value) || 4.6;
+  const rate = parseFloat(document.getElementById('rep-rate').value) || 1000;
+  const origins = parseInt(document.getElementById('rep-origins').value) || 1;
+  const totalBp = genomeMbp * 1e6;
+  // Each origin spawns 2 forks. Replication time = (genome / 2 / origins) / rate
+  const timeSec = totalBp / (2 * origins * rate);
+  const timeMin = timeSec / 60;
+  const timeHr = timeMin / 60;
+  let timeStr;
+  if (timeMin < 1) timeStr = timeSec.toFixed(0) + ' 秒';
+  else if (timeMin < 60) timeStr = timeMin.toFixed(1) + ' 分';
+  else if (timeHr < 24) timeStr = timeHr.toFixed(1) + ' 時間';
+  else timeStr = (timeHr / 24).toFixed(1) + ' 日';
+
+  const org = ORGANISMS[selectedOrg];
+  const generationMin = org.generationMin;
+  const ratio = timeMin / generationMin;
+  const isMultifork = ratio > 1.0;
+
+  const stats = document.getElementById('rep-stats');
+  stats.innerHTML = `
+    <div class="compact-stat"><div class="v">${timeStr}</div><div class="l">複製時間 (1 round)</div></div>
+    <div class="compact-stat"><div class="v">${origins.toLocaleString()}</div><div class="l">複製起点 (origin)</div></div>
+    <div class="compact-stat"><div class="v">${(origins * 2).toLocaleString()}</div><div class="l">複製フォーク数</div></div>
+    <div class="compact-stat"><div class="v">${rate.toLocaleString()}</div><div class="l">フォーク速度 (nt/秒)</div></div>
+    <div class="compact-stat"><div class="v">${generationMin < 60 ? generationMin + ' 分' : (generationMin / 60).toFixed(1) + ' 時間'}</div><div class="l">世代時間 (参考)</div></div>
+    <div class="compact-stat"><div class="v ${isMultifork ? 'warn' : 'ok'}">${ratio.toFixed(2)}×</div><div class="l">複製/世代 比</div></div>
+  `;
+
+  // Paradox box
+  const paradoxBox = document.getElementById('rep-paradox');
+  const paradoxBody = document.getElementById('rep-paradox-body');
+  const paradoxTitle = document.getElementById('rep-paradox-title');
+  if (isMultifork) {
+    paradoxBox.style.display = 'block';
+    paradoxTitle.textContent = '⚡ multifork replication が必要';
+    paradoxBody.innerHTML = `
+      複製時間 (<strong>${timeMin.toFixed(1)} 分</strong>) > 世代時間 (<strong>${generationMin} 分</strong>)。
+      これでは増殖できない。解: <strong>oriC 配列はゲノムに 1 か所のみ</strong>だが、
+      前回の複製が終わる前に次の複製を <strong>reinitiation</strong> で開始 → 1 細胞内に物理コピーが
+      ${Math.ceil(ratio + 1)} 個程度同時発火する状態に。${org.note}
+    `;
+  } else {
+    paradoxBox.style.display = 'block';
+    paradoxTitle.textContent = '✅ 単一 round で間に合う';
+    paradoxBody.innerHTML = `
+      複製時間 (<strong>${timeStr}</strong>) ≤ 世代時間 → multifork は不要、1 サイクルで完了。
+      ${org.note}
+    `;
+  }
+
+  renderReplicationSVG(origins, rate, isMultifork);
+  // Reset button highlights
+  document.querySelectorAll('#org-buttons button').forEach((b, i) => {
+    b.classList.toggle('active', i === selectedOrg);
+  });
+}
+
+function renderReplicationSVG(origins, rate, isMultifork) {
+  const svg = document.getElementById('rep-svg');
+  const ns = 'http://www.w3.org/2000/svg';
+  svg.innerHTML = '';
+  const W = 800, H = 280;
+  const lineY = 140;
+
+  // Background DNA double line
+  for (let i = 0; i < 2; i++) {
+    const ln = document.createElementNS(ns, 'line');
+    ln.setAttribute('x1', 30); ln.setAttribute('y1', lineY - 8 + i * 16);
+    ln.setAttribute('x2', W - 30); ln.setAttribute('y2', lineY - 8 + i * 16);
+    ln.setAttribute('stroke', '#cbd5e0'); ln.setAttribute('stroke-width', '2');
+    svg.appendChild(ln);
+  }
+
+  // Origin and fork visualization
+  const visibleOrigins = Math.min(origins, isMultifork ? 4 : 6);
+  const usableW = W - 80;
+  const oriSpacing = usableW / (visibleOrigins + 1);
+
+  for (let i = 0; i < visibleOrigins; i++) {
+    const x = 40 + (i + 1) * oriSpacing;
+    // Origin marker
+    const ori = document.createElementNS(ns, 'circle');
+    ori.setAttribute('cx', x); ori.setAttribute('cy', lineY);
+    ori.setAttribute('r', 8);
+    ori.setAttribute('fill', '#d64545');
+    svg.appendChild(ori);
+    const oriLbl = document.createElementNS(ns, 'text');
+    oriLbl.setAttribute('x', x); oriLbl.setAttribute('y', lineY - 16);
+    oriLbl.setAttribute('text-anchor', 'middle');
+    oriLbl.setAttribute('fill', '#d64545'); oriLbl.setAttribute('font-size', '11'); oriLbl.setAttribute('font-weight', '700');
+    oriLbl.textContent = origins === 1 ? 'oriC' : 'ori';
+    svg.appendChild(oriLbl);
+
+    // Bidirectional forks (replication bubble)
+    const bubbleW = Math.min(50, oriSpacing * 0.4);
+    const bubble = document.createElementNS(ns, 'ellipse');
+    bubble.setAttribute('cx', x); bubble.setAttribute('cy', lineY);
+    bubble.setAttribute('rx', bubbleW); bubble.setAttribute('ry', 14);
+    bubble.setAttribute('fill', 'none'); bubble.setAttribute('stroke', '#2b6cb0'); bubble.setAttribute('stroke-width', '2');
+    bubble.setAttribute('stroke-dasharray', '4,2');
+    svg.appendChild(bubble);
+    // Left fork arrow
+    const lf = document.createElementNS(ns, 'text');
+    lf.setAttribute('x', x - bubbleW - 4); lf.setAttribute('y', lineY + 4);
+    lf.setAttribute('text-anchor', 'end'); lf.setAttribute('fill', '#2b6cb0'); lf.setAttribute('font-size', '14'); lf.setAttribute('font-weight', '700');
+    lf.textContent = '←';
+    svg.appendChild(lf);
+    // Right fork arrow
+    const rf = document.createElementNS(ns, 'text');
+    rf.setAttribute('x', x + bubbleW + 4); rf.setAttribute('y', lineY + 4);
+    rf.setAttribute('text-anchor', 'start'); rf.setAttribute('fill', '#2b6cb0'); rf.setAttribute('font-size', '14'); rf.setAttribute('font-weight', '700');
+    rf.textContent = '→';
+    svg.appendChild(rf);
+  }
+
+  // Title and footer label
+  const title = document.createElementNS(ns, 'text');
+  title.setAttribute('x', W / 2); title.setAttribute('y', 30);
+  title.setAttribute('text-anchor', 'middle'); title.setAttribute('fill', '#1a4a80');
+  title.setAttribute('font-size', '15'); title.setAttribute('font-weight', '700');
+  title.textContent = isMultifork
+    ? `⚡ multifork: 物理コピー ${visibleOrigins} か所同時発火 (oriC は 1 か所のみ)`
+    : `${visibleOrigins} 個の origin から双方向にフォークが進む`;
+  svg.appendChild(title);
+
+  const sub = document.createElementNS(ns, 'text');
+  sub.setAttribute('x', W / 2); sub.setAttribute('y', 52);
+  sub.setAttribute('text-anchor', 'middle'); sub.setAttribute('fill', '#5a6978');
+  sub.setAttribute('font-size', '11');
+  sub.textContent = `🔴 origin · 🔵 replication bubble (フォークが両方向に進行) · ${rate.toLocaleString()} nt/秒/フォーク`;
+  svg.appendChild(sub);
+
+  // Footer: process explanation
+  const proc = document.createElementNS(ns, 'text');
+  proc.setAttribute('x', W / 2); proc.setAttribute('y', H - 24);
+  proc.setAttribute('text-anchor', 'middle'); proc.setAttribute('fill', '#5a6978');
+  proc.setAttribute('font-size', '11');
+  proc.textContent = 'リーディング鎖: Pol III/ε 連続合成 · ラギング鎖: Pol III/δ + 岡崎フラグメント (~1 kb) · RNase H1/H2 + Pol I/δ + リガーゼで結合';
+  svg.appendChild(proc);
+}
+
+document.getElementById('rep-genome').addEventListener('input', renderReplication);
+document.getElementById('rep-rate').addEventListener('input', renderReplication);
+document.getElementById('rep-origins').addEventListener('input', renderReplication);
+renderOrgButtons();
+renderReplication();
+
+/* ========== 2. Mutation Hierarchy Tracker ========== */
+const HIERARCHY_LAYERS = {
+  pol:   { active: true, errorRate: 1e-5, label: '① Pol III 単独',         color: '#e53e3e' },
+  proof: { active: true, factor: 1e-2,    label: '② + 校正 (3\'→5\' エキソ)', color: '#e09f3e' },
+  mmr:   { active: true, factor: 1e-3,    label: '③ + MMR (post-replication)', color: '#2e8b57' },
+};
+
+function computeHierarchyRate() {
+  if (!HIERARCHY_LAYERS.pol.active) return null;
+  let r = HIERARCHY_LAYERS.pol.errorRate;
+  if (HIERARCHY_LAYERS.proof.active) r *= HIERARCHY_LAYERS.proof.factor;
+  if (HIERARCHY_LAYERS.mmr.active)   r *= HIERARCHY_LAYERS.mmr.factor;
+  return r;
+}
+
+function formatRate(r) {
+  if (r === null || r === 0) return '—';
+  const log = Math.log10(r);
+  return `10^${log.toFixed(1)}`;
+}
+
+function renderHierarchy() {
+  const wrap = document.getElementById('hier-bars');
+  const genomeMbp = parseFloat(document.getElementById('hier-genome').value) || 3000;
+  const totalBp = genomeMbp * 1e6;
+  wrap.innerHTML = '';
+
+  // Build cumulative cascade
+  const stages = [];
+  let cumulative = HIERARCHY_LAYERS.pol.errorRate;
+  if (HIERARCHY_LAYERS.pol.active) {
+    stages.push({ label: 'Pol III 単独', rate: cumulative, color: '#e53e3e' });
+  }
+  if (HIERARCHY_LAYERS.proof.active && HIERARCHY_LAYERS.pol.active) {
+    cumulative *= HIERARCHY_LAYERS.proof.factor;
+    stages.push({ label: '+ 校正', rate: cumulative, color: '#e09f3e' });
+  }
+  if (HIERARCHY_LAYERS.mmr.active && HIERARCHY_LAYERS.pol.active) {
+    cumulative *= HIERARCHY_LAYERS.mmr.factor;
+    stages.push({ label: '+ MMR', rate: cumulative, color: '#2e8b57' });
+  }
+
+  // Log scale (10⁻⁵ = 100% width, 10⁻¹⁰ = 1% width)
+  const logMax = -5; // best case (Pol alone)
+  const logMin = -11; // worst case (MMR fully active scaled)
+  stages.forEach(s => {
+    const log = Math.log10(s.rate);
+    const widthPct = Math.max(2, ((log - logMin) / (logMax - logMin)) * 100);
+    const errors = s.rate * totalBp;
+    const errorsStr = errors >= 1
+      ? errors.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' 個'
+      : '< 1 個';
+    const row = document.createElement('div');
+    row.className = 'hierarchy-bar-row';
+    row.innerHTML = `
+      <div class="lbl">${s.label}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${widthPct}%; background:linear-gradient(90deg, ${s.color}, ${s.color}cc);"></div>
+        <span class="bar-label">${formatRate(s.rate)}</span>
+      </div>
+      <div class="err-count">${errorsStr} / 世代</div>
+    `;
+    wrap.appendChild(row);
+  });
+
+  // Add summary row
+  const final = stages.length ? stages[stages.length - 1] : null;
+  const summary = document.createElement('div');
+  summary.style.cssText = 'margin-top:14px; padding:12px 14px; background:#f0f7ff; border-radius:6px; font-size:13px;';
+  if (final) {
+    const finalErrors = final.rate * totalBp;
+    summary.innerHTML = `
+      <strong>最終エラー率:</strong> ${formatRate(final.rate)} /塩基 ·
+      <strong>${genomeMbp >= 1000 ? (genomeMbp / 1000).toFixed(1) + ' Gb' : genomeMbp + ' Mb'} ゲノム × 1 世代</strong>:
+      <span style="color:var(--accent); font-family:var(--mono); font-weight:700;">${
+        finalErrors >= 1
+          ? finalErrors.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' 個'
+          : '< 1 個 (' + finalErrors.toExponential(2) + ')'
+      }</span> の複製エラーが残る。
+      ${genomeMbp >= 3000
+        ? `ヒト germline では <strong>30-100 個 / 世代</strong>の de novo 変異 (~70% 父親由来、精原細胞分裂継続による)。`
+        : ''}
+    `;
+  } else {
+    summary.innerHTML = '<strong>Pol を OFF にすると複製不能</strong>。Pol が無いと DNA 合成自体が起きない。';
+  }
+  wrap.appendChild(summary);
+}
+
+document.querySelectorAll('.hierarchy-toggle').forEach(t => {
+  t.addEventListener('click', () => {
+    const layer = t.dataset.layer;
+    HIERARCHY_LAYERS[layer].active = !HIERARCHY_LAYERS[layer].active;
+    t.classList.toggle('active', HIERARCHY_LAYERS[layer].active);
+    renderHierarchy();
+  });
+});
+document.getElementById('hier-genome').addEventListener('input', renderHierarchy);
+renderHierarchy();
+
+/* ========== 3. DNA Damage Drug Matcher ========== */
+const DRUGS = [
+  {
+    id: 'tmz',
+    emoji: '🧠',
+    name: 'テモゾロミド (Temozolomide)',
+    klass: 'アルキル化薬',
+    target: 'DNA グアニン O⁶ メチル化',
+    mechanism: 'グアニンの O⁶ 位を自発的にメチル化 → O⁶-メチルグアニン (O⁶-MeG) → 複製時に T と誤対合 → MMR 認識 → futile cycle → DSB → 細胞死',
+    repairPath: '直接修復 (MGMT) / MMR',
+    biomarker: 'MGMT プロモーターメチル化',
+    biomarkerNote: 'MGMT がメチル化サイレンシングされていると O⁶-MeG が修復できず TMZ 感受性が高い (生存 21.7 ヶ月 vs 12.7 ヶ月、Hegi NEJM 2005)',
+    indication: '膠芽腫 (GBM) 第一選択 (Stupp regimen) — 放射線療法 + TMZ',
+    slide: 'S27',
+  },
+  {
+    id: 'pembro',
+    emoji: '💉',
+    name: 'ペムブロリズマブ (Keytruda)',
+    klass: '抗 PD-1 抗体 (チェックポイント阻害)',
+    target: 'PD-1 (T 細胞活性化阻害シグナル)',
+    mechanism: 'CD8⁺ T 細胞の PD-1 を阻害 → 腫瘍内 T 細胞が活性化 → ネオアンチゲン提示細胞を攻撃。MMR 欠損腫瘍は変異多数 → ネオアンチゲン豊富 → 強奏効。',
+    repairPath: 'MMR (欠損)',
+    biomarker: 'MSI-H / dMMR',
+    biomarkerNote: 'MSH2/MLH1/MSH6/PMS2 機能喪失 → 変異 ~1,000-10,000 個 / 腫瘍 (TMB-high) → ネオアンチゲン高頻度。Lynch 症候群 germline と sporadic 両方を含む。',
+    indication: '組織横断的承認 (2017 FDA、世界初の biomarker-based 承認) — 大腸がん・子宮内膜がん・胃がん等の MSI-H 固形腫瘍',
+    slide: 'S30',
+  },
+  {
+    id: 'olaparib',
+    emoji: '🎯',
+    name: 'オラパリブ (Lynparza)',
+    klass: 'PARP 阻害薬',
+    target: 'PARP1 / PARP2',
+    mechanism: 'PARP は SSB センサー → 阻害すると SSB が DSB に進行 → BRCA 正常細胞は HR で修復可能、BRCA 欠損細胞は修復不能 → 選択的細胞死 = <strong>合成致死 (synthetic lethality)</strong>',
+    repairPath: 'BER (PARP) / HR (BRCA)',
+    biomarker: 'BRCA1/2 病的変異 (germline + somatic)',
+    biomarkerNote: 'BRACAnalysis CDx (Myriad) がコンパニオン診断。BRCA wt 患者には効果なし。卵巣がんで PFS 大幅延長 (SOLO1 試験)。',
+    indication: '卵巣がん (BRCAm 維持療法)、転移性乳がん (BRCAm)、膵がん (BRCAm 維持)、前立腺がん (BRCA + ATM 等 HRR 変異)。同系統 4 剤 (オラパリブ・ルカパリブ・ニラパリブ・タラゾパリブ) 承認済み',
+    slide: 'S31',
+  },
+  {
+    id: 'cisplatin',
+    emoji: '⚗️',
+    name: 'シスプラチン (Cisplatin / CDDP)',
+    klass: '白金製剤',
+    target: 'DNA グアニン N7 鎖内/鎖間架橋',
+    mechanism: 'シス配置の白金がグアニン N7 と共有結合 → DNA 鎖内・鎖間架橋 → 複製・転写阻害 → アポトーシス。NER で除去される。',
+    repairPath: 'NER',
+    biomarker: 'NER 関連 ERCC1 発現 (一部試験的)',
+    biomarkerNote: 'ERCC1 高発現腫瘍は NER 活発 → CDDP 抵抗性。NER 欠損 (色素性乾皮症 XP-A 等) では強毒性。',
+    indication: '精巣・卵巣・膀胱・肺・頭頸部・食道がん。腎毒性・聴覚毒性・末梢神経毒性が用量制限毒性。',
+    slide: 'S26',
+  },
+  {
+    id: '5fu',
+    emoji: '💊',
+    name: '5-フルオロウラシル (5-FU)',
+    klass: '抗代謝薬 (ピリミジンアナログ)',
+    target: 'チミジル酸合成酵素 (TS)',
+    mechanism: 'FdUMP が TS と共有結合 (suicide inhibition) → dTMP 合成阻害 → DNA 合成停止 (チミンレス死)。RNA に取り込まれて RNA 機能障害も。',
+    repairPath: '(直接の修復経路標的ではない)',
+    biomarker: 'DPD (dihydropyrimidine dehydrogenase) 活性 / 遺伝子型',
+    biomarkerNote: 'DPD 欠損 → 5-FU 代謝不能 → 重篤毒性 (致死性骨髄抑制・粘膜障害)。DPYD 遺伝子検査が一部国で必須。',
+    indication: '大腸がん (FOLFOX/FOLFIRI 基幹薬)、胃がん、乳がん、頭頸部がん。経口プロドラッグ (カペシタビン、テガフール) も。',
+    slide: 'S26',
+  },
+];
+
+let activeDrug = null;
+
+function renderDrugGrid() {
+  const grid = document.getElementById('drug-grid');
+  grid.innerHTML = '';
+  DRUGS.forEach((d, i) => {
+    const card = document.createElement('div');
+    card.className = 'drug-card' + (activeDrug === i ? ' active' : '');
+    card.innerHTML = `
+      <div class="drug-emoji">${d.emoji}</div>
+      <h4>${d.name.split(' ')[0]}</h4>
+      <div class="drug-class">${d.klass}</div>
+      <div class="drug-target">標的: ${d.target}</div>
+      <div class="drug-biomarker">🔬 ${d.biomarker}</div>
+    `;
+    card.addEventListener('click', () => {
+      activeDrug = activeDrug === i ? null : i;
+      renderDrugGrid();
+      renderDrugDetail();
+    });
+    grid.appendChild(card);
+  });
+}
+
+function renderDrugDetail() {
+  const panel = document.getElementById('drug-detail-panel');
+  if (activeDrug === null) {
+    panel.innerHTML = `
+      <div style="background:#f7fafc; border:1px dashed var(--border); border-radius:8px; padding:24px; text-align:center; color:var(--muted); font-size:13px;">
+        ↑ 上のカードをクリックすると、機序・コンパニオン診断・適応の詳細が表示されます
+      </div>
+    `;
+    return;
+  }
+  const d = DRUGS[activeDrug];
+  panel.innerHTML = `
+    <div class="drug-detail">
+      <h3>${d.emoji} ${d.name}</h3>
+      <div class="drug-class-tag">${d.klass}</div>
+
+      <div class="field">
+        <div class="field-label">標的</div>
+        <div class="field-value">${d.target}</div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">作用機序</div>
+        <div class="field-value">${d.mechanism}</div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">関連修復経路</div>
+        <div class="field-value">${d.repairPath}</div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">コンパニオン診断 (biomarker)</div>
+        <div class="biomarker-box">
+          <strong>${d.biomarker}</strong><br>
+          ${d.biomarkerNote}
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">適応</div>
+        <div class="field-value">${d.indication}</div>
+      </div>
+
+      <div class="field" style="font-size:12px; color:var(--muted); margin-top:14px;">
+        📍 講義スライド ${d.slide} で扱います
+      </div>
+    </div>
+  `;
+}
+
+renderDrugGrid();
+renderDrugDetail();
 
 // Quiz data
 const QUIZ = [
