@@ -1629,6 +1629,20 @@ document.getElementById('quiz-pdf').addEventListener('click', async () => {
   検証コード ${verCode} · 学籍番号 ${studentId} · ${datetime}
 </footer>
 
+<script>
+(function(){
+  try {
+    var p = new URLSearchParams(location.search);
+    var isRetake = p.get('retake') === '1' ||
+                   (document.referrer && /(?:lms\.keio\.jp\/courses\/)144965/.test(document.referrer));
+    if (!isRetake) return;
+    // Swap PDF URL: 140260 → 144965, item 6135409 → 6135410
+    document.querySelectorAll('a[href*="courses/140260/modules/items/6135409"]').forEach(function(a){
+      a.href = a.href.replace('courses/140260/modules/items/6135409', 'courses/144965/modules/items/6135410');
+    });
+  } catch (e) { /* no-op */ }
+})();
+</script>
 </body>
 </html>`;
 
