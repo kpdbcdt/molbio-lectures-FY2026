@@ -149,6 +149,13 @@
         a.textContent = '開く →';
       }
     });
+    // Propagate ?retake=1 to ALL Lec01-08 card links so child pages know retake context
+    document.querySelectorAll('.card a[href^="./lec"]').forEach(function(a){
+      var h = a.getAttribute('href');
+      if (h && !h.includes('retake=1')) {
+        a.setAttribute('href', h + (h.includes('?') ? '&' : '?') + 'retake=1');
+      }
+    });
   } catch (e) { /* no-op */ }
 })();
 </script>
