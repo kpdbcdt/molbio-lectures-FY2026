@@ -13,9 +13,9 @@ BASE_URL = "https://kpdbcdt.github.io/molbio-lectures-FY2026/lec05/poll/student.
 OUT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 QUESTIONS = {
-    1: ("S03", "発現している遺伝子の割合"),
-    2: ("S07", "二本鎖DNAからの mRNA 配列"),
-    3: ("S14", "リファンピシンの作用段階"),
+    1: ("S04", "大腸菌RNA polの進行速度"),
+    2: ("S09", "ヒトと大腸菌のmRNA半減期比"),
+    3: ("S25", "ヒト細胞1個のmRNA分子総数"),
 }
 
 
