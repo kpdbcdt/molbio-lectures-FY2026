@@ -412,8 +412,10 @@
   </ul>
   <h3>Lec05 リソース</h3>
   <ul>
-    <li><a href="#" class="disabled"><span class="lec-num">📄</span>講義スライド (PDF)<span class="soon-badge">TBD</span></a></li>
-    <li><a href="#" class="disabled"><span class="lec-num">📓</span>NotebookLM<span class="soon-badge">TBD</span></a></li>
+    <li><a href="https://lms.keio.jp/courses/140260/modules/items/6144773" target="_blank"><span class="lec-num">📄</span>講義スライドPDF</a></li>
+    <li><a href="https://lms.keio.jp/courses/144965/modules/items/6144774" target="_blank"><span class="lec-num">📄</span>講義スライドPDF (再度試験)</a></li>
+    <li><a href="https://notebooklm.google.com/notebook/1d8b8329-7987-496c-81eb-d53c6bcacc56" target="_blank"><span class="lec-num">📓</span>NotebookLM (質問・音声復習)</a></li>
+    <li><a href="./poll/instructor.html" target="_blank"><span class="lec-num">🎙️</span>講師用投票画面<span class="soon-badge">講師</span></a></li>
   </ul>
 </aside>
 
@@ -427,14 +429,19 @@
       <p style="margin: 0 0 12px 0; color: var(--muted); font-size: 13px;">12 問の復習クイズで転写の基本と調節機構を確認</p>
     </div>
     <div style="margin: 8px 0; display:flex; gap:10px; flex-wrap:wrap;">
-      <a href="#" onclick="return false;"
-         style="display:inline-flex; align-items:center; gap:8px; background:#999; color:white; padding:10px 18px; border-radius:8px; text-decoration:none; font-weight:600; font-size:14px; box-shadow:0 2px 6px rgba(0,0,0,0.15); cursor:default;">
-        📄 講義スライド (PDF)
+      <a href="https://lms.keio.jp/courses/140260/modules/items/6144773" target="_blank"
+         style="display:inline-flex; align-items:center; gap:8px; background:#d64545; color:white; padding:10px 18px; border-radius:8px; text-decoration:none; font-weight:600; font-size:14px; box-shadow:0 2px 6px rgba(214,69,69,0.25);">
+        📄 講義スライドPDF
       </a>
-      <a href="#" onclick="return false;"
-         style="display:inline-flex; align-items:center; gap:8px; background:#999; color:white; padding:10px 18px; border-radius:8px; text-decoration:none; font-weight:600; font-size:14px; box-shadow:0 2px 6px rgba(0,0,0,0.15); cursor:default;">
+      <a href="https://lms.keio.jp/courses/144965/modules/items/6144774" target="_blank"
+         style="display:inline-flex; align-items:center; gap:8px; background:#e09f3e; color:white; padding:10px 18px; border-radius:8px; text-decoration:none; font-weight:600; font-size:14px; box-shadow:0 2px 6px rgba(224,159,62,0.25);">
+        📄 講義スライドPDF (再度試験)
+      </a>
+      <a href="https://notebooklm.google.com/notebook/1d8b8329-7987-496c-81eb-d53c6bcacc56" target="_blank"
+         style="display:inline-flex; align-items:center; gap:8px; background:#2b6cb0; color:white; padding:10px 18px; border-radius:8px; text-decoration:none; font-weight:600; font-size:14px; box-shadow:0 2px 6px rgba(43,108,176,0.25);">
         📓 NotebookLM
       </a>
+      <p style="font-size:11px; color:var(--muted); margin:6px 0 0 0; flex-basis:100%;">※ 「講義スライドPDF」と「講義スライドPDF (再度試験)」は<strong>全く同一のもの</strong>です。本講義 (140260) の方は左、再度試験 (144965) 受験者は右をお選びください。</p>
     </div>
   </div>
 </div>
@@ -1012,6 +1019,10 @@ renderQuiz();
       if (h && !h.includes('retake=1') && !h.startsWith('#')) {
         a.setAttribute('href', h + (h.includes('?') ? '&' : '?') + 'retake=1');
       }
+    });
+    // Swap PDF URL: 140260 → 144965, item 6144773 → 6144774
+    document.querySelectorAll('a[href*="courses/140260/modules/items/6144773"]').forEach(function(a){
+      a.href = a.href.replace('courses/140260/modules/items/6144773', 'courses/144965/modules/items/6144774');
     });
   } catch (e) { /* no-op */ }
 })();
