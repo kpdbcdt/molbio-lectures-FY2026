@@ -464,15 +464,15 @@
 
   <div class="card">
     <div style="margin-bottom:12px;">
-      <label for="strand-input"><strong>鋳型鎖 (template) 配列を入力</strong> (5'→3'、A/T/G/C のみ、最大 30 残基):</label>
-      <input type="text" id="strand-input" value="ACGGAT" maxlength="30" style="font-family:var(--mono); font-size:16px; padding:8px 12px; margin:6px 0; width:100%; max-width:400px; border:1px solid var(--border); border-radius:6px;">
+      <label for="strand-input"><strong>鋳型鎖 (template) 配列を入力</strong> — スライド S08 と同じく <strong>3'→5' を左→右で記載</strong> (A/T/G/C のみ、最大 30 残基):</label>
+      <input type="text" id="strand-input" value="TACGGT" maxlength="30" style="font-family:var(--mono); font-size:16px; padding:8px 12px; margin:6px 0; width:100%; max-width:400px; border:1px solid var(--border); border-radius:6px;">
     </div>
     <div style="margin-bottom:12px;">
       <strong>例:</strong>
-      <button class="strand-example" data-seq="ACGGAT">ACGGAT</button>
-      <button class="strand-example" data-seq="TACGGT">TACGGT</button>
-      <button class="strand-example" data-seq="CGATGCCTAG">CGATGCCTAG</button>
-      <button class="strand-example" data-seq="ATGCCTAGGAA">ATGCCTAGGAA</button>
+      <button class="strand-example" data-seq="TACGGT">TACGGT (S08 例)</button>
+      <button class="strand-example" data-seq="ATGCCTAG">ATGCCTAG</button>
+      <button class="strand-example" data-seq="TACGGATC">TACGGATC</button>
+      <button class="strand-example" data-seq="GCAGCAGCAA">GCAGCAGCAA</button>
     </div>
 
     <div id="strand-display" style="font-family:var(--mono); background:#f7fafc; padding:16px; border-radius:8px; border:1px solid var(--border); margin-top:12px; line-height:2;"></div>
@@ -836,7 +836,7 @@ const QUIZ = [
   {
     source: '国試改変',
     challenge: true,
-    stem: 'タマゴテングタケ (Amanita phalloides) 中毒について<strong>正しい</strong>のはどれか。',
+    stem: 'シロタマゴテング (<em>Amanita verna</em>) やタマゴテングタケ (<em>Amanita phalloides</em>) に含まれる α-アマニチン中毒について<strong>正しい</strong>のはどれか。',
     options: [
       '毒素 α-アマニチンは細菌 RNA ポリメラーゼを特異的に阻害するため、ヒトには無害である',
       'α-アマニチンは RNA Pol II を低濃度で選択的に阻害して mRNA 合成を停止させ、肝細胞壊死による急性肝不全を起こす',
@@ -1154,33 +1154,37 @@ document.getElementById('quiz-pdf').addEventListener('click', async () => {
 renderQuiz();
 
 /* ========== TOOL 1: Strand Direction ========== */
+// 入力 = 鋳型鎖を 3'→5' で左→右に書いた配列 (スライド S08 の表記)
+// 鋳型鎖 3'→5' に対して、コード鎖は 5'→3' で antiparallel + 相補
+// → 同じ位置の塩基をそのまま相補対 (A↔T, G↔C) に変換すれば coding 5'→3' になる
 (function(){
-  const COMP = {A:'T', T:'A', G:'C', C:'G'};
+  const COMP_DNA = {A:'T', T:'A', G:'C', C:'G'};
   const COMP_RNA = {A:'U', T:'A', G:'C', C:'G'};
-  function complement(seq, asRNA) {
-    return seq.split('').reverse().map(b => (asRNA ? COMP_RNA : COMP)[b] || '?').join('');
+  function pairwiseComplement(seq, asRNA) {
+    // antiparallel な相補: 同じ位置の塩基を相補対に置換 (reverse しない)
+    return seq.split('').map(b => (asRNA ? COMP_RNA : COMP_DNA)[b] || '?').join('');
   }
   function renderStrand() {
     const input = document.getElementById('strand-input');
     const v = (input.value || '').toUpperCase().replace(/[^ATGC]/g, '');
     input.value = v;
     if (!v) { document.getElementById('strand-display').innerHTML = '<em style="color:var(--muted);">配列を入力してください</em>'; return; }
-    // template: input as 5'→3' but actually written 5'→3'. We display rotated to 3'→5' (template direction Pol reads)
-    const tmpl5to3 = v;                          // 入力 (5'→3')
-    const tmpl3to5 = v.split('').reverse().join('');  // 3'→5' (Pol が読む方向)
-    const coding = complement(v);                // コード鎖 5'→3' (= reverse complement of template 5'→3')
-    const mrna = complement(v, true);            // mRNA 5'→3'
+    // 入力 = 鋳型鎖 3'→5' (スライド S08 表記)
+    const tmpl3to5 = v;                                  // 鋳型鎖 3'→5' (入力そのまま)
+    const tmpl5to3 = v.split('').reverse().join('');     // 同じ分子を 5'→3' で書き直したもの
+    const coding5to3 = pairwiseComplement(v, false);     // コード鎖 5'→3' (antiparallel 相補、同位置で base pair)
+    const mrna5to3 = pairwiseComplement(v, true);        // mRNA 5'→3' (= coding の T→U)
     document.getElementById('strand-display').innerHTML =
-      '<div><strong style="color:var(--warn);">鋳型鎖 (3\'→5\', Pol が読む方向)</strong>: 3\'-' +
+      '<div><strong style="color:var(--warn);">鋳型鎖 (3\'→5\', スライド表記 / Pol が読む方向)</strong>: 3\'-' +
       tmpl3to5.split('').join('-') + '-5\'</div>' +
-      '<div><strong style="color:var(--warn);">鋳型鎖 (5\'→3\', 入力した方向)</strong>: 5\'-' +
-      tmpl5to3.split('').join('-') + '-3\'</div>' +
+      '<div><strong style="color:var(--primary);">コード鎖 (5\'→3\', 教科書・データベース表記)</strong>: 5\'-' +
+      coding5to3.split('').join('-') + '-3\'</div>' +
+      '<div><strong style="color:var(--ok);">mRNA (5\'→3\', コード鎖と同配列、T→U)</strong>: 5\'-' +
+      mrna5to3.split('').join('-') + '-3\'</div>' +
       '<div style="border-top:1px dashed var(--border); margin:8px 0;"></div>' +
-      '<div><strong style="color:var(--primary);">コード鎖 (5\'→3\', 教科書表記)</strong>: 5\'-' +
-      coding.split('').join('-') + '-3\'</div>' +
-      '<div><strong style="color:var(--ok);">mRNA (5\'→3\')</strong>: 5\'-' +
-      mrna.split('').join('-') + '-3\'</div>' +
-      '<div style="font-size:11px; color:var(--muted); margin-top:8px;">→ mRNA はコード鎖と同配列 (T→U の違いのみ)。鋳型鎖は mRNA の相補鎖。</div>';
+      '<div style="font-size:11px; color:var(--muted);">参考: 鋳型鎖を 5\'→3\' で書き直すと → 5\'-' +
+      tmpl5to3.split('').join('-') + '-3\'</div>' +
+      '<div style="font-size:11px; color:var(--muted); margin-top:6px;">→ <strong>antiparallel 塩基対</strong>: 鋳型 3\'→5\' と コード 5\'→3\' / mRNA 5\'→3\' が同じ位置で A-T(U)、G-C 対形成。mRNA はコード鎖と同配列 (T→U のみ)。</div>';
   }
   document.getElementById('strand-input').addEventListener('input', renderStrand);
   document.querySelectorAll('.strand-example').forEach(b => {
@@ -1273,7 +1277,7 @@ renderQuiz();
     {name:'リファンピシン (Rifampicin)', selectivity:'細菌', target:'RNA pol β サブユニット', mechanism:'RNA exit channel に結合 → RNA 2-3 nt 伸長を阻止 → 転写開始阻害', use:'結核 RIPE 療法', note:'CYP3A4 強誘導 → ワルファリン / 経口避妊薬 / HIV 薬 等と相互作用。耐性は rpoB の RRDR 変異 (Ser531Leu)。尿が橙赤色になる。', color:'#d64545'},
     {name:'フィダキソマイシン (Fidaxomicin)', selectivity:'細菌', target:'RNA pol σ-スイッチ領域', mechanism:'open complex 形成阻害', use:'C. difficile 感染症 (CDI)、狭スペクトル', note:'腸内常在菌をあまり殺さないので CDI 再発予防に有用。', color:'#e09f3e'},
     {name:'Bicyclomycin', selectivity:'細菌', target:'Rho 因子', mechanism:'Rho の ATPase / ヘリカーゼ活性を阻害 → Rho 依存性終結阻害', use:'研究ツール (臨床薬としては限定的)', note:'Rho 阻害剤として有名。', color:'#9f7aea'},
-    {name:'α-アマニチン (α-amanitin)', selectivity:'真核 (Pol II 強感受性)', target:'真核 RNA Pol II', mechanism:'Pol II の bridge helix / trigger loop に結合 → 伸長阻害', use:'タマゴテングタケ (Amanita verna) 中毒。LD50 ~0.1 mg/kg。', note:'24-48 時間後に肝壊死。治療はシリビニン、ペニシリン G、肝移植。Pol I は抵抗性、Pol III は中等度感受性。', color:'#38a169'},
+    {name:'α-アマニチン (α-amanitin)', selectivity:'真核 (Pol II 強感受性)', target:'真核 RNA Pol II', mechanism:'Pol II の bridge helix / trigger loop に結合 → 伸長阻害', use:'シロタマゴテング (Amanita verna) / タマゴテングタケ (A. phalloides) 中毒。LD50 ~0.1 mg/kg。', note:'24-48 時間後に肝壊死。治療はシリビニン、ペニシリン G、肝移植。Pol I は抵抗性、Pol III は中等度感受性。', color:'#38a169'},
     {name:'アクチノマイシン D (Actinomycin D)', selectivity:'非選択的 (両方の Pol を阻害)', target:'DNA (二本鎖インターカレーション)', mechanism:'DNA の G-C 塩基対に挿入 → 鋳型 DNA 機能不能 → RNA pol 阻害 (特に Pol I に強い)', use:'抗がん剤 (ウィルムス腫瘍、横紋筋肉腫)', note:'Streptomyces 由来。古典的抗腫瘍抗生物質。', color:'#2b6cb0'},
     {name:'モルヌピラビル (Molnupiravir、ラゲブリオ)', selectivity:'ウイルス', target:'ウイルス RdRp (RNA 依存型 RNA pol)', mechanism:'RdRp に偽 NTP として取り込まれ大量変異誘導 → lethal mutagenesis', use:'COVID-19 経口薬', note:'RdRp はヒトに存在しないので安全域広い。経口投与可能。', color:'#319795'},
   ];
