@@ -446,13 +446,140 @@
 </div>
 
 <nav class="tabs">
-  <button data-tab="quiz" class="active">✅ Quiz (12問)</button>
+  <button data-tab="receptors" class="active">🎭 Nuclear Receptor Match</button>
+  <button data-tab="jakstat">📡 JAK-STAT Sim</button>
+  <button data-tab="splicing">✂️ Splicing & Editing</button>
+  <button data-tab="histone">🏷️ Histone Code Reader</button>
+  <button data-tab="quiz">✅ Quiz (12問)</button>
 </nav>
 
 <main>
 
-<!-- ============ TAB 1: CHROMATIN COMPACTION ============ -->
-<section id="quiz" class="tab active">
+<!-- ============ TAB 1: NUCLEAR RECEPTOR MATCH ============ -->
+<section id="receptors" class="tab active">
+  <h2>🎭 核内受容体 — リガンド・応答配列・薬のマッチング</h2>
+  <p class="lead">ヒト核内受容体は <strong>48 種類</strong>。今日のスライド (S11-S12) で扱った代表 10 種を、リガンド・応答配列・標的・対応薬で整理。<strong>処方薬の ~30% が核内受容体経由</strong>。</p>
+
+  <div class="card">
+    <h3 style="margin-top:0; font-size:16px;">受容体カード (クリックで詳細展開)</h3>
+    <div id="receptor-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:12px;"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0; font-size:16px;">共通 3 ドメイン構造 (試験頻出)</h3>
+    <div style="font-family:var(--mono); background:#f7fafc; padding:14px; border-radius:8px; border:1px solid var(--border); font-size:13px; line-height:1.8;">
+      <div>N末 ───[ <span style="background:#bee3f8; padding:2px 6px; border-radius:4px;">AF-1 / TAD</span> ]───[ <span style="background:#fed7d7; padding:2px 6px; border-radius:4px;">DBD (C4 ジンクフィンガー × 2)</span> ]───[ <span style="background:#c6f6d5; padding:2px 6px; border-radius:4px;">LBD (リガンド結合 + AF-2)</span> ]─── C末</div>
+    </div>
+    <p style="font-size:13px; color:var(--muted); margin:10px 0 0 0;">
+      <strong>非ステロイド型 (RAR/RXR/TR/VDR/PPAR)</strong> は核内常在でヘテロ二量体。<strong>ステロイド型 (GR/ER/AR/PR/MR)</strong> はリガンド非結合時 HSP90/70 と複合体で細胞質に存在、リガンド結合 → 構造変化 → DBD 露出 → 核移行 → ホモ二量体化 → 応答配列結合。
+    </p>
+  </div>
+  <div class="hint">
+    💡 <strong>応答配列の見分け方</strong>: ステロイド受容体 (GR/AR/PR/MR) は GRE (AGAACA-nnn-TGTTCT) 共通 → <strong>組織発現でセレクティビティ確保</strong>。RXR ヘテロダイマー型 (RAR/TR/VDR/PPAR) は DR1-5 (Direct Repeat、スペーサー長で差別化)。
+  </div>
+</section>
+
+<!-- ============ TAB 2: JAK-STAT SIM ============ -->
+<section id="jakstat" class="tab">
+  <h2>📡 JAK-STAT — サイトカイン・JAK・STAT・薬の経路選択</h2>
+  <p class="lead">サイトカインを選ぶと <strong>JAK → STAT → 標的応答 → 関連薬</strong>の流れが表示されます。スライド S15-S16 表 15-6 を双方向に学習。</p>
+
+  <div class="card">
+    <h3 style="margin-top:0; font-size:16px;">サイトカインを選択</h3>
+    <div id="cyto-buttons" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;"></div>
+    <div id="cyto-display" style="background:#f7fafc; padding:16px; border-radius:8px; border:1px solid var(--border);"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0; font-size:16px;">JAK 阻害剤一覧 (薬学頻出)</h3>
+    <table style="width:100%; font-size:13px; border-collapse:collapse;">
+      <thead>
+        <tr style="background:#edf2f7;">
+          <th style="padding:8px; border:1px solid var(--border); text-align:left;">薬剤</th>
+          <th style="padding:8px; border:1px solid var(--border); text-align:left;">選択性</th>
+          <th style="padding:8px; border:1px solid var(--border); text-align:left;">適応</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="padding:8px; border:1px solid var(--border);"><strong>トファシチニブ (ゼルヤンツ)</strong></td><td style="padding:8px; border:1px solid var(--border);">JAK1/3</td><td style="padding:8px; border:1px solid var(--border);">関節リウマチ、潰瘍性大腸炎</td></tr>
+        <tr><td style="padding:8px; border:1px solid var(--border);"><strong>バリシチニブ (オルミエント)</strong></td><td style="padding:8px; border:1px solid var(--border);">JAK1/2</td><td style="padding:8px; border:1px solid var(--border);">RA、AD、円形脱毛症、COVID-19</td></tr>
+        <tr><td style="padding:8px; border:1px solid var(--border);"><strong>ウパダシチニブ (リンヴォック)</strong></td><td style="padding:8px; border:1px solid var(--border);">JAK1 選択的</td><td style="padding:8px; border:1px solid var(--border);">RA、AD、UC、クローン病</td></tr>
+        <tr><td style="padding:8px; border:1px solid var(--border);"><strong>ルキソリチニブ (ジャカビ)</strong></td><td style="padding:8px; border:1px solid var(--border);">JAK1/2</td><td style="padding:8px; border:1px solid var(--border);">骨髄線維症、真性多血症</td></tr>
+        <tr><td style="padding:8px; border:1px solid var(--border);"><strong>デルゴシチニブ (コレクチム軟膏)</strong></td><td style="padding:8px; border:1px solid var(--border);">pan-JAK</td><td style="padding:8px; border:1px solid var(--border);">アトピー性皮膚炎 (外用)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="hint">
+    💡 <strong>覚え方</strong>: 名前に「<strong>JAK</strong>」 → <strong>二面神 Janus</strong> (1 月 = January)。分子内に 2 つのキナーゼ様ドメイン (JH1 触媒 + JH2 偽キナーゼ調節) を持つ。STAT = <strong>S</strong>ignal <strong>T</strong>ransducer and <strong>A</strong>ctivator of <strong>T</strong>ranscription。
+  </div>
+</section>
+
+<!-- ============ TAB 3: SPLICING & EDITING SIM ============ -->
+<section id="splicing" class="tab">
+  <h2>✂️ スプライシング・編集 — αトロポミオシン と apoB</h2>
+  <p class="lead">選択的スプライシング (S22) と mRNA 編集 (S23) を体感。<strong>同じ遺伝子から組織特異的に異なるタンパクが生まれる</strong>仕組みを 2 例で確認。</p>
+
+  <div class="card">
+    <h3 style="margin-top:0; font-size:16px;">① αトロポミオシン — 組織を選択</h3>
+    <p style="font-size:13px; color:var(--muted); margin:4px 0 12px 0;">組織ボタンをクリック → どのエキソンを含む / 除外するかが切り替わります。</p>
+    <div id="tropomyosin-buttons" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;"></div>
+    <div id="tropomyosin-display" style="background:#f7fafc; padding:16px; border-radius:8px; border:1px solid var(--border);"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0; font-size:16px;">② apoB mRNA 編集 — 肝臓 vs 小腸</h3>
+    <p style="font-size:13px; color:var(--muted); margin:4px 0 12px 0;">組織を選んで <strong>APOBEC1 による C → U 編集</strong>の有無を切り替えると、最終産物が変わります。</p>
+    <div style="display:flex; gap:24px; flex-wrap:wrap; margin:12px 0;">
+      <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:14px;">
+        <input type="radio" name="apob-tissue" value="liver" checked style="transform:scale(1.4);">
+        <strong>肝臓 (APOBEC1 なし)</strong>
+      </label>
+      <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:14px;">
+        <input type="radio" name="apob-tissue" value="intestine" style="transform:scale(1.4);">
+        <strong>小腸 (APOBEC1 あり)</strong>
+      </label>
+    </div>
+    <div id="apob-display" style="background:#f7fafc; padding:16px; border-radius:8px; border:1px solid var(--border);"></div>
+  </div>
+  <div class="hint">
+    💡 <strong>1 遺伝子 → 多様タンパク</strong>の 2 機構: ① <strong>選択的スプライシング</strong> (エキソン choice) と ② <strong>mRNA 編集</strong> (塩基変換 C→U or A→I)。ヒト遺伝子の ~95% が選択的スプライシングを受け、~23,000 遺伝子 → 100,000+ タンパク種。SMA 治療 (ヌシネルセン / リスジプラム) は ① を、APOBEC ファミリーは ② を利用。
+  </div>
+</section>
+
+<!-- ============ TAB 4: HISTONE CODE READER ============ -->
+<section id="histone" class="tab">
+  <h2>🏷️ ヒストンコード — 修飾と意味の対応 (S41 試験頻出)</h2>
+  <p class="lead">H3 を中心に、よく出る 8 つのヒストン修飾を整理。各カードをクリックで <strong>writer / eraser / reader / 効果 / 関連薬</strong>を表示。</p>
+
+  <div class="card">
+    <h3 style="margin-top:0; font-size:16px;">修飾カード (クリックで詳細展開)</h3>
+    <div id="histone-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:12px;"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0; font-size:16px;">スライド S41 まとめ表</h3>
+    <table style="width:100%; font-size:13px; border-collapse:collapse;">
+      <thead>
+        <tr style="background:#edf2f7;">
+          <th style="padding:8px; border:1px solid var(--border); text-align:left;">修飾の状況</th>
+          <th style="padding:8px; border:1px solid var(--border); text-align:center;">意義</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="padding:8px; border:1px solid var(--border);"><strong>H3K9me</strong> (9 番目リジン メチル化)</td><td style="padding:8px; border:1px solid var(--border); text-align:center; color:#d64545; font-weight:600;">ヘテロクロマチン形成、サイレンシング <strong>OFF</strong></td></tr>
+        <tr><td style="padding:8px; border:1px solid var(--border);"><strong>H3K4me + H3K9ac</strong></td><td style="padding:8px; border:1px solid var(--border); text-align:center; color:#38a169; font-weight:600;">active promoter <strong>ON</strong></td></tr>
+        <tr><td style="padding:8px; border:1px solid var(--border);"><strong>H3S10ph + K14ac</strong></td><td style="padding:8px; border:1px solid var(--border); text-align:center; color:#38a169; font-weight:600;">遺伝子発現 / 細胞周期 <strong>ON</strong></td></tr>
+        <tr><td style="padding:8px; border:1px solid var(--border);"><strong>H3K27me</strong></td><td style="padding:8px; border:1px solid var(--border); text-align:center; color:#d64545; font-weight:600;">Hox サイレンシング、X 不活化 <strong>OFF</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="hint">
+    💡 <strong>Writer / Eraser / Reader モデル</strong>: 修飾を付ける酵素 (HAT, HMT, キナーゼ) が writer、外す酵素 (HDAC, HDM, ホスファターゼ) が eraser、認識する蛋白 (ブロモドメイン → アセチル化、クロモドメイン → メチル化) が reader。<strong>writer/eraser の阻害剤がエピゲノム創薬の主戦場</strong> (ボリノスタット、タゼメトスタット等)。
+  </div>
+</section>
+
+<!-- ============ TAB 5: QUIZ ============ -->
+<section id="quiz" class="tab">
   <h2>✅ 復習クイズ (12 問)</h2>
   <p class="lead">各問題の選択肢をクリックすると、その場で正解・解説が表示されます。
     <br>
@@ -992,6 +1119,198 @@ document.getElementById('quiz-pdf').addEventListener('click', async () => {
 });
 
 renderQuiz();
+
+/* ========== TOOL 1: Nuclear Receptor Match ========== */
+(function(){
+  const RECEPTORS = [
+    {name:'GR (NR3C1)', ligand:'コルチゾール / プレドニゾロン', re:'GRE (AGAACA-nnn-TGTTCT)', loc:'細胞質 (HSP90 複合体)', targets:'抗炎症遺伝子 (アネキシン A1, IκB, MKP-1) 誘導 + NF-κB / AP-1 を transrepression で抑制', drugs:'プレドニゾロン、デキサメタゾン、ベタメタゾン (合成 GR 作動薬)。COVID-19 中等症以上で死亡率低下 (RECOVERY 試験 2020)', color:'#d64545'},
+    {name:'ER (NR3A1/2, ERα/β)', ligand:'17β-エストラジオール', re:'ERE (AGGTCA-nnn-TGACCT)', loc:'細胞質 → 核', targets:'PR, pS2, Cyclin D1, MYC 等の女性ホルモン応答遺伝子', drugs:'タモキシフェン (SERM, 乳腺 antagonist / 子宮 agonist)、フルベストラント (pure antagonist)、アロマターゼ阻害剤 (アナストロゾール) でリガンド枯渇', color:'#ed64a6'},
+    {name:'AR (NR3C4)', ligand:'テストステロン / DHT', re:'ARE', loc:'細胞質 → 核', targets:'PSA、KLK3、TMPRSS2 等の前立腺特異遺伝子', drugs:'エンザルタミド、アパルタミド (AR 拮抗)、アビラテロン (CYP17 阻害でアンドロゲン合成遮断)、ビカルタミド', color:'#9f7aea'},
+    {name:'MR (NR3C2)', ligand:'アルドステロン / コルチゾール', re:'MRE (= GRE 様)', loc:'細胞質 → 核', targets:'ENaC, Na+/K+-ATPase 等の腎集合管 Na 再吸収遺伝子', drugs:'スピロノラクトン (アルダクトン)、エプレレノン (セララ)、エサキセレノン (ミネブロ) — 高血圧、心不全、原発性アルドステロン症', color:'#2b6cb0'},
+    {name:'PR (NR3C3)', ligand:'プロゲステロン', re:'PRE', loc:'細胞質 → 核', targets:'子宮内膜・乳腺発達遺伝子', drugs:'ミフェプリストン (RU-486、PR 拮抗 → 妊娠中絶薬)、メドロキシプロゲステロン (合成 progestin)', color:'#e09f3e'},
+    {name:'VDR (NR1I1)', ligand:'カルシトリオール (1,25-(OH)₂D₃)', re:'VDRE', loc:'核内常在 (RXR ヘテロダイマー)', targets:'カルシウム結合タンパク (Calbindin)、TRPV6、CYP24A1', drugs:'アルファカルシドール、エルデカルシトール、カルシトリオール — 骨粗鬆症、慢性腎不全 2 次性副甲状腺機能亢進症', color:'#38a169'},
+    {name:'RAR / RXR (NR1B1-3 / NR2B1-3)', ligand:'ATRA (all-trans) / 9-cis-RA', re:'RARE (DR5)', loc:'核内常在 (RAR-RXR ヘテロダイマー、リガンド非結合時 NCoR/SMRT + HDAC 招集)', targets:'上皮分化、粘液分泌、リンパ球腸管移動、Hox 遺伝子、好中球分化', drugs:'ATRA (トレチノイン) — 急性前骨髄性白血病 APL の分化誘導療法。三酸化ヒ素併用で化学療法なしで 95% 寛解。アダパレン (RAR-γ、ニキビ外用)、ベキサロテン (RXR 選択、CTCL)', color:'#319795'},
+    {name:'TR (NR1A1/2, TRα/β)', ligand:'T3 (トリヨードチロニン)', re:'TRE (DR4)', loc:'核内常在 (RXR ヘテロダイマー)', targets:'基礎代謝・心拍数・体温調節遺伝子 (Na+/K+-ATPase, UCP, β-アドレナリン受容体)', drugs:'レボチロキシン (チラーヂン S) — 甲状腺機能低下症補充。チアマゾール (メルカゾール) は TR 自体ではなく甲状腺ペルオキシダーゼを阻害', color:'#805ad5'},
+    {name:'PPARα (NR1C1)', ligand:'脂肪酸、フィブラート系', re:'PPRE (DR1)', loc:'核内常在 (RXR ヘテロダイマー)', targets:'肝脂質代謝遺伝子 (LPL, FATP, ACOX1)、β酸化亢進', drugs:'フェノフィブラート、ベザフィブラート、ペマフィブラート — 高 TG 血症。スタチンと併用で横紋筋融解症リスク↑', color:'#dd6b20'},
+    {name:'PPARγ (NR1C3)', ligand:'チアゾリジンジオン (TZD)', re:'PPRE (DR1)', loc:'核内常在 (RXR ヘテロダイマー)', targets:'GLUT4、アディポネクチン → インスリン感受性↑、脂肪細胞分化', drugs:'ピオグリタゾン (アクトス) — 2 型糖尿病。体重↑、浮腫、心不全悪化、骨折リスクに注意。ロシグリタゾンは心血管リスクで撤退', color:'#0987a0'},
+  ];
+  let opened = {};
+  function render() {
+    document.getElementById('receptor-grid').innerHTML = RECEPTORS.map((r, i) => {
+      const o = opened[i];
+      return '<div class="recep-card" data-i="' + i + '" style="background:white; border:2px solid ' +
+        (o ? r.color : 'var(--border)') + '; border-radius:8px; padding:14px; cursor:pointer; transition:all 0.15s;">' +
+        '<div style="font-weight:700; color:' + r.color + '; font-size:15px;">' + r.name + '</div>' +
+        '<div style="font-size:11px; color:var(--muted); margin-top:4px;">リガンド: ' + r.ligand + '</div>' +
+        (o ?
+          '<div style="font-size:13px; margin-top:10px; line-height:1.6;">' +
+          '<div><strong>応答配列:</strong> ' + r.re + '</div>' +
+          '<div style="margin-top:4px;"><strong>非結合時:</strong> ' + r.loc + '</div>' +
+          '<div style="margin-top:4px;"><strong>標的遺伝子:</strong> ' + r.targets + '</div>' +
+          '<div style="font-size:11px; color:var(--muted); margin-top:6px;"><strong>薬:</strong> ' + r.drugs + '</div>' +
+          '</div>'
+          :
+          '<div style="font-size:11px; color:var(--muted); margin-top:8px;">→ クリックで詳細</div>') +
+        '</div>';
+    }).join('');
+    document.querySelectorAll('.recep-card').forEach(c => {
+      c.addEventListener('click', () => { opened[c.dataset.i] = !opened[c.dataset.i]; render(); });
+    });
+  }
+  render();
+})();
+
+/* ========== TOOL 2: JAK-STAT Cytokine Sim ========== */
+(function(){
+  const CYTOKINES = [
+    {name:'IL-6', jak:'JAK1 + JAK2', stat:'STAT3', response:'急性期反応 (CRP↑)、Th17 分化、肝で SAA / フィブリノゲン産生、慢性炎症 / がん促進 (持続性活性)', drug:'トシリズマブ (抗 IL-6R 抗体、アクテムラ) — RA、巨細胞性動脈炎、CRS (CAR-T 副作用)、キャッスルマン病', color:'#d64545'},
+    {name:'IFN-γ', jak:'JAK1 + JAK2', stat:'STAT1', response:'マクロファージ活性化 (M1 分極)、MHC class II 発現↑、抗ウイルス、Th1 分化、抗腫瘍免疫', drug:'インターフェロン γ-1a 製剤 (慢性肉芽腫症)。逆に JAK1 阻害 (バリシチニブ等) で過剰応答抑制', color:'#319795'},
+    {name:'IFN-α / β', jak:'Tyk2 + JAK2 (α) / JAK1 (β)', stat:'STAT1 + STAT2 (+ IRF9 → ISGF3)', response:'ウイルス感染抵抗 (ISG 数百種↑)、抗増殖、自然免疫第一線', drug:'ペグインターフェロン α (旧 C 型肝炎、HBV)。インターフェロン β (多発性硬化症、SARS-CoV-2 試験)', color:'#9f7aea'},
+    {name:'IL-2', jak:'JAK1 + JAK3', stat:'STAT5', response:'T 細胞増殖、Treg 維持、NK 細胞活性化', drug:'高用量 IL-2 (アルデスロイキン、進行性メラノーマ / 腎細胞癌)。Treg 選択的低用量 IL-2 = 自己免疫治療開発中', color:'#2b6cb0'},
+    {name:'IL-4', jak:'JAK1 + JAK3', stat:'STAT6', response:'Th2 分化、B 細胞 IgE クラススイッチ、好酸球誘導、アレルギー喘息', drug:'デュピルマブ (抗 IL-4Rα 抗体) — アトピー性皮膚炎、喘息、好酸球性副鼻腔炎。STAT6 経路を遮断', color:'#dd6b20'},
+    {name:'IL-22', jak:'JAK1 + Tyk2', stat:'STAT3', response:'上皮バリア修復、抗菌ペプチド (REG3γ, S100A) 産生、粘膜免疫 (長谷研テーマ)', drug:'(まだ標準薬なし、IBD で開発中)', color:'#38a169'},
+    {name:'EPO (エリトロポエチン)', jak:'JAK2', stat:'STAT5', response:'赤血球前駆細胞のアポトーシス阻止 → 赤血球産生↑', drug:'エポエチンα/β (エスポー、エポジン)、ダルベポエチン (ネスプ) — 腎性貧血、化学療法後貧血。JAK2 V617F 変異 = 真性多血症 → ルキソリチニブ (JAK1/2 阻害)', color:'#ed64a6'},
+    {name:'プロラクチン (PRL)', jak:'JAK1 + JAK2', stat:'STAT5', response:'乳汁産生、生殖機能調節', drug:'プロラクチン産生過剰 (下垂体腺腫) にはブロモクリプチン / カベルゴリン (ドパミン D2 作動 → PRL 抑制)', color:'#e09f3e'},
+    {name:'成長ホルモン (GH)', jak:'JAK2', stat:'STAT1 + STAT5', response:'IGF-1 産生誘導 → 骨成長、筋・脂肪代謝', drug:'ソマトロピン (遺伝子組換え GH) — 成長ホルモン分泌不全性低身長。先端巨大症にはペグビソマント (GH 受容体拮抗)', color:'#805ad5'},
+    {name:'GM-CSF', jak:'JAK2', stat:'STAT5', response:'顆粒球・マクロファージ産生促進', drug:'サルグラモスチム (好中球減少時)、ナマレマブ (抗 GM-CSF 抗体、関節リウマチ試験)', color:'#0987a0'},
+  ];
+  function render(idx) {
+    const c = CYTOKINES[idx];
+    document.getElementById('cyto-display').innerHTML =
+      '<div style="font-size:13px; line-height:1.8;">' +
+      '<div style="font-family:var(--mono); background:white; padding:10px; border-radius:6px; border:1px solid var(--border); margin-bottom:10px;">' +
+      '<strong style="color:' + c.color + ';">' + c.name + '</strong> → 受容体二量体化 → <strong>' + c.jak + '</strong> 自己リン酸化 → 受容体 Tyr リン酸化 → <strong>' + c.stat + '</strong> SH2 結合 → リン酸化 → 二量体核移行 → 標的遺伝子' +
+      '</div>' +
+      '<div><strong>主な応答:</strong> ' + c.response + '</div>' +
+      '<div style="margin-top:6px; font-size:12px; color:var(--muted);"><strong>薬:</strong> ' + c.drug + '</div>' +
+      '</div>';
+    document.querySelectorAll('.cyto-btn').forEach((b, i) => {
+      b.style.background = (i === idx) ? CYTOKINES[i].color : 'white';
+      b.style.color = (i === idx) ? 'white' : CYTOKINES[i].color;
+      b.style.borderColor = CYTOKINES[i].color;
+    });
+  }
+  const btnContainer = document.getElementById('cyto-buttons');
+  btnContainer.innerHTML = CYTOKINES.map((c, i) =>
+    '<button class="cyto-btn" data-i="' + i + '" style="background:white; color:' + c.color + '; border:2px solid ' + c.color + '; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:13px; font-weight:600;">' + c.name + '</button>'
+  ).join('');
+  document.querySelectorAll('.cyto-btn').forEach(b => {
+    b.addEventListener('click', () => render(parseInt(b.dataset.i)));
+  });
+  render(0);
+})();
+
+/* ========== TOOL 3: Splicing & Editing Sim ========== */
+(function(){
+  // αトロポミオシン — 5 tissue patterns (スライド S22)
+  const TISSUES = [
+    {name:'横紋筋', desc:'骨格筋型 — Ca²⁺ 制御収縮', exons:[1,2,3,5,7,8,11], color:'#d64545'},
+    {name:'平滑筋', desc:'血管・内臓平滑筋型', exons:[1,2,3,5,6,9,11], color:'#9f7aea'},
+    {name:'繊維芽細胞 (A)', desc:'結合組織型 A', exons:[1,2,3,4,6,7,11], color:'#319795'},
+    {name:'繊維芽細胞 (B)', desc:'結合組織型 B (代替 splice site)', exons:[1,2,3,4,8,9,11], color:'#38a169'},
+    {name:'脳', desc:'神経特異型', exons:[1,2,3,4,5,7,9,11], color:'#2b6cb0'},
+  ];
+  const ALL_EXONS = [1,2,3,4,5,6,7,8,9,11];
+  function renderTropomyosin(idx) {
+    const t = TISSUES[idx];
+    const exonHtml = ALL_EXONS.map(e => {
+      const included = t.exons.includes(e);
+      return '<span style="display:inline-block; padding:6px 10px; margin:3px; background:' +
+        (included ? t.color : '#eee') + '; color:' + (included ? 'white' : '#999') +
+        '; border-radius:4px; font-family:var(--mono); font-weight:600; font-size:13px; opacity:' +
+        (included ? '1' : '0.4') + ';">E' + e + (included ? '' : '✗') + '</span>';
+    }).join(' ');
+    document.getElementById('tropomyosin-display').innerHTML =
+      '<div style="font-size:13px; margin-bottom:10px;"><strong style="color:' + t.color + ';">' + t.name + '</strong> — ' + t.desc + '</div>' +
+      '<div style="background:white; padding:12px; border-radius:6px; border:1px solid var(--border); margin-bottom:10px;">' +
+      '<div style="font-size:11px; color:var(--muted); margin-bottom:6px;">この組織でスプライスされたエキソン構成 (灰色 = 除外):</div>' +
+      '5\'-' + exonHtml + '-3\'' +
+      '</div>' +
+      '<div style="font-size:12px; color:var(--muted);">同じ <em>α-トロポミオシン</em> 遺伝子から、スプライス部位選択で異なるアイソフォームが組織特異的に作られる。SR / hnRNP タンパクの比率で選択が決まる。</div>';
+    document.querySelectorAll('.trop-btn').forEach((b, i) => {
+      b.style.background = (i === idx) ? TISSUES[i].color : 'white';
+      b.style.color = (i === idx) ? 'white' : TISSUES[i].color;
+    });
+  }
+  const tropBtns = document.getElementById('tropomyosin-buttons');
+  tropBtns.innerHTML = TISSUES.map((t, i) =>
+    '<button class="trop-btn" data-i="' + i + '" style="background:white; color:' + t.color + '; border:2px solid ' + t.color + '; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:13px; font-weight:600;">' + t.name + '</button>'
+  ).join('');
+  document.querySelectorAll('.trop-btn').forEach(b => {
+    b.addEventListener('click', () => renderTropomyosin(parseInt(b.dataset.i)));
+  });
+  renderTropomyosin(0);
+
+  // apoB editing
+  function renderApoB() {
+    const tissue = document.querySelector('input[name="apob-tissue"]:checked').value;
+    if (tissue === 'liver') {
+      document.getElementById('apob-display').innerHTML =
+        '<div style="font-family:var(--mono); background:white; padding:12px; border-radius:6px; border:1px solid var(--border); font-size:13px; line-height:1.8;">' +
+        '<div>pre-mRNA: 5\'─ AUG ─ ... ─ <span style="background:#c6f6d5; padding:2px 6px; border-radius:3px;">CAA</span> (Gln) ─ ... ─ UUA ─3\'</div>' +
+        '<div style="margin:4px 0; color:var(--muted);">↓ スプライシング・ポリ A 付加 (APOBEC1 なし)</div>' +
+        '<div>mRNA:     5\'─ AUG ─ ... ─ <span style="background:#c6f6d5; padding:2px 6px; border-radius:3px;">CAA</span> (Gln) ─ ... ─ UUA ─3\'</div>' +
+        '<div style="margin:4px 0; color:var(--muted);">↓ 翻訳</div>' +
+        '<div><strong style="color:#2b6cb0;">apoB-100 タンパク</strong> (全長 4536 aa) — LDL / VLDL の主成分、LDLR 結合ドメインあり</div>' +
+        '</div>' +
+        '<div style="font-size:12px; color:var(--muted); margin-top:10px;">肝臓では APOBEC1 が発現していないので、フルレングスの apoB-100 が翻訳される。LDL 受容体への結合に必要。</div>';
+    } else {
+      document.getElementById('apob-display').innerHTML =
+        '<div style="font-family:var(--mono); background:white; padding:12px; border-radius:6px; border:1px solid var(--border); font-size:13px; line-height:1.8;">' +
+        '<div>pre-mRNA: 5\'─ AUG ─ ... ─ <span style="background:#c6f6d5; padding:2px 6px; border-radius:3px;">CAA</span> (Gln) ─ ... ─ UUA ─3\'</div>' +
+        '<div style="margin:4px 0; color:#d64545;">↓ <strong>APOBEC1 + ACF</strong> による C → U 脱アミノ化</div>' +
+        '<div>mRNA:     5\'─ AUG ─ ... ─ <span style="background:#fed7d7; padding:2px 6px; border-radius:3px;">UAA</span> (stop) ─ ... ─ UUA ─3\'</div>' +
+        '<div style="margin:4px 0; color:var(--muted);">↓ 翻訳が早期停止</div>' +
+        '<div><strong style="color:#d64545;">apoB-48 タンパク</strong> (全長の 48% = N 末端 ~2152 aa) — カイロミクロン主成分、LDLR 結合ドメインなし</div>' +
+        '</div>' +
+        '<div style="font-size:12px; color:var(--muted); margin-top:10px;">小腸では APOBEC1 が CAA → UAA に変換し、早期終止コドンを作る。同じ apoB 遺伝子から組織特異的に 2 種の機能タンパクができる。</div>';
+    }
+  }
+  document.querySelectorAll('input[name="apob-tissue"]').forEach(r => r.addEventListener('change', renderApoB));
+  renderApoB();
+})();
+
+/* ========== TOOL 4: Histone Code Reader ========== */
+(function(){
+  const MARKS = [
+    {name:'H3K4me3', writer:'SET1 / MLL (KMT2A)', eraser:'KDM5 (JARID1)', reader:'TAF3 (PHD finger)、CHD1', effect:'active promoter (TSS 周辺)', signal:'ON', drug:'KMT2A (MLL) 融合 → AML → メニン-MLL 阻害剤 (レボメニブ Revumenib、FDA 2024)', color:'#38a169'},
+    {name:'H3K9me3', writer:'SUV39H1/2、SETDB1、G9a', eraser:'KDM4 (JMJD2)', reader:'HP1 (クロモドメイン)', effect:'構成性ヘテロクロマチン (テロメア・セントロメア)', signal:'OFF', drug:'G9a 阻害剤 (UNC0638、研究用)、ICF 症候群 (DNMT3B 変異) で異常', color:'#d64545'},
+    {name:'H3K27me3', writer:'EZH2 (PRC2 触媒)', eraser:'KDM6 (UTX / JMJD3)', reader:'PRC1 (CBX クロモドメイン)', effect:'通性ヘテロクロマチン、Hox サイレンシング、X 不活化', signal:'OFF', drug:'EZH2 機能獲得変異 (Y641F) → DLBCL / 濾胞性リンパ腫 → タゼメトスタット (タズベリク、FDA 2020)。上皮型肉腫', color:'#9f7aea'},
+    {name:'H3K27ac', writer:'p300 / CBP', eraser:'HDAC1/2/3', reader:'BRD4 (ブロモドメイン)、SMARCA4', effect:'active enhancer / promoter', signal:'ON', drug:'BET 阻害剤 (JQ1, OTX015, ペレチネル) — NUT 中線がん、AML 試験中。HDAC 阻害でアセチル化維持 (ボリノスタット)', color:'#319795'},
+    {name:'H3K36me3', writer:'SETD2', eraser:'KDM4', reader:'PWWP ドメイン蛋白 (DNMT3B 含む)', effect:'active gene body、スプライシング部位選択', signal:'ON', drug:'SETD2 機能喪失変異 → 腎細胞癌・小児神経芽腫。NSD2 (= MMSET) 過剰 → 多発性骨髄腫 t(4;14)', color:'#2b6cb0'},
+    {name:'H3K9ac', writer:'GCN5、PCAF (KAT2A/B)', eraser:'HDAC1/2/3', reader:'BRD2/4 (ブロモドメイン)', effect:'active promoter (S41 で K4me と共に ON マーク)', signal:'ON', drug:'HDAC 阻害剤 (ボリノスタット = CTCL、ロミデプシン = CTCL/PTCL、パノビノスタット = MM) でアセチル化維持。バルプロ酸も弱い HDAC 阻害', color:'#dd6b20'},
+    {name:'H3S10ph', writer:'Aurora B (M 期)、MSK1 (即時応答)', eraser:'PP1 (ホスファターゼ)', reader:'14-3-3 蛋白', effect:'細胞周期 M 期凝集、即時応答遺伝子 (Fos, Jun) 活性化', signal:'ON (K14ac 併発時)', drug:'Aurora B 阻害剤 (バラセルチブ、開発中) — AML / 固形がん試験', color:'#e09f3e'},
+    {name:'H3K79me', writer:'DOT1L (KMT4) — 唯一の K79 メチル化酵素', eraser:'(不明、機能を持つ脱メチル化酵素未同定)', reader:'AF9 / ENL', effect:'転写伸長、テロメア・セントロメア境界、DNA ダメージ応答', signal:'ON', drug:'MLL 融合 (MLL-AF9 等) で DOT1L 異常リクルート → AML → ピノメトスタット (Pinometostat, EPZ-5676、開発中)', color:'#805ad5'},
+  ];
+  let opened = {};
+  function render() {
+    document.getElementById('histone-grid').innerHTML = MARKS.map((m, i) => {
+      const o = opened[i];
+      const signalColor = m.signal === 'ON' ? '#38a169' : '#d64545';
+      return '<div class="histone-card" data-i="' + i + '" style="background:white; border:2px solid ' +
+        (o ? m.color : 'var(--border)') + '; border-radius:8px; padding:14px; cursor:pointer; transition:all 0.15s;">' +
+        '<div style="display:flex; justify-content:space-between; align-items:center;">' +
+        '<div style="font-weight:700; color:' + m.color + '; font-size:15px; font-family:var(--mono);">' + m.name + '</div>' +
+        '<div style="background:' + signalColor + '; color:white; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600;">' + m.signal + '</div>' +
+        '</div>' +
+        '<div style="font-size:12px; color:var(--muted); margin-top:6px;">' + m.effect + '</div>' +
+        (o ?
+          '<div style="font-size:12px; margin-top:10px; line-height:1.6;">' +
+          '<div><strong>Writer:</strong> ' + m.writer + '</div>' +
+          '<div><strong>Eraser:</strong> ' + m.eraser + '</div>' +
+          '<div><strong>Reader:</strong> ' + m.reader + '</div>' +
+          '<div style="font-size:11px; color:var(--muted); margin-top:6px;"><strong>薬・疾患:</strong> ' + m.drug + '</div>' +
+          '</div>'
+          :
+          '<div style="font-size:11px; color:var(--muted); margin-top:8px;">→ クリックで詳細</div>') +
+        '</div>';
+    }).join('');
+    document.querySelectorAll('.histone-card').forEach(c => {
+      c.addEventListener('click', () => { opened[c.dataset.i] = !opened[c.dataset.i]; render(); });
+    });
+  }
+  render();
+})();
 </script>
 <script>
 (function(){
