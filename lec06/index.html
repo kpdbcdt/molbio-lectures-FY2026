@@ -452,7 +452,7 @@
       <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
         <span style="background:#d64545; color:white; padding:3px 10px; border-radius:4px; font-size:12px; font-weight:700;">📝 今週の課題</span>
         <span style="background:#744210; color:white; padding:3px 10px; border-radius:4px; font-size:12px; font-weight:600;">⏰ 締切 2026-05-28 (木) 23:59</span>
-        <span style="font-size:12px; color:var(--muted);">長谷先生・本講義 (140260) 受講生対象</span>
+        <span style="font-size:12px; color:var(--muted);">長谷先生 · 本講義 (140260) と再度試験 (144965) の両方で公開</span>
       </div>
       <div style="font-size:14px; line-height:1.7; margin:8px 0;">
         <strong>Q1.</strong> 映画『ジュラシックパーク』の中で、琥珀の中で固まっていた<strong>古代恐竜の血を吸った蚊から恐竜の DNA を採取し</strong>、現代に恐竜を復活させた。このような事は実際に可能でしょうか？それとも不可能でしょうか？ その理由についても考えてみて下さい。<br>
@@ -1371,6 +1371,10 @@ renderQuiz();
     // Swap PDF URL: 140260 → 144965, item 6150180 → 6150181 (Lec06 PDF)
     document.querySelectorAll('a[href*="courses/140260/modules/items/6150180"]').forEach(function(a){
       a.href = a.href.replace('courses/140260/modules/items/6150180', 'courses/144965/modules/items/6150181');
+    });
+    // Swap 今週の課題 (長谷) URL: 140260/1222568 → 144965/1268793
+    document.querySelectorAll('a[href*="courses/140260/assignments/1222568"]').forEach(function(a){
+      a.href = a.href.replace('courses/140260/assignments/1222568', 'courses/144965/assignments/1268793');
     });
   } catch (e) { /* no-op */ }
 })();
