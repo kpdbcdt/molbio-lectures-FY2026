@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分子生物学 過去問アーカイブ — FY2026</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: #f7f9fc;
+    color: #1a2633;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 20px;
+    line-height: 1.7;
+  }
+  header {
+    background: linear-gradient(135deg, #2b6cb0, #1a4a80);
+    color: white;
+    padding: 24px 28px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  header h1 { margin: 0 0 6px 0; font-size: 22px; }
+  header p { margin: 0; opacity: 0.92; font-size: 13px; }
+  .notice {
+    background: #fff8e1;
+    border-left: 4px solid #f4b400;
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 18px;
+    font-size: 13px;
+  }
+  .filter-panel {
+    background: white;
+    border: 1px solid #d7dce5;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    align-items: center;
+  }
+  .filter-group { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .filter-group label { font-size: 13px; font-weight: 600; color: #5a6978; margin-right: 4px; }
+  .chip {
+    display: inline-block;
+    background: #edf2f7;
+    color: #1a2633;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 4px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    user-select: none;
+  }
+  .chip:hover { background: #e2e8f0; }
+  .chip.active { background: #2b6cb0; color: white; border-color: #1a4a80; }
+  .summary {
+    font-size: 12px;
+    color: #5a6978;
+    margin-bottom: 12px;
+  }
+  .pdf-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .pdf-links a {
+    display: inline-block;
+    background: white;
+    border: 1px solid #d7dce5;
+    color: #2b6cb0;
+    padding: 6px 12px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 12px;
+  }
+  .pdf-links a:hover { background: #edf2f7; }
+  .question-card {
+    background: white;
+    border: 1px solid #d7dce5;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 14px;
+  }
+  .q-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .q-tag {
+    font-size: 11px;
+    color: #5a6978;
+    background: #edf2f7;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 4px;
+    display: inline-block;
+  }
+  .q-tag.year { background: #fce4ec; color: #ad1457; }
+  .q-tag.lec { background: #e8f5e9; color: #2e7d32; }
+  .q-tag.multi { background: #fff3e0; color: #ef6c00; }
+  .q-stem {
+    font-size: 15px;
+    line-height: 1.7;
+    margin: 8px 0 12px 0;
+  }
+  .q-image {
+    margin: 10px 0;
+    text-align: center;
+  }
+  .q-image img {
+    max-width: 100%;
+    max-height: 480px;
+    border: 1px solid #d7dce5;
+    border-radius: 4px;
+    cursor: zoom-in;
+  }
+  .q-image img.zoomed {
+    max-height: none;
+    cursor: zoom-out;
+  }
+  .q-options {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 12px 0;
+  }
+  .q-options li {
+    padding: 8px 12px;
+    margin: 4px 0;
+    border: 1px solid #d7dce5;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    background: #fafbfc;
+    user-select: none;
+  }
+  .q-options li:hover { background: #edf2f7; }
+  .q-options li.selected {
+    background: #dbeafe;
+    border-color: #2b6cb0;
+  }
+  .q-options li.correct {
+    background: #c6f6d5;
+    border-color: #22543d;
+    color: #22543d;
+  }
+  .q-options li.incorrect {
+    background: #fed7d7;
+    border-color: #9b2c2c;
+    color: #9b2c2c;
+  }
+  .q-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .btn {
+    background: #2b6cb0;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 18px;
+    font-size: 13px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .btn:hover { background: #1a4a80; }
+  .btn.secondary {
+    background: white;
+    border: 1px solid #d7dce5;
+    color: #5a6978;
+  }
+  .btn.secondary:hover { background: #edf2f7; }
+  .q-explain {
+    background: #f0f9ff;
+    border-left: 4px solid #2b6cb0;
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-top: 12px;
+    font-size: 13px;
+    line-height: 1.75;
+    display: none;
+  }
+  .q-explain.shown { display: block; }
+  .q-explain b { color: #1a4a80; }
+  .q-feedback {
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .q-feedback.ok { color: #22543d; }
+  .q-feedback.ng { color: #9b2c2c; }
+  .empty-state {
+    text-align: center;
+    color: #5a6978;
+    padding: 40px 20px;
+    background: white;
+    border-radius: 8px;
+    border: 1px dashed #d7dce5;
+  }
+  footer {
+    text-align: center;
+    color: #5a6978;
+    font-size: 12px;
+    margin-top: 30px;
+    padding-top: 18px;
+    border-top: 1px solid #d7dce5;
+  }
+  footer a { color: #2b6cb0; text-decoration: none; }
+  @media (max-width: 600px) {
+    body { padding: 12px; }
+    header { padding: 18px 20px; }
+    header h1 { font-size: 18px; }
+    .filter-panel { padding: 12px; }
+    .question-card { padding: 14px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📝 分子生物学 過去問アーカイブ</h1>
+  <p>生化学1 定期試験 (2019-2024) · 慶應義塾大学薬学部 · FY2026</p>
+</header>
+
+<div class="notice">
+  <b>使い方</b>: 年度・Lec フィルタで絞り込み → 選択肢をクリックして回答 → 「答え合わせ」で正解と解説を表示。<br>
+  選択式問題のみ収録 (空欄補充の記述式は除外)。図問題は画像付き。<br>
+  紙で解きたい場合は下の年度別 PDF をダウンロード。
+</div>
+
+<div class="pdf-links" id="pdf-links"></div>
+
+<div class="filter-panel">
+  <div class="filter-group">
+    <label>年度:</label>
+    <span class="chip active" data-filter="year" data-value="all">すべて</span>
+    <span class="chip" data-filter="year" data-value="2024">2024</span>
+    <span class="chip" data-filter="year" data-value="2023">2023</span>
+    <span class="chip" data-filter="year" data-value="2022">2022</span>
+    <span class="chip" data-filter="year" data-value="2021">2021</span>
+    <span class="chip" data-filter="year" data-value="2020">2020</span>
+    <span class="chip" data-filter="year" data-value="2019">2019</span>
+  </div>
+  <div class="filter-group">
+    <label>Lec:</label>
+    <span class="chip active" data-filter="lec" data-value="all">すべて</span>
+    <span class="chip" data-filter="lec" data-value="1">L1</span>
+    <span class="chip" data-filter="lec" data-value="2">L2</span>
+    <span class="chip" data-filter="lec" data-value="3">L3</span>
+    <span class="chip" data-filter="lec" data-value="4">L4</span>
+    <span class="chip" data-filter="lec" data-value="5">L5</span>
+    <span class="chip" data-filter="lec" data-value="6">L6</span>
+    <span class="chip" data-filter="lec" data-value="7">L7</span>
+    <span class="chip" data-filter="lec" data-value="8">L8</span>
+  </div>
+</div>
+
+<div class="summary" id="summary"></div>
+
+<div id="questions"></div>
+
+<footer>
+  © 2026 高橋大輔 · 慶應義塾大学薬学部<br>
+  解説は教科書 (Lehninger 8e、Krebs Genes XII) と本講義 Speaker_Notes に基づく自家編集。誤りがあれば <a href="https://github.com/kpdbcdt/molbio-lectures-FY2026/issues">GitHub Issues</a> へ。<br>
+  <a href="../">← Interactive Labs 一覧へ戻る</a>
+</footer>
+
+<script src="past-exams-data.js"></script>
+<script>
+(function(){
+  const state = { year: 'all', lec: 'all' };
+  const qContainer = document.getElementById('questions');
+  const summary = document.getElementById('summary');
+  const pdfLinks = document.getElementById('pdf-links');
+
+  // PDF download links
+  Object.keys(EXAM_META).sort((a,b) => b - a).forEach(y => {
+    const meta = EXAM_META[y];
+    const a = document.createElement('a');
+    a.href = meta.pdf;
+    a.target = '_blank';
+    a.textContent = `📄 ${y} 年 PDF`;
+    pdfLinks.appendChild(a);
+  });
+
+  function matchesFilter(q) {
+    if (state.year !== 'all' && q.year !== parseInt(state.year)) return false;
+    if (state.lec !== 'all') {
+      const lecNum = parseInt(state.lec);
+      if (!q.lec.includes(lecNum)) return false;
+    }
+    return true;
+  }
+
+  function render() {
+    const filtered = PAST_EXAMS.filter(matchesFilter);
+    summary.textContent = `${filtered.length} 問を表示中`;
+    qContainer.innerHTML = '';
+    if (filtered.length === 0) {
+      qContainer.innerHTML = '<div class="empty-state">該当する問題はありません (準備中の年度の可能性があります)</div>';
+      return;
+    }
+    filtered.forEach(q => qContainer.appendChild(renderQuestion(q)));
+  }
+
+  function renderQuestion(q) {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.dataset.qid = q.id;
+
+    const lecTags = q.lec.map(l => `<span class="q-tag lec">${LEC_TITLES[l] || ('Lec0'+l)}</span>`).join('');
+    const multiTag = q.multi ? '<span class="q-tag multi">複数選択</span>' : '<span class="q-tag">1 つ選択</span>';
+
+    let html = `
+      <div class="q-header">
+        <div>
+          <span class="q-tag year">${q.year} 年 問${q.num}</span>
+          ${multiTag}
+          ${lecTags}
+        </div>
+      </div>
+      <div class="q-stem">${q.stem}</div>
+    `;
+    if (q.image) {
+      html += `<div class="q-image"><img src="${q.image}" alt="問題図" onclick="this.classList.toggle('zoomed')"></div>`;
+    }
+    html += '<ul class="q-options">';
+    q.options.forEach((opt, i) => {
+      html += `<li data-idx="${i}">${i + 1}. ${opt}</li>`;
+    });
+    html += '</ul>';
+    html += `
+      <div class="q-actions">
+        <button class="btn" data-action="check">答え合わせ</button>
+        <button class="btn secondary" data-action="reset">リセット</button>
+        <button class="btn secondary" data-action="reveal">解説のみ表示</button>
+      </div>
+      <div class="q-feedback"></div>
+      <div class="q-explain">${q.explain}</div>
+    `;
+    card.innerHTML = html;
+
+    const selected = new Set();
+    const optionsEls = card.querySelectorAll('.q-options li');
+    optionsEls.forEach(li => {
+      li.addEventListener('click', () => {
+        if (card.classList.contains('locked')) return;
+        const idx = parseInt(li.dataset.idx);
+        if (q.multi) {
+          if (selected.has(idx)) { selected.delete(idx); li.classList.remove('selected'); }
+          else { selected.add(idx); li.classList.add('selected'); }
+        } else {
+          selected.clear();
+          optionsEls.forEach(x => x.classList.remove('selected'));
+          selected.add(idx);
+          li.classList.add('selected');
+        }
+      });
+    });
+
+    const checkBtn = card.querySelector('[data-action="check"]');
+    const resetBtn = card.querySelector('[data-action="reset"]');
+    const revealBtn = card.querySelector('[data-action="reveal"]');
+    const feedback = card.querySelector('.q-feedback');
+    const explain = card.querySelector('.q-explain');
+
+    checkBtn.addEventListener('click', () => {
+      if (selected.size === 0) { feedback.textContent = '選択肢を選んでください'; feedback.className = 'q-feedback ng'; return; }
+      const correctSet = new Set(q.correct);
+      const isCorrect = selected.size === correctSet.size && [...selected].every(x => correctSet.has(x));
+      optionsEls.forEach(li => {
+        const idx = parseInt(li.dataset.idx);
+        li.classList.remove('selected');
+        if (correctSet.has(idx)) li.classList.add('correct');
+        else if (selected.has(idx)) li.classList.add('incorrect');
+      });
+      feedback.textContent = isCorrect ? '✓ 正解です!' : '✗ 不正解 — 解説を確認してください';
+      feedback.className = isCorrect ? 'q-feedback ok' : 'q-feedback ng';
+      explain.classList.add('shown');
+      card.classList.add('locked');
+    });
+
+    resetBtn.addEventListener('click', () => {
+      selected.clear();
+      optionsEls.forEach(li => li.classList.remove('selected', 'correct', 'incorrect'));
+      feedback.textContent = '';
+      feedback.className = 'q-feedback';
+      explain.classList.remove('shown');
+      card.classList.remove('locked');
+    });
+
+    revealBtn.addEventListener('click', () => {
+      explain.classList.toggle('shown');
+    });
+
+    return card;
+  }
+
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const filter = chip.dataset.filter;
+      const value = chip.dataset.value;
+      document.querySelectorAll(`.chip[data-filter="${filter}"]`).forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      state[filter] = value;
+      render();
+    });
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
