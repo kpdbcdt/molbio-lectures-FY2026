@@ -1,8 +1,10 @@
 """Generate QR code PNGs for Lec07 poll questions.
 
 Each QR encodes the student URL with ?q=N parameter.
-Output: qr_q1.png ... qr_q3.png in the same directory.
-Also generates qr_with_label_qN.png with question text below the QR.
+Output: qr_q1.png + qr_q1_slide.png in the same directory.
+Also generates qr_lec07_lab_slide.png for the Interactive Lab landing page.
+
+注: 新 PPTX 37-slide 構造では Q#1 のみ active (Q#2/Q#3 は廃止、2026-05-27 削除)。
 """
 import os
 import qrcode
@@ -14,8 +16,8 @@ OUT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 QUESTIONS = {
     1: ("S03", "タンパク質分子数"),
-    2: ("S10", "ペプチド転移を触媒する分子"),
-    3: ("S18", "アミノグリコシドの結合部位"),
+    # 2 ("S10", "ペプチド転移を触媒する分子"): 新 PPTX 構造で廃止
+    # 3 ("S18", "アミノグリコシドの結合部位"): 新 PPTX 構造で廃止
 }
 
 

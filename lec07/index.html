@@ -404,11 +404,11 @@
     <li><a href="../lec01/"><span class="lec-num">Lec 01</span>概論・遺伝情報を担う分子</a></li>
     <li><a href="../lec02/"><span class="lec-num">Lec 02</span>化学的基盤</a></li>
     <li><a href="../lec03/"><span class="lec-num">Lec 03</span>染色体とゲノム</a></li>
-    <li><a href="#" class="disabled"><span class="lec-num">Lec 04</span>DNA 複製・修復<span class="soon-badge">SOON</span></a></li>
-    <li><a href="#" class="disabled"><span class="lec-num">Lec 05</span>転写<span class="soon-badge">SOON</span></a></li>
-    <li><a href="#" class="disabled"><span class="lec-num">Lec 06</span>転写調節・RNA プロセシング<span class="soon-badge">SOON</span></a></li>
+    <li><a href="../lec04/"><span class="lec-num">Lec 04</span>DNA 複製・修復</a></li>
+    <li><a href="../lec05/"><span class="lec-num">Lec 05</span>転写</a></li>
+    <li><a href="../lec06/"><span class="lec-num">Lec 06</span>転写調節・RNA プロセシング</a></li>
     <li><a href="../lec07/" class="active"><span class="lec-num">Lec 07</span>翻訳と翻訳後修飾</a></li>
-    <li><a href="#" class="disabled"><span class="lec-num">Lec 08</span>組換え DNA とゲノム編集<span class="soon-badge">SOON</span></a></li>
+    <li><a href="../lec08/"><span class="lec-num">Lec 08</span>組換え DNA とゲノム編集</a></li>
   </ul>
   <h3>Lec07 リソース</h3>
   <ul>
@@ -452,7 +452,9 @@
     <br>
     📘 <strong>問1-9</strong>: 基本問題 (翻訳と翻訳後修飾)<br>
     🏆 <strong>問10-12</strong>: 薬剤師国試改変 (<strong>発展・チャレンジ</strong>)</p>
-  <div class="card retake-only" style="background:#fffaf0; border-color:#e09f3e; border-width:2px; display:none;">
+
+  
+  <div class="card" style="background:#fffaf0; border-color:#e09f3e; border-width:2px;">
     <h3 style="margin-top:0; font-size:16px; color:#744210;">📋 再度試験受験者: 提出手順</h3>
     <ol style="font-size:13px; line-height:1.9; margin:6px 0;">
       <li>下の 12 問を解く (不合格なら「クイズをリセット」で再挑戦)</li>
@@ -989,35 +991,6 @@ document.getElementById('quiz-pdf').addEventListener('click', async () => {
 });
 
 renderQuiz();
-</script>
-<script>
-(function(){
-  try {
-    var p = new URLSearchParams(location.search);
-    var isRetake = p.get('retake') === '1' ||
-                   (document.referrer && /(?:lms\.keio\.jp\/courses\/)144965/.test(document.referrer));
-    if (!isRetake) return;
-    document.body.classList.add('is-retake');
-    document.querySelectorAll('.retake-only').forEach(function(el){ el.style.display = ''; });
-    document.querySelectorAll('.sidebar a.disabled').forEach(function(a){
-      var label = a.querySelector('.lec-num');
-      var t = label && label.textContent ? label.textContent.trim() : '';
-      var m = t.match(/^Lec\s*0?(\d+)$/);
-      if (!m) return;
-      var n = m[1].padStart(2,'0');
-      a.classList.remove('disabled');
-      a.setAttribute('href', '../lec' + n + '/?retake=1');
-      var soon = a.querySelector('.soon-badge');
-      if (soon) soon.remove();
-    });
-    document.querySelectorAll('.sidebar a[href*="../lec0"]').forEach(function(a){
-      var h = a.getAttribute('href');
-      if (h && !h.includes('retake=1') && !h.startsWith('#')) {
-        a.setAttribute('href', h + (h.includes('?') ? '&' : '?') + 'retake=1');
-      }
-    });
-  } catch (e) { /* no-op */ }
-})();
 </script>
 </body>
 </html>

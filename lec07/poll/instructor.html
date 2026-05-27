@@ -213,8 +213,6 @@
 
 <div class="qnav">
   <button data-q="1">Q1</button>
-  <button data-q="2">Q2</button>
-  <button data-q="3">Q3</button>
 </div>
 
 <header>
@@ -231,7 +229,7 @@
 <div class="controls">
   <button class="btn reveal" id="btn-reveal">🎯 正解を公開</button>
   <button class="btn reset" id="btn-reset">🔄 この Q をリセット</button>
-  <button class="btn reset" id="btn-reset-all" style="background:#9b2c2c;">⚠️ 全 Q を一括リセット</button>
+  <button class="btn reset" id="btn-reset-all" style="background:#9b2c2c;">⚠️ Q1 をリセット</button>
 </div>
 
 <div class="qr-info">
@@ -247,7 +245,7 @@ import {
   getFirestore, doc, setDoc, onSnapshot, deleteField
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
-import { POLLS } from "./poll-data.js?v=20260430a";
+import { POLLS } from "./poll-data.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -348,30 +346,28 @@ document.getElementById('btn-reset').addEventListener('click', async () => {
 });
 
 document.getElementById('btn-reset-all').addEventListener('click', async () => {
-  if (!confirm('⚠️ Q1 〜 Q3 のすべての投票をリセットしますか？\n\n講義開始直前に実行してください。\n（全カウントを 0 に戻し、正解公開状態も解除）')) return;
+  if (!confirm('⚠️ Q1 の投票をリセットしますか？\n\n講義開始直前に実行してください。\n（全カウントを 0 に戻し、正解公開状態も解除）\n\n注: 新 PPTX 37-slide 構造では Q#1 のみ active (Q#2/Q#3 は廃止)')) return;
   const btn = document.getElementById('btn-reset-all');
   btn.disabled = true;
   btn.textContent = 'リセット中…';
   try {
-    for (let q = 1; q <= 3; q++) {
-      const pollDoc = doc(db, 'polls_lec07', 'q' + q);
-      await setDoc(pollDoc, {
-        votes: { A: 0, B: 0, C: 0, D: 0 },
-        revealed: false,
-        reset_at: new Date().toISOString(),
-      }, { merge: true });
-    }
-    btn.textContent = '✅ 全リセット完了';
+    const pollDoc = doc(db, 'polls_lec07', 'q1');
+    await setDoc(pollDoc, {
+      votes: { A: 0, B: 0, C: 0, D: 0 },
+      revealed: false,
+      reset_at: new Date().toISOString(),
+    }, { merge: true });
+    btn.textContent = '✅ Q1 リセット完了';
     setTimeout(() => {
       btn.disabled = false;
-      btn.textContent = '⚠️ 全 Q を一括リセット';
+      btn.textContent = '⚠️ Q1 をリセット';
     }, 2500);
   } catch (err) {
     console.error(err);
     btn.textContent = '❌ エラー: ' + err.message;
     setTimeout(() => {
       btn.disabled = false;
-      btn.textContent = '⚠️ 全 Q を一括リセット';
+      btn.textContent = '⚠️ Q1 をリセット';
     }, 4000);
   }
 });
