@@ -729,7 +729,7 @@ function renderQuiz() {
       banner.className = 'challenge-banner';
       banner.innerHTML = `
         <h3>🏆 ここから国試チャレンジ問題 (発展)</h3>
-        <p>以下の問題は<strong>薬剤師国家試験の過去問</strong>を一部改変したものです。染色体異常・スプライシング治療薬・エピジェネティクス治療など、Lec03 の内容と密接に関連する臨床応用トピックです。解説を読んで「染色体・ゲノムの知識がどう医療に生きているか」を体感してください。</p>
+        <p>以下の問題は<strong>薬剤師国家試験の過去問</strong>を一部改変したものです。マクロライド系・アミノグリコシド系抗菌薬の作用機序、プロテアソーム阻害剤 (ボルテゾミブ) など、Lec07 の翻訳機構と翻訳後修飾の知識が臨床で直結する応用トピックです。解説を読んで「翻訳・PTM の知識がどう医療に生きているか」を体感してください。</p>
       `;
       list.appendChild(banner);
       challengeBannerShown = true;
@@ -880,7 +880,7 @@ document.getElementById('quiz-pdf').addEventListener('click', async () => {
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>分子生物学 Lec03 復習クイズ修了証</title>
+<title>分子生物学 Lec07 復習クイズ修了証</title>
 <style>
   @page { size: A4; margin: 18mm 15mm; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif; color: #1a2633; line-height: 1.6; font-size: 11pt; margin: 0; padding: 0; }
@@ -926,7 +926,7 @@ document.getElementById('quiz-pdf').addEventListener('click', async () => {
 
 <div class="cert-box">
   <div class="cert-title">分子生物学 復習クイズ修了証</div>
-  <div class="cert-sub">Certificate of Completion — 第3回 染色体とゲノム</div>
+  <div class="cert-sub">Certificate of Completion — 第7回 翻訳と翻訳後修飾</div>
   <div class="cert-field"><span class="label">学籍番号</span><br><span class="value">${studentId}</span></div>
   <div class="cert-score">${score} / ${total}</div>
   <div class="cert-field"><span class="label">合格基準: ${Math.ceil(total * PASS_THRESHOLD)}問以上</span></div>
