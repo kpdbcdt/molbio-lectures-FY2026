@@ -441,13 +441,89 @@
 </div>
 
 <nav class="tabs">
-  <button data-tab="quiz" class="active">✅ Quiz (12問)</button>
+  <button data-tab="codon" class="active">🧬 Codon Translator</button>
+  <button data-tab="ribosome">🎯 Ribosome A/P/E Animator</button>
+  <button data-tab="drugs">💊 抗菌薬 Matcher</button>
+  <button data-tab="quiz">✅ Quiz (12問)</button>
 </nav>
 
 <main>
 
+<!-- ============ TAB 1: CODON TRANSLATOR ============ -->
+<section id="codon" class="tab active">
+  <h2>🧬 Codon Translator — mRNA を翻訳してみる</h2>
+  <p class="lead">mRNA 配列を入力すると、5'→3' 方向に 3 塩基ずつ読んで翻訳されるアミノ酸配列を表示します。コドン表 (S07) とウォブル (S09) の理解を深めてください。</p>
+
+  <div class="card">
+    <label for="mrna-input" style="font-weight:600; display:block; margin-bottom:6px;">mRNA 配列を入力 (A/U/G/C のみ、5'→3'):</label>
+    <textarea id="mrna-input" rows="3" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:6px; font-family:monospace; font-size:14px; resize:vertical;" placeholder="例: AUGGCUUCCAAAGAGUAA  (Met-Ala-Ser-Lys-Glu-STOP)">AUGGCUUCCAAAGAGUAA</textarea>
+    <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn" id="codon-translate-btn" style="background:var(--primary); color:white;">▶ 翻訳実行</button>
+      <button class="btn" id="codon-example-hbb" style="background:#5a6978; color:white;">例: HbA (Glu6) vs HbS (Val6)</button>
+      <button class="btn" id="codon-example-dmd" style="background:#5a6978; color:white;">例: DMD ナンセンス変異</button>
+    </div>
+  </div>
+
+  <div id="codon-result" style="margin-top:16px;"></div>
+</section>
+
+<!-- ============ TAB 2: RIBOSOME A/P/E ANIMATOR ============ -->
+<section id="ribosome" class="tab">
+  <h2>🎯 Ribosome A/P/E Animator — 伸長サイクル 3 ステップ</h2>
+  <p class="lead">リボソームの A/P/E サイトと tRNA の動きを 3 ステップで追います (S14)。「結合 → 転移 → 移動」のリズムを掴んでください。</p>
+
+  <div class="card">
+    <div id="ribosome-stage" style="background:#f7fafc; border:1px solid var(--border); border-radius:8px; padding:24px; min-height:280px; position:relative;">
+      <!-- リボソーム 3 サイト表示 -->
+      <div style="display:flex; gap:8px; justify-content:center; margin-bottom:20px;">
+        <div id="site-E" style="width:140px; padding:16px 8px; border:2px solid #d7dce5; border-radius:8px; text-align:center; background:white;">
+          <div style="font-size:11px; color:var(--muted); font-weight:600;">E site (排出)</div>
+          <div id="site-E-tRNA" style="margin-top:8px; min-height:50px; font-size:13px;">—</div>
+        </div>
+        <div id="site-P" style="width:140px; padding:16px 8px; border:2px solid #d7dce5; border-radius:8px; text-align:center; background:white;">
+          <div style="font-size:11px; color:var(--muted); font-weight:600;">P site (ペプチド)</div>
+          <div id="site-P-tRNA" style="margin-top:8px; min-height:50px; font-size:13px;">—</div>
+        </div>
+        <div id="site-A" style="width:140px; padding:16px 8px; border:2px solid #d7dce5; border-radius:8px; text-align:center; background:white;">
+          <div style="font-size:11px; color:var(--muted); font-weight:600;">A site (受容)</div>
+          <div id="site-A-tRNA" style="margin-top:8px; min-height:50px; font-size:13px;">—</div>
+        </div>
+      </div>
+      <!-- mRNA codon 表示 -->
+      <div style="text-align:center; font-family:monospace; font-size:13px; color:var(--muted); margin-bottom:12px;">mRNA: 5'... <span id="ribosome-codon" style="background:#fef5e7; padding:2px 6px; border-radius:4px; font-weight:700;">UUU</span> <span id="ribosome-next-codon" style="opacity:0.4;">GCC</span> ...3'</div>
+      <!-- ステップ説明 -->
+      <div id="ribosome-step-info" style="background:#edf2f7; padding:12px 16px; border-radius:6px; font-size:13px; line-height:1.7; min-height:80px;">
+        ステップを進めて伸長サイクルを観察してください。
+      </div>
+    </div>
+    <div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+      <button class="btn" id="ribosome-reset" style="background:#5a6978; color:white;">⟲ リセット</button>
+      <button class="btn" id="ribosome-step1" style="background:var(--primary); color:white;">① 結合 (EF-Tu)</button>
+      <button class="btn" id="ribosome-step2" style="background:#2e8b57; color:white;">② 転移 (PTase = リボザイム)</button>
+      <button class="btn" id="ribosome-step3" style="background:#9b2c7f; color:white;">③ 移動 (EF-G)</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TAB 3: TRANSLATION INHIBITOR MATCHER ============ -->
+<section id="drugs" class="tab">
+  <h2>💊 翻訳阻害抗菌薬 Matcher</h2>
+  <p class="lead">7 種の翻訳阻害抗菌薬を**標的サブユニット (30S / 50S)** にマッチさせてください。クリックで標的選択 → 各薬剤がどこに効くか確認 (S20)。</p>
+
+  <div class="card">
+    <div style="display:flex; gap:12px; margin-bottom:16px; justify-content:center; flex-wrap:wrap;">
+      <button class="btn drug-filter active" data-target="all" style="background:var(--primary); color:white;">全て</button>
+      <button class="btn drug-filter" data-target="30S" style="background:white; color:var(--primary); border:1px solid var(--primary);">30S 標的</button>
+      <button class="btn drug-filter" data-target="50S" style="background:white; color:var(--primary); border:1px solid var(--primary);">50S 標的</button>
+      <button class="btn drug-filter" data-target="殺菌的" style="background:white; color:#9b2c2c; border:1px solid #9b2c2c;">殺菌的のみ</button>
+    </div>
+    <div id="drugs-list" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:14px;"></div>
+  </div>
+</section>
+
+
 <!-- ============ TAB 1: CHROMATIN COMPACTION ============ -->
-<section id="quiz" class="tab active">
+<section id="quiz" class="tab">
   <h2>✅ 復習クイズ (12 問)</h2>
   <p class="lead">各問題の選択肢をクリックすると、その場で正解・解説が表示されます。
     <br>
@@ -455,7 +531,7 @@
     🏆 <strong>問10-12</strong>: 薬剤師国試改変 (<strong>発展・チャレンジ</strong>)</p>
 
   
-  <div class="card" style="background:#fffaf0; border-color:#e09f3e; border-width:2px;">
+  <div id="retake-submission-card" class="card" style="background:#fffaf0; border-color:#e09f3e; border-width:2px; display:none;">
     <h3 style="margin-top:0; font-size:16px; color:#744210;">📋 再度試験受験者: 提出手順</h3>
     <ol style="font-size:13px; line-height:1.9; margin:6px 0;">
       <li>下の 12 問を解く (不合格なら「クイズをリセット」で再挑戦)</li>
@@ -706,6 +782,196 @@ const QUIZ = [
 // Quiz logic + certificate
 const quizState = { answered: [], correct: 0, shuffleMaps: [] };
 const LETTERS = ['a', 'b', 'c', 'd', 'e'];
+
+// ============ Phase 1: 再度試験提出手順 表示制御 ============
+(function(){
+  const params = new URLSearchParams(location.search);
+  const isRetake = params.get('retake') === '1';
+  const card = document.getElementById('retake-submission-card');
+  if (card) card.style.display = isRetake ? '' : 'none';
+})();
+
+// ============ Tab switching ============
+document.querySelectorAll('.tabs button[data-tab]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tabs button[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    document.querySelectorAll('section.tab').forEach(s => s.classList.toggle('active', s.id === tab));
+  });
+});
+
+// ============ Tool 1: Codon Translator ============
+const CODON_TABLE = {
+  UUU:['Phe','F','疎水'], UUC:['Phe','F','疎水'], UUA:['Leu','L','疎水'], UUG:['Leu','L','疎水'],
+  CUU:['Leu','L','疎水'], CUC:['Leu','L','疎水'], CUA:['Leu','L','疎水'], CUG:['Leu','L','疎水'],
+  AUU:['Ile','I','疎水'], AUC:['Ile','I','疎水'], AUA:['Ile','I','疎水'], AUG:['Met','M','疎水/開始'],
+  GUU:['Val','V','疎水'], GUC:['Val','V','疎水'], GUA:['Val','V','疎水'], GUG:['Val','V','疎水'],
+  UCU:['Ser','S','極性'], UCC:['Ser','S','極性'], UCA:['Ser','S','極性'], UCG:['Ser','S','極性'],
+  CCU:['Pro','P','疎水'], CCC:['Pro','P','疎水'], CCA:['Pro','P','疎水'], CCG:['Pro','P','疎水'],
+  ACU:['Thr','T','極性'], ACC:['Thr','T','極性'], ACA:['Thr','T','極性'], ACG:['Thr','T','極性'],
+  GCU:['Ala','A','疎水'], GCC:['Ala','A','疎水'], GCA:['Ala','A','疎水'], GCG:['Ala','A','疎水'],
+  UAU:['Tyr','Y','極性'], UAC:['Tyr','Y','極性'], UAA:['STOP','*','終止'], UAG:['STOP','*','終止'],
+  CAU:['His','H','塩基性'], CAC:['His','H','塩基性'], CAA:['Gln','Q','極性'], CAG:['Gln','Q','極性'],
+  AAU:['Asn','N','極性'], AAC:['Asn','N','極性'], AAA:['Lys','K','塩基性'], AAG:['Lys','K','塩基性'],
+  GAU:['Asp','D','酸性'], GAC:['Asp','D','酸性'], GAA:['Glu','E','酸性'], GAG:['Glu','E','酸性'],
+  UGU:['Cys','C','極性/S-S'], UGC:['Cys','C','極性/S-S'], UGA:['STOP','*','終止/Sec'], UGG:['Trp','W','疎水'],
+  CGU:['Arg','R','塩基性'], CGC:['Arg','R','塩基性'], CGA:['Arg','R','塩基性'], CGG:['Arg','R','塩基性'],
+  AGU:['Ser','S','極性'], AGC:['Ser','S','極性'], AGA:['Arg','R','塩基性'], AGG:['Arg','R','塩基性'],
+  GGU:['Gly','G','疎水'], GGC:['Gly','G','疎水'], GGA:['Gly','G','疎水'], GGG:['Gly','G','疎水'],
+};
+const AA_COLOR = {'疎水':'#fed7d7','極性':'#bee3f8','塩基性':'#c6f6d5','酸性':'#fef5e7','疎水/開始':'#feb2b2','終止':'#1a2633','終止/Sec':'#744210','極性/S-S':'#9ae6b4'};
+
+function translateMRNA(seq) {
+  seq = seq.toUpperCase().replace(/[^AUGC]/g, '');
+  const peptide = [];
+  let i = 0;
+  while (i + 3 <= seq.length) {
+    const codon = seq.substring(i, i+3);
+    const aa = CODON_TABLE[codon] || ['?','?','不明'];
+    peptide.push({codon, name: aa[0], letter: aa[1], prop: aa[2]});
+    if (aa[0] === 'STOP') break;
+    i += 3;
+  }
+  return peptide;
+}
+
+function renderCodonResult(seq) {
+  const p = translateMRNA(seq);
+  const cleaned = seq.toUpperCase().replace(/[^AUGC]/g, '');
+  let html = `<div class="card"><h3 style="margin-top:0;">翻訳結果 (mRNA 長 ${cleaned.length} nt)</h3>`;
+  html += '<div style="display:flex; flex-wrap:wrap; gap:6px; margin:10px 0;">';
+  p.forEach((aa, idx) => {
+    const color = AA_COLOR[aa.prop] || '#edf2f7';
+    const isStop = aa.name === 'STOP';
+    html += `<div style="background:${color}; ${isStop ? 'color:white;' : ''} padding:8px 10px; border-radius:6px; text-align:center; min-width:60px; font-family:monospace;">
+      <div style="font-size:10px; color:${isStop ? '#fef5e7' : 'var(--muted)'};">${aa.codon}</div>
+      <div style="font-weight:700; font-size:14px; margin:2px 0;">${aa.name}</div>
+      <div style="font-size:10px;">${aa.prop}</div>
+    </div>`;
+  });
+  html += '</div>';
+  const stopFound = p.some(x => x.name === 'STOP');
+  if (stopFound) {
+    html += '<p style="color:var(--ok); font-weight:600; margin:6px 0 0;">✓ 終止コドンで翻訳停止</p>';
+  } else {
+    html += '<p style="color:var(--accent); font-weight:600; margin:6px 0 0;">⚠️ 終止コドンに到達せず (mRNA 末端まで)</p>';
+  }
+  // 色分けの凡例
+  html += '<div style="margin-top:14px; padding-top:10px; border-top:1px solid var(--border); font-size:11px; color:var(--muted);">凡例: <span style="background:#fed7d7;padding:2px 6px;">疎水</span> <span style="background:#bee3f8;padding:2px 6px;">極性</span> <span style="background:#c6f6d5;padding:2px 6px;">塩基性</span> <span style="background:#fef5e7;padding:2px 6px;">酸性</span> <span style="background:#1a2633;color:white;padding:2px 6px;">終止</span></div>';
+  html += '</div>';
+  document.getElementById('codon-result').innerHTML = html;
+}
+
+document.getElementById('codon-translate-btn').addEventListener('click', () => {
+  renderCodonResult(document.getElementById('mrna-input').value);
+});
+document.getElementById('codon-example-hbb').addEventListener('click', () => {
+  document.getElementById('mrna-input').value = 'AUGGUGCAUCUGACUCCUGAGGAGAAGUCUGCC'; // HbS (Val6 変異版、最初の数コドン)
+  renderCodonResult('AUGGUGCAUCUGACUCCUGAGGAGAAGUCUGCC');
+});
+document.getElementById('codon-example-dmd').addEventListener('click', () => {
+  document.getElementById('mrna-input').value = 'AUGCUGUGGGCUGAACGGAGUGAACGCCAUCGCAGGAUCAUAGCUG'; // 途中で UAG (ナンセンス変異)
+  renderCodonResult('AUGCUGUGGGCUGAACGGAGUGAACGCCAUCGCAGGAUCAUAGCUG');
+});
+// 初期描画
+renderCodonResult(document.getElementById('mrna-input').value);
+
+// ============ Tool 2: Ribosome A/P/E Animator ============
+const RIBOSOME_STEPS = {
+  reset: {
+    E: '—',
+    P: '<div style="background:#9ae6b4;padding:4px 6px;border-radius:4px;">tRNA-Phe<br><small>ペプチジル (3 aa)</small></div>',
+    A: '—',
+    codon: 'UUU',
+    nextCodon: 'GCC',
+    info: '<strong>初期状態</strong>: P サイトに tRNA-Phe (ペプチジル、3 aa のペプチド鎖)、A サイトは空。次のコドン GCC (Ala) が露出。'
+  },
+  step1: {
+    E: '—',
+    P: '<div style="background:#9ae6b4;padding:4px 6px;border-radius:4px;">tRNA-Phe<br><small>ペプチジル (3 aa)</small></div>',
+    A: '<div style="background:#bee3f8;padding:4px 6px;border-radius:4px;">EF-Tu-GTP<br>+ tRNA-Ala<br><small>アミノアシル</small></div>',
+    codon: 'UUU',
+    nextCodon: 'GCC',
+    info: '<strong>Step 1: 結合 (EF-Tu-GTP)</strong> — EF-Tu-GTP が aa-tRNA を A サイトに仮置き。コドン↔アンチコドン対合が正しいと <strong>GTP 加水分解</strong> → EF-Tu 解離 → tRNA 正式に収まる (動的校正 = kinetic proofreading)。'
+  },
+  step2: {
+    E: '—',
+    P: '<div style="background:#cbd5e0;padding:4px 6px;border-radius:4px;">tRNA-Phe<br><small>脱アシル (空)</small></div>',
+    A: '<div style="background:#9ae6b4;padding:4px 6px;border-radius:4px;">tRNA-Ala<br><small>ペプチジル (4 aa)</small></div>',
+    codon: 'UUU',
+    nextCodon: 'GCC',
+    info: '<strong>Step 2: ペプチド転移 (PTase = リボザイム)</strong> — P サイトのペプチド鎖が A サイトの aa-tRNA のアミノ基に転移し、<strong>新ペプチド結合形成</strong>。触媒は <strong>23S rRNA そのもの (リボザイム)</strong>。一時的に A サイトに「ペプチジル tRNA」、P サイトに「脱アシル tRNA」。'
+  },
+  step3: {
+    E: '<div style="background:#cbd5e0;padding:4px 6px;border-radius:4px;">tRNA-Phe<br><small>排出中</small></div>',
+    P: '<div style="background:#9ae6b4;padding:4px 6px;border-radius:4px;">tRNA-Ala<br><small>ペプチジル (4 aa)</small></div>',
+    A: '<div style="background:#fef5e7;padding:4px 6px;border-radius:4px;">空 → 次の<br>aa-tRNA<br>を待つ</small></div>',
+    codon: 'GCC',
+    nextCodon: 'AAA',
+    info: '<strong>Step 3: トランスロケーション (EF-G-GTP)</strong> — EF-G-GTP の GTP 加水分解エネルギーで <strong>リボソームが 3 塩基 (1 コドン) 5\'→3\' 移動</strong>。A→P (ペプチジル)、P→E (脱アシル) へシフト。A サイト空き、次コドン露出 → サイクル 1 回完了。1000 aa なら 1000 サイクル (大腸菌で約 1 分)。'
+  }
+};
+
+function setRibosomeState(stateName) {
+  const s = RIBOSOME_STEPS[stateName];
+  document.getElementById('site-E-tRNA').innerHTML = s.E;
+  document.getElementById('site-P-tRNA').innerHTML = s.P;
+  document.getElementById('site-A-tRNA').innerHTML = s.A;
+  document.getElementById('ribosome-codon').textContent = s.codon;
+  document.getElementById('ribosome-next-codon').textContent = s.nextCodon;
+  document.getElementById('ribosome-step-info').innerHTML = s.info;
+}
+
+document.getElementById('ribosome-reset').addEventListener('click', () => setRibosomeState('reset'));
+document.getElementById('ribosome-step1').addEventListener('click', () => setRibosomeState('step1'));
+document.getElementById('ribosome-step2').addEventListener('click', () => setRibosomeState('step2'));
+document.getElementById('ribosome-step3').addEventListener('click', () => setRibosomeState('step3'));
+setRibosomeState('reset');
+
+// ============ Tool 3: Translation Inhibitor Matcher ============
+const DRUGS = [
+  {name:'ゲンタマイシン', class:'アミノグリコシド', target:'30S', site:'16S rRNA A サイト', mech:'コドン認識を撹乱 → 誤読 → 異常タンパクが膜に挿入', effect:'殺菌的', note:'腎毒性・耳毒性 (ミトコンドリアリボソーム) → TDM 必須', color:'#fed7d7'},
+  {name:'ストレプトマイシン', class:'アミノグリコシド', target:'30S', site:'16S rRNA A サイト', mech:'誤読誘発、結核 RIPE 療法', effect:'殺菌的', note:'結核第 4 選択薬、聴覚毒性', color:'#fed7d7'},
+  {name:'テトラサイクリン', class:'テトラサイクリン', target:'30S', site:'A サイト', mech:'aa-tRNA の A サイト結合阻害', effect:'静菌的', note:'歯黄染 (8 歳未満禁忌)、光線過敏症', color:'#fef5e7'},
+  {name:'エリスロマイシン', class:'マクロライド', target:'50S', site:'23S rRNA exit tunnel', mech:'ペプチド鎖の通過阻害', effect:'静菌的', note:'CYP3A4 阻害 (相互作用)', color:'#bee3f8'},
+  {name:'クロラムフェニコール', class:'クロラムフェニコール', target:'50S', site:'23S rRNA PT 中心', mech:'ペプチド結合形成阻害 (リボザイム阻害)', effect:'静菌的', note:'骨髄抑制 (再生不良性貧血) → 限定使用', color:'#bee3f8'},
+  {name:'クリンダマイシン', class:'リンコサミド', target:'50S', site:'23S rRNA', mech:'転移/トランスロケーション阻害 (マクロライドと拮抗)', effect:'静菌的', note:'偽膜性大腸炎 (C. difficile) リスク', color:'#bee3f8'},
+  {name:'リネゾリド', class:'オキサゾリジノン', target:'50S', site:'23S rRNA', mech:'翻訳開始 (fMet-tRNA P サイト配置) 阻害', effect:'静菌的', note:'MRSA / VRE、経口可、血小板減少注意', color:'#bee3f8'},
+];
+
+function renderDrugs(filter) {
+  const list = document.getElementById('drugs-list');
+  const filtered = DRUGS.filter(d => filter === 'all' || d.target === filter || d.effect === filter);
+  list.innerHTML = filtered.map(d => `
+    <div style="background:${d.color}; padding:14px; border-radius:8px; border:1px solid rgba(0,0,0,0.05);">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px;">
+        <strong style="font-size:15px;">${d.name}</strong>
+        <span style="font-size:11px; background:${d.effect==='殺菌的' ? '#9b2c2c' : '#5a6978'}; color:white; padding:2px 8px; border-radius:10px;">${d.effect}</span>
+      </div>
+      <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">${d.class} · <strong>${d.target}</strong> 標的</div>
+      <div style="font-size:12px; margin-bottom:4px;"><strong>結合部位:</strong> ${d.site}</div>
+      <div style="font-size:12px; margin-bottom:6px;"><strong>機序:</strong> ${d.mech}</div>
+      <div style="font-size:11px; color:#744210; padding-top:6px; border-top:1px solid rgba(0,0,0,0.08);"><strong>薬学接点:</strong> ${d.note}</div>
+    </div>
+  `).join('');
+}
+
+document.querySelectorAll('.drug-filter').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.drug-filter').forEach(b => {
+      b.classList.remove('active');
+      b.style.background = 'white';
+      b.style.color = b.dataset.target === '殺菌的' ? '#9b2c2c' : 'var(--primary)';
+    });
+    btn.classList.add('active');
+    btn.style.background = btn.dataset.target === '殺菌的' ? '#9b2c2c' : 'var(--primary)';
+    btn.style.color = 'white';
+    renderDrugs(btn.dataset.target);
+  });
+});
+renderDrugs('all');
+
+
 const PASS_THRESHOLD = 0.8;
 
 function shuffleArray(arr) {
