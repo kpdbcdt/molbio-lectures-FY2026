@@ -431,7 +431,7 @@
     <div>
       <div style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">LEC 08 · 2026-06-04</div>
       <h2 style="margin: 0 0 4px 0; font-size: 20px;">組換え DNA とゲノム編集</h2>
-      <p style="margin: 0 0 12px 0; color: var(--muted); font-size: 13px;">12 問の復習クイズで分子生物学技術とゲノム編集の最前線を確認</p>
+      <p style="margin: 0 0 12px 0; color: var(--muted); font-size: 13px;">4 つの interactive tools（制限酵素&クローニング / PCR / ブロット法 / CRISPR）+ 12 問の復習クイズで分子生物学技術とゲノム編集を体験・確認</p>
     </div>
     <div style="margin: 8px 0; display:flex; gap:10px; flex-wrap:wrap;">
       <a href="https://lms.keio.jp/courses/140260/modules/items/6159688" target="_blank"
@@ -447,13 +447,94 @@
 </div>
 
 <nav class="tabs">
-  <button data-tab="quiz" class="active">✅ Quiz (12問)</button>
+  <button data-tab="cloning" class="active">🔪 制限酵素 & クローニング</button>
+  <button data-tab="pcr">🔥 PCR Amplifier</button>
+  <button data-tab="blot">🎯 ブロット法 Matcher</button>
+  <button data-tab="crispr">✂️ CRISPR-Cas9 Editor</button>
+  <button data-tab="quiz">✅ Quiz (12問)</button>
 </nav>
 
 <main>
 
-<!-- ============ TAB 1: CHROMATIN COMPACTION ============ -->
-<section id="quiz" class="tab active">
+<!-- ============ TOOL 1: 制限酵素 & クローニング ============ -->
+<section id="cloning" class="tab active">
+  <h2>🔪 制限酵素 &amp; クローニング Builder</h2>
+  <p class="lead">制限酵素ごとの切断パターン（付着末端 / 平滑末端）を確認し、ベクターとインサートを切る酵素を選んで <strong>ライゲーション可否（互換末端）</strong>を判定します。</p>
+  <div class="card">
+    <h3 style="margin-top:0;">① 制限酵素の切断パターン</h3>
+    <div id="enz-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:12px;"></div>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0;">② ライゲーション互換性チェッカー</h3>
+    <p style="font-size:13px; color:var(--muted); margin-top:0;">ベクターとインサートを切る酵素を選ぶと、生じる末端どうしが連結できるか判定します。</p>
+    <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-end;">
+      <label style="font-size:13px;">ベクター側を切る酵素<br><select id="lig-v" style="padding:6px; font-size:14px; margin-top:4px;"></select></label>
+      <label style="font-size:13px;">インサート側を切る酵素<br><select id="lig-i" style="padding:6px; font-size:14px; margin-top:4px;"></select></label>
+    </div>
+    <div id="lig-result" style="margin-top:16px;"></div>
+  </div>
+</section>
+
+<!-- ============ TOOL 2: PCR Amplifier ============ -->
+<section id="pcr" class="tab">
+  <h2>🔥 PCR Amplifier — 指数増幅シミュレーター</h2>
+  <p class="lead">サイクル数を変えると、1 分子の DNA が <strong>2ⁿ 倍</strong>に増幅される様子を確認できます。各サイクルは 3 ステップで温度を変えます。</p>
+  <div class="card">
+    <div style="display:flex; gap:20px; justify-content:center; flex-wrap:wrap; margin-bottom:18px;">
+      <div style="text-align:center;"><div style="font-size:11px;color:var(--muted)">① 変性 Denaturation</div><div style="font-size:24px;font-weight:700;color:#c0392b">95°C</div><div style="font-size:11px;">二本鎖を解離</div></div>
+      <div style="text-align:center;"><div style="font-size:11px;color:var(--muted)">② アニーリング Annealing</div><div style="font-size:24px;font-weight:700;color:#2b6cb0">55–65°C</div><div style="font-size:11px;">プライマー結合</div></div>
+      <div style="text-align:center;"><div style="font-size:11px;color:var(--muted)">③ 伸長 Extension</div><div style="font-size:24px;font-weight:700;color:#2e8b57">72°C</div><div style="font-size:11px;">Taq が合成</div></div>
+    </div>
+    <label style="font-size:14px;">サイクル数: <strong id="pcr-n">25</strong> 回
+      <input type="range" id="pcr-slider" min="0" max="35" value="25" style="width:100%; margin-top:6px;"></label>
+    <div style="text-align:center; margin-top:18px;">
+      <div style="font-size:13px; color:var(--muted);">理論コピー数 (2ⁿ)</div>
+      <div id="pcr-copies" style="font-size:34px; font-weight:700; font-family:var(--mono); color:var(--primary);">—</div>
+      <div style="background:#edf2f7; border-radius:6px; overflow:hidden; margin-top:10px;">
+        <div id="pcr-bar" style="height:22px; background:linear-gradient(90deg,#2b6cb0,#2e8b57); border-radius:6px; width:0%; transition:width .2s;"></div>
+      </div>
+      <div id="pcr-note" style="font-size:13px; margin-top:12px; color:var(--muted);"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TOOL 3: ブロット法 Matcher ============ -->
+<section id="blot" class="tab">
+  <h2>🎯 ブロット法 Matcher</h2>
+  <p class="lead">3 種のブロット法を <strong>検出対象（DNA / RNA / タンパク質）</strong>にマッチさせます。カードをクリックで答え・由来・用途を表示。セントラルドグマの 3 層に対応 (S17)。</p>
+  <div class="card" style="background:#f0fff4; border-color:#9ae6b4;">
+    <strong>覚え方</strong>: <strong>サザン=DNA</strong>（Southern は<strong>発明者の姓</strong>）/ <strong>ノーザン=RNA</strong> / <strong>ウエスタン=タンパク質</strong>（北・西はジョーク命名）。「サザンだけ人名」。
+  </div>
+  <div id="blot-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px; margin-top:14px;"></div>
+  <div class="card" style="margin-top:14px;">
+    <h3 style="margin-top:0;">ミニ自己テスト</h3>
+    <div id="blot-q" style="font-weight:600; margin-bottom:10px;"></div>
+    <div id="blot-opts" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
+    <div id="blot-fb" style="margin-top:10px; font-size:14px;"></div>
+  </div>
+</section>
+
+<!-- ============ TOOL 4: CRISPR-Cas9 Editor ============ -->
+<section id="crispr" class="tab">
+  <h2>✂️ CRISPR-Cas9 Editor</h2>
+  <p class="lead">標的 DNA から <strong>PAM (5'-NGG-3')</strong> を探し、sgRNA(20 nt)が結合 → Cas9 が PAM の <strong>3 塩基上流</strong>で二本鎖切断(DSB)。修復経路 <strong>NHEJ</strong>(ノックアウト) / <strong>HDR</strong>(精密編集) で結果が変わります (S24-26)。</p>
+  <div class="card">
+    <label style="font-size:13px;">標的 DNA 配列 (5'→3'、A/T/G/C):<br>
+      <input type="text" id="cr-seq" value="ATGGCACCTGAAGGTCTGAACGGTACCATGCGGAACTGAGCC" style="width:100%; font-family:var(--mono); font-size:14px; padding:7px; margin-top:4px; letter-spacing:1px;"></label>
+    <button class="btn" id="cr-scan" style="margin-top:12px;">🔍 PAM を探して切断</button>
+    <div id="cr-out" style="margin-top:16px; font-family:var(--mono); font-size:15px; word-break:break-all; line-height:2.1;"></div>
+    <div id="cr-legend" style="font-size:12px; color:var(--muted); margin-top:6px;"></div>
+    <div id="cr-repair" style="margin-top:16px; display:none;">
+      <div style="font-weight:600; margin-bottom:8px;">修復経路を選択:</div>
+      <button class="btn" id="cr-nhej" style="background:#c0392b;">NHEJ で修復（ノックアウト）</button>
+      <button class="btn" id="cr-hdr" style="background:#2e8b57;">HDR で修復（精密ノックイン）</button>
+      <div id="cr-result" style="margin-top:14px; font-size:14px;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Quiz ============ -->
+<section id="quiz" class="tab">
   <h2>✅ 復習クイズ (12 問)</h2>
   <p class="lead">各問題の選択肢をクリックすると、その場で正解・解説が表示されます。
     <br>
@@ -529,6 +610,131 @@ document.querySelectorAll('nav.tabs button').forEach(btn => {
     document.getElementById(btn.dataset.tab).classList.add('active');
   });
 });
+
+/* ===== TOOL 1: 制限酵素 & クローニング ===== */
+const ENZYMES = [
+  {name:'EcoRI',   site:'G^AATTC', end:'付着末端 (5\' 突出)', over:'AATT', type:'sticky'},
+  {name:'MfeI',    site:'C^AATTG', end:'付着末端 (5\' 突出)', over:'AATT', type:'sticky'},
+  {name:'BamHI',   site:'G^GATCC', end:'付着末端 (5\' 突出)', over:'GATC', type:'sticky'},
+  {name:'BglII',   site:'A^GATCT', end:'付着末端 (5\' 突出)', over:'GATC', type:'sticky'},
+  {name:'HindIII', site:'A^AGCTT', end:'付着末端 (5\' 突出)', over:'AGCT', type:'sticky'},
+  {name:'SmaI',    site:'CCC^GGG', end:'平滑末端', over:'blunt', type:'blunt'},
+  {name:'EcoRV',   site:'GAT^ATC', end:'平滑末端', over:'blunt', type:'blunt'},
+];
+(function(){
+  const grid=document.getElementById('enz-grid'); if(!grid) return;
+  grid.innerHTML=ENZYMES.map(e=>`<div style="border:1px solid var(--border); border-radius:8px; padding:10px 12px; background:white;">
+    <div style="font-weight:700; color:var(--primary);">${e.name}</div>
+    <div style="font-family:var(--mono); font-size:15px; margin:4px 0;">${e.site.replace('^','<span style="color:#c0392b">▾</span>')}</div>
+    <div style="font-size:12px;">${e.end}</div>
+    <div style="font-size:12px; color:var(--muted);">突出: ${e.over==='blunt'?'なし':e.over}</div></div>`).join('');
+  const sv=document.getElementById('lig-v'), si=document.getElementById('lig-i');
+  const opts=ENZYMES.map(e=>`<option value="${e.name}">${e.name} (${e.over==='blunt'?'平滑':e.over})</option>`).join('');
+  sv.innerHTML=opts; si.innerHTML=opts; si.selectedIndex=1;
+  function check(){
+    const a=ENZYMES.find(e=>e.name===sv.value), b=ENZYMES.find(e=>e.name===si.value);
+    const r=document.getElementById('lig-result'); let ok,msg,color;
+    if(a.type==='sticky'&&b.type==='sticky'&&a.over===b.over){
+      ok='✅ 連結可能'; color='#2e8b57';
+      msg=`両方とも <b>${a.over}</b> の付着末端を生じるため、相補的にアニーリングして効率よくライゲーションできる。${a.name!==b.name?`<br>（<b>${a.name}</b> と <b>${b.name}</b> は<b>互換末端 (compatible ends)</b> の例）`:''}`;
+    } else if(a.type==='blunt'&&b.type==='blunt'){
+      ok='⚠️ 連結可能（低効率）'; color='#b7791f';
+      msg='どちらも平滑末端なので連結はできるが、<b>効率が低く</b>、<b>挿入の向きが制御できない</b>（方向性なし）。';
+    } else {
+      ok='❌ 連結不可'; color='#c0392b';
+      const reason=(a.type!==b.type)?'一方が付着末端・他方が平滑末端で末端の形が合わない':`突出配列が異なる（${a.over} vs ${b.over}）ため相補的にならない`;
+      msg=`${reason}。そのままでは連結できない（平滑化処理やアダプターが必要）。`;
+    }
+    r.innerHTML=`<div style="font-size:18px; font-weight:700; color:${color};">${ok}</div><div style="font-size:13px; margin-top:6px;">${msg}</div>`;
+  }
+  sv.addEventListener('change',check); si.addEventListener('change',check); check();
+})();
+
+/* ===== TOOL 2: PCR Amplifier ===== */
+(function(){
+  const sl=document.getElementById('pcr-slider'); if(!sl) return;
+  function upd(){
+    const n=+sl.value; document.getElementById('pcr-n').textContent=n;
+    const copies=Math.pow(2,n);
+    document.getElementById('pcr-copies').textContent=copies.toLocaleString('en-US');
+    document.getElementById('pcr-bar').style.width=(n/35*100)+'%';
+    let note;
+    if(n===0) note='0 サイクル = 鋳型 1 分子のまま。';
+    else if(n<10) note=`${n} サイクルで ${copies.toLocaleString()} 倍。まだ増幅は少ない。`;
+    else if(n<25) note='20 サイクルで約 100 万倍。1 サイクルごとに倍々（指数的）に急増する。';
+    else note='30 サイクルで約 10 億倍（理論値）。実際は試薬・酵素の枯渇で <b>プラトー（頭打ち）</b> に達する。';
+    document.getElementById('pcr-note').innerHTML=note;
+  }
+  sl.addEventListener('input',upd); upd();
+})();
+
+/* ===== TOOL 3: ブロット法 Matcher ===== */
+const BLOTS=[
+  {m:'サザンブロット', t:'DNA', en:'Southern blot', why:'発明者 Edwin Southern (1975) の姓に由来', use:'遺伝子の有無・コピー数・再編成の検出（鎌状赤血球症の HBB 変異など）'},
+  {m:'ノーザンブロット', t:'RNA', en:'Northern blot', why:'Southern(南)に対する「北」のジョーク命名（人名ではない）', use:'特定 mRNA の発現量・サイズ。現在は RT-qPCR / RNA-seq に置換傾向'},
+  {m:'ウエスタンブロット', t:'タンパク質', en:'Western blot', why:'「西」のジョーク続き', use:'特異抗体でタンパク質を検出（SDS-PAGE → 膜転写 → 抗体）'},
+];
+(function(){
+  const grid=document.getElementById('blot-grid'); if(!grid) return;
+  grid.innerHTML=BLOTS.map((b,i)=>`<div class="blot-card" data-i="${i}" style="border:1px solid var(--border); border-radius:8px; padding:14px; background:white; cursor:pointer;">
+    <div style="font-weight:700; color:var(--primary); font-size:16px;">${b.m}</div>
+    <div style="font-size:12px; color:var(--muted);">${b.en}</div>
+    <div class="blot-rev" style="display:none; margin-top:8px; font-size:13px;">
+      <div>検出対象: <b style="color:#c0392b;">${b.t}</b></div>
+      <div style="margin-top:4px;">由来: ${b.why}</div>
+      <div style="margin-top:4px;">用途: ${b.use}</div></div>
+    <div class="blot-hint" style="font-size:12px; color:var(--muted); margin-top:8px;">クリックで答え →</div></div>`).join('');
+  grid.querySelectorAll('.blot-card').forEach(c=>c.addEventListener('click',()=>{
+    const rev=c.querySelector('.blot-rev'), hint=c.querySelector('.blot-hint'), show=rev.style.display==='none';
+    rev.style.display=show?'block':'none'; hint.style.display=show?'none':'block';
+  }));
+  const qs=[{q:'RNA を検出するブロットは?',a:'ノーザンブロット'},{q:'DNA を検出するブロットは?',a:'サザンブロット'},{q:'タンパク質を検出するブロットは?',a:'ウエスタンブロット'}];
+  let qi=0;
+  function renderQ(){
+    document.getElementById('blot-q').textContent=`Q${qi+1}. ${qs[qi].q}`;
+    const opts=document.getElementById('blot-opts');
+    opts.innerHTML=BLOTS.map(b=>`<button class="btn secondary blot-opt" data-a="${b.m}">${b.m}</button>`).join('');
+    document.getElementById('blot-fb').textContent='';
+    opts.querySelectorAll('.blot-opt').forEach(btn=>btn.addEventListener('click',()=>{
+      const fb=document.getElementById('blot-fb');
+      if(btn.dataset.a===qs[qi].a){ fb.innerHTML='<span style="color:#2e8b57;">✅ 正解！</span>'; qi=(qi+1)%qs.length; setTimeout(renderQ,900); }
+      else { fb.innerHTML='<span style="color:#c0392b;">❌ もう一度</span>'; }
+    }));
+  }
+  renderQ();
+})();
+
+/* ===== TOOL 4: CRISPR-Cas9 Editor ===== */
+(function(){
+  const btn=document.getElementById('cr-scan'); if(!btn) return;
+  let cutInfo=null;
+  btn.addEventListener('click',()=>{
+    const seq=(document.getElementById('cr-seq').value||'').toUpperCase().replace(/[^ATGC]/g,'');
+    const out=document.getElementById('cr-out'), legend=document.getElementById('cr-legend'), rep=document.getElementById('cr-repair');
+    document.getElementById('cr-result').innerHTML='';
+    let pamStart=-1;
+    for(let i=20;i+3<=seq.length;i++){ if(seq[i+1]==='G'&&seq[i+2]==='G'){ pamStart=i; break; } }
+    if(pamStart<0){ out.innerHTML='<span style="color:#c0392b;">PAM (NGG) が見つかりません（上流に 20 nt 以上 + NGG が必要）。配列を長く・変えてみてください。</span>'; legend.innerHTML=''; rep.style.display='none'; return; }
+    const protoStart=pamStart-20, cut=pamStart-3;
+    let html='';
+    for(let i=0;i<seq.length;i++){
+      if(i===cut) html+='<span style="color:#c0392b; font-weight:700;">✂</span>';
+      let style='';
+      if(i>=protoStart&&i<pamStart) style='background:#bee3f8;';
+      if(i>=pamStart&&i<pamStart+3) style='background:#feb2b2; font-weight:700;';
+      html+=`<span style="${style}">${seq[i]}</span>`;
+    }
+    out.innerHTML=html;
+    legend.innerHTML='<span style="background:#bee3f8;">&nbsp;sgRNA 結合 (20 nt)&nbsp;</span>　<span style="background:#feb2b2;">&nbsp;PAM (NGG)&nbsp;</span>　<span style="color:#c0392b;">✂ = Cas9 切断 (PAM の 3 bp 上流)</span>';
+    cutInfo={seq,cut}; rep.style.display='block';
+  });
+  document.getElementById('cr-nhej').addEventListener('click',()=>{ if(!cutInfo) return;
+    document.getElementById('cr-result').innerHTML='<b style="color:#c0392b;">NHEJ（非相同末端結合）</b>: 鋳型なしで再結合するため、数塩基の <b>挿入・欠失 (indel)</b> がランダムに生じる。多くは <b>フレームシフト</b> を起こし → <b>遺伝子ノックアウト（機能喪失）</b>。<br>例: Casgevy では BCL11A エンハンサーを NHEJ で破壊し、胎児型ヘモグロビン (HbF) を脱抑制する。';
+  });
+  document.getElementById('cr-hdr').addEventListener('click',()=>{ if(!cutInfo) return;
+    document.getElementById('cr-result').innerHTML='<b style="color:#2e8b57;">HDR（相同組換え修復）</b>: <b>ドナー鋳型 DNA</b> を供給すると、それを鋳型に正確に修復 → <b>狙った塩基置換・配列挿入（ノックイン）</b> が可能。ただし <b>S/G2 期の細胞でしか働かず効率が低い</b>。点変異疾患の精密修復に用いる。';
+  });
+})();
 
 // Quiz data
 const QUIZ = [
