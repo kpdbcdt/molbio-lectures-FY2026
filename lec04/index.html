@@ -1392,6 +1392,12 @@ const quizState = { answered: [], correct: 0, shuffleMaps: [] };
 const LETTERS = ['a', 'b', 'c', 'd', 'e'];
 const PASS_THRESHOLD = 0.8;
 
+// 再度試験 (144965) は不正解時に正解を隠す (修了証の公正性)。本講義は不正解でも正解+解説を表示。
+const IS_RETAKE = (function () {
+  try { return new URLSearchParams(location.search).get('retake') === '1' || /lms\.keio\.jp\/courses\/144965/.test(document.referrer || ''); }
+  catch (e) { return false; }
+})();
+
 function shuffleArray(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -1467,11 +1473,19 @@ function answerQuestion(qi, oi) {
       btn.classList.add('correct');
     }
     if (origIdx === oi && !isCorrect) btn.classList.add('wrong');
+    // 本講義では不正解でも正解を表示。再試 (IS_RETAKE) は隠す。
+    if (!isCorrect && !IS_RETAKE && origIdx === q.correct) {
+      btn.classList.add('revealed', 'correct-answer');
+    }
   });
   card.classList.add('answered', isCorrect ? 'correct' : 'incorrect');
   if (!isCorrect) {
     const explain = card.querySelector('.q-explain');
-    explain.innerHTML = '<strong>不正解です。</strong> 講義資料・教科書を復習して、リセット後に再挑戦してください。';
+    if (IS_RETAKE) {
+      explain.innerHTML = '<strong>不正解です。</strong> 講義資料・教科書を復習して、リセット後に再挑戦してください。';
+    } else {
+      explain.innerHTML = `<strong>不正解。</strong> <strong>解説:</strong> ${q.explain}`;
+    }
     explain.style.display = 'block';
     explain.style.borderLeftColor = 'var(--accent)';
   }
