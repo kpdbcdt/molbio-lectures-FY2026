@@ -902,7 +902,7 @@ function renderQuiz() {
       banner.className = 'challenge-banner';
       banner.innerHTML = `
         <h3>🏆 ここから国試チャレンジ問題 (発展)</h3>
-        <p>以下の問題は<strong>薬剤師国家試験の過去問</strong>を一部改変したものです。染色体異常・スプライシング治療薬・エピジェネティクス治療など、Lec03 の内容と密接に関連する臨床応用トピックです。解説を読んで「染色体・ゲノムの知識がどう医療に生きているか」を体感してください。</p>
+        <p>以下の問題は<strong>薬剤師国家試験の過去問</strong>を一部改変したものです。結核治療薬リファンピシン、アマトキシン (RNA ポリメラーゼ II 阻害)、転写を直接阻害する薬物群など、Lec05 (転写) の知識が臨床で直結する応用トピックです。解説を読んで「転写の知識がどう医療に生きているか」を体感してください。</p>
       `;
       list.appendChild(banner);
       challengeBannerShown = true;
@@ -1021,7 +1021,7 @@ function showFinish() {
 }
 
 async function generateVerificationCode(studentId, score, date) {
-  const data = `${studentId}:lec03:${score}/${QUIZ.length}:${date}:molbio2026`;
+  const data = `${studentId}:lec05:${score}/${QUIZ.length}:${date}:molbio2026`;
   const encoder = new TextEncoder();
   const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
   const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -1029,7 +1029,7 @@ async function generateVerificationCode(studentId, score, date) {
 }
 
 function saveQuizState() {
-  try { localStorage.setItem('lec03_quiz_state', JSON.stringify(quizState)); } catch(e) {}
+  try { localStorage.setItem('lec05_quiz_state', JSON.stringify(quizState)); } catch(e) {}
 }
 
 function loadQuizState() {
@@ -1038,7 +1038,7 @@ function loadQuizState() {
 }
 
 document.getElementById('quiz-reset').addEventListener('click', () => {
-  localStorage.removeItem('lec03_quiz_state');
+  localStorage.removeItem('lec05_quiz_state');
   renderQuiz();
 });
 
@@ -1061,7 +1061,7 @@ document.getElementById('quiz-pdf').addEventListener('click', async () => {
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>分子生物学 Lec03 復習クイズ修了証</title>
+<title>分子生物学 Lec05 復習クイズ修了証</title>
 <style>
   @page { size: A4; margin: 18mm 15mm; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif; color: #1a2633; line-height: 1.6; font-size: 11pt; margin: 0; padding: 0; }
@@ -1107,7 +1107,7 @@ document.getElementById('quiz-pdf').addEventListener('click', async () => {
 
 <div class="cert-box">
   <div class="cert-title">分子生物学 復習クイズ修了証</div>
-  <div class="cert-sub">Certificate of Completion — 第3回 染色体とゲノム</div>
+  <div class="cert-sub">Certificate of Completion — 第5回 転写</div>
   <div class="cert-field"><span class="label">学籍番号</span><br><span class="value">${studentId}</span></div>
   <div class="cert-score">${score} / ${total}</div>
   <div class="cert-field"><span class="label">合格基準: ${Math.ceil(total * PASS_THRESHOLD)}問以上</span></div>

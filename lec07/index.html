@@ -1127,7 +1127,7 @@ function showFinish() {
 }
 
 async function generateVerificationCode(studentId, score, date) {
-  const data = `${studentId}:lec03:${score}/${QUIZ.length}:${date}:molbio2026`;
+  const data = `${studentId}:lec07:${score}/${QUIZ.length}:${date}:molbio2026`;
   const encoder = new TextEncoder();
   const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
   const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -1135,7 +1135,7 @@ async function generateVerificationCode(studentId, score, date) {
 }
 
 function saveQuizState() {
-  try { localStorage.setItem('lec03_quiz_state', JSON.stringify(quizState)); } catch(e) {}
+  try { localStorage.setItem('lec07_quiz_state', JSON.stringify(quizState)); } catch(e) {}
 }
 
 function loadQuizState() {
@@ -1144,7 +1144,7 @@ function loadQuizState() {
 }
 
 document.getElementById('quiz-reset').addEventListener('click', () => {
-  localStorage.removeItem('lec03_quiz_state');
+  localStorage.removeItem('lec07_quiz_state');
   renderQuiz();
 });
 
