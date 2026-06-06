@@ -1267,14 +1267,17 @@ document.getElementById('quiz-pdf').addEventListener('click', async () => {
 </body>
 </html>`;
 
-  const w = window.open('', '_blank');
+  // Blob URL 方式: about:blank への document.write は一部ブラウザで印刷時に白紙になるため、
+  // 実体のある blob: URL として開く (印刷/PDF 保存を安定化)。
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const w = window.open(url, '_blank');
   if (!w) {
     alert('ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
+    URL.revokeObjectURL(url);
     return;
   }
-  w.document.open();
-  w.document.write(html);
-  w.document.close();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
 });
 
 renderQuiz();
