@@ -265,21 +265,9 @@ const PAST_EXAMS = [
       "5'-CTAGTT-3'", "5'-AAGGAT-3'", "5'-TAGCCG-3'", "5'-CCCGTT-3'",
       "5'-CGGCTA-3'", "5'-ATCGGC-3'", "5'-GGGCAA-3'", "5'-TTGATC-3'"
     ],
-    correct: [1, 4],
+    correct: [1, 3],
     explain:
-      "正解 = 2, 5。<br>" +
-      "<b>PCR プライマー設計の原則</b>:<br>" +
-      "• 5'→3' 方向に伸長する<br>" +
-      "• フォワード = 上鎖の 5' 末端側配列と同じ (= 下鎖と相補)<br>" +
-      "• リバース = 下鎖の 5' 末端側配列と同じ (= 上鎖と相補)<br>" +
-      "• 両プライマーは<b>互いに内向き</b>に配置される<br><br>" +
-      "目的領域: 上鎖 5'-AAGGAT...GCGGCTA-3'<br>" +
-      "• フォワード = 上鎖の 5' 端配列と同じ → <b>5'-AAGGAT-3' (選択肢 2)</b><br>" +
-      "• リバース = 下鎖の 5' 端から読んだ配列 = 上鎖 3' 端の逆相補 → 上鎖 CGGCTA の逆相補 = 5'-TAGCCG-3'... ではなく、下鎖 5'-TAGCCGCCC...-5' 末端側 = 上鎖 3' 末端 CGGCTA の相補 = 5'-CGGCTA-3' でもなく…<br>" +
-      "→ 実際: <b>5'-CGGCTA-3' = 上鎖の 3' 端配列と同じ</b>を逆相補したリバースプライマー = <b>5'-TAGCCG-3'</b> を取る。<br>" +
-      "→ ただし問題の選択肢では「上鎖 3' 端の CGGCTA をそのままリバースプライマーとして使う」表現で <b>5 (5'-CGGCTA-3')</b> を選ばせる流儀がある (リバースプライマーは下鎖の方向で書かれることが多い)。<br>" +
-      "<b>確認推奨</b>: 問題提示の選択肢の表記法 (上鎖 5'-3' 方向で書く流儀 vs 自分が伸長する方向で書く流儀) で正解が変わる。標準解答は <b>2 と 5</b>。<br>" +
-      "<small>出典: Lec08 Speaker_Notes S13 (PCR プライマー設計)</small>"
+      "正解 = 2, 4。<br>破線(箱)の<b>内側の両端</b>に一致するプライマーを選ぶ。<br>順方向 = 箱左端の上鎖 <b>5′-AAGGAT-3′</b>(下鎖を鋳型に右へ伸長)。<br>逆方向 = 箱右端の上鎖 AACGGG の<b>逆相補 5′-CCCGTT-3′</b>(上鎖を鋳型に左へ伸長)。<br><b>CGGCTA は箱の外側(flanking)の配列</b>なので「箱のみを増幅」には不適 — 典型的なひっかけ。"
   },
   {
     id: "2024-Q17", year: 2024, num: 17, multi: true, lec: [5, 6],
@@ -541,12 +529,9 @@ const PAST_EXAMS = [
     id: "2023-Q9", year: 2023, num: 9, multi: true, lec: [5],
     stem: "真核生物と原核生物の転写において共通する性質をすべて選べ。",
     options: ["RNA ポリメラーゼの活性には Mg²⁺ を必要とする。", "RNA ポリメラーゼがプロモーター領域を認識する。", "転写終結シグナルがある。", "隣接する複数の遺伝子が 1 つの mRNA として転写される。", "RNA ポリメラーゼには校正機能がある。"],
-    correct: [0, 1],
+    correct: [0, 2],
     explain:
-      "正解 = 1, 2。[2024-Q10 と選択肢順違いの同型]<br>" +
-      "両者で <b>Mg²⁺</b> 必須 (2-metal-ion 機構) と <b>プロモーター認識</b> (機構違うが「認識する」点は共通)。<br>" +
-      "3. 終結シグナルは両者にあるが機構が異なる (微妙)。4. ポリシストロニックは原核のみ。5. RNA pol の校正は限定的。<br>" +
-      "<small>出典: Lec05 Speaker_Notes</small>"
+      "正解 = 1, 3。<br>真核・原核の転写で<b>共通</b>するのは <b>Mg²⁺ 要求</b>と<b>転写終結シグナルの存在</b>(機構自体は両者で異なるが、共通項目として成立)。<br><b>「RNA ポリメラーゼがプロモーターを認識する」は共通ではない</b> — 原核は RNA pol の σ 因子が認識するが、<u>真核では RNA pol 自身ではなく基本転写因子(TFIID 等)がプロモーターを認識する</u>(第5回スライド28)。<br>校正機能(両者とも限定的)、ポリシストロニック/ポリ A 尾部(片方のみ)、「どちらの鎖も鋳型」も共通性質ではない。"
   },
   {
     id: "2023-Q10", year: 2023, num: 10, multi: false, lec: [5],
@@ -612,11 +597,9 @@ const PAST_EXAMS = [
     id: "2023-Q17", year: 2023, num: 17, multi: true, lec: [8],
     stem: "PCR 法により図の破線で囲んだ塩基配列のみを増幅したい。プライマーとして適切なものを 2 つ選べ。<br><pre style='font-family:monospace;background:#f4f4f4;padding:8px;border-radius:4px;font-size:12px;'>5'- GATCAAAAGGATGGCGA・・・・・・AGACTAACGGG CGGCTA-3'\n3'- CTAGTT TTCCTACCGCT・・・・・・TCTGATTGCCC GCCGAT-5'</pre>",
     options: ["5'-CTAGTT-3'", "5'-ATCGGC-3'", "5'-TAGCCG-3'", "5'-GGGCAA-3'", "5'-CGGCTA-3'", "5'-AAGGAT-3'", "5'-CCCGTT-3'", "5'-TTGATC-3'"],
-    correct: [4, 5],
+    correct: [5, 6],
     explain:
-      "正解 = 5, 6。[2024-Q16 と選択肢順違いの同型]<br>" +
-      "フォワード = 上鎖 5' 端 <b>AAGGAT</b> (選択肢 6)。リバース = 上鎖 3' 端 <b>CGGCTA</b> (選択肢 5、慣用表記)。<br>" +
-      "<small>出典: Lec08 Speaker_Notes S13</small>"
+      "正解 = 6, 7。<br>破線(箱)の<b>内側の両端</b>に一致するプライマーを選ぶ。<br>順方向 = 箱左端の上鎖 <b>5′-AAGGAT-3′</b>(下鎖を鋳型に右へ伸長)。<br>逆方向 = 箱右端の上鎖 AACGGG の<b>逆相補 5′-CCCGTT-3′</b>(上鎖を鋳型に左へ伸長)。<br><b>CGGCTA は箱の外側(flanking)の配列</b>なので「箱のみを増幅」には不適 — 典型的なひっかけ。"
   },
   {
     id: "2023-Q18", year: 2023, num: 18, multi: true, lec: [5, 6],
@@ -793,11 +776,9 @@ const PAST_EXAMS = [
     id: "2022-Q9", year: 2022, num: 9, multi: true, lec: [5],
     stem: "真核生物と原核生物の転写において共通する性質をすべて選べ。",
     options: ["RNA ポリメラーゼの活性には Mg²⁺ を必要とする。", "RNA ポリメラーゼがプロモーター領域を認識する。", "転写終結シグナルがある。", "mRNA の 3' 末端にはポリ A 尾部と呼ばれる構造が付加される。", "RNA ポリメラーゼには校正機能がある。"],
-    correct: [0, 1],
+    correct: [0, 2],
     explain:
-      "正解 = 1, 2。[2024-Q10 / 2023-Q9 同型 — 選択肢 4 が「ポリ A」に置換]<br>" +
-      "<b>ポリ A は真核 mRNA のみ</b> (原核は持たない)。共通は Mg²⁺ と プロモーター認識。<br>" +
-      "<small>出典: Lec05 / Lec06 Speaker_Notes</small>"
+      "正解 = 1, 3。<br>真核・原核の転写で<b>共通</b>するのは <b>Mg²⁺ 要求</b>と<b>転写終結シグナルの存在</b>(機構自体は両者で異なるが、共通項目として成立)。<br><b>「RNA ポリメラーゼがプロモーターを認識する」は共通ではない</b> — 原核は RNA pol の σ 因子が認識するが、<u>真核では RNA pol 自身ではなく基本転写因子(TFIID 等)がプロモーターを認識する</u>(第5回スライド28)。<br>校正機能(両者とも限定的)、ポリシストロニック/ポリ A 尾部(片方のみ)、「どちらの鎖も鋳型」も共通性質ではない。"
   },
   {
     id: "2022-Q10", year: 2022, num: 10, multi: false, lec: [5],
@@ -893,8 +874,9 @@ const PAST_EXAMS = [
     id: "2022-Q17", year: 2022, num: 17, multi: true, lec: [8],
     stem: "PCR 法により図の破線で囲んだ塩基配列のみを増幅したい。プライマーとして適切なものを 2 つ選べ。<br><pre style='font-family:monospace;background:#f4f4f4;padding:8px;border-radius:4px;font-size:12px;'>5'- GATCAAAAGGATGGCGA・・・・・・AGACTAACGGG CGGCTA-3'\n3'- CTAGTT TTCCTACCGCT・・・・・・TCTGATTGCCC GCCGAT-5'</pre>",
     options: ["5'-CTAGTT-3'", "5'-ATCGGC-3'", "5'-TAGCCG-3'", "5'-GGGCAA-3'", "5'-CGGCTA-3'", "5'-AAGGAT-3'", "5'-CCCGTT-3'", "5'-TTGATC-3'"],
-    correct: [4, 5],
-    explain: "正解 = 5, 6 (AAGGAT + CGGCTA)。[2024-Q16 / 2023-Q17 と同型] <small>出典: Lec08 Speaker_Notes S13</small>"
+    correct: [5, 6],
+    explain:
+      "正解 = 6, 7。<br>破線(箱)の<b>内側の両端</b>に一致するプライマーを選ぶ。<br>順方向 = 箱左端の上鎖 <b>5′-AAGGAT-3′</b>(下鎖を鋳型に右へ伸長)。<br>逆方向 = 箱右端の上鎖 AACGGG の<b>逆相補 5′-CCCGTT-3′</b>(上鎖を鋳型に左へ伸長)。<br><b>CGGCTA は箱の外側(flanking)の配列</b>なので「箱のみを増幅」には不適 — 典型的なひっかけ。"
   },
   {
     id: "2022-Q18", year: 2022, num: 18, multi: true, lec: [5, 6],
@@ -1222,8 +1204,9 @@ const PAST_EXAMS = [
     id: "2021-Q20", year: 2021, num: 20, multi: true, lec: [8],
     stem: "PCR 法により図の破線で囲んだ塩基配列だけを増幅したい。プライマーとしてもっとも適切な組み合わせとなる 2 つを選べ。<br><pre style='font-family:monospace;background:#f4f4f4;padding:8px;border-radius:4px;font-size:12px;'>5'- GATCAAAAGGATGGCGA・・・・・・AGACTAACGGG CGGCTA-3'\n3'- CTAGTT TTCCTACCGCT・・・・・・TCTGATTGCCC GCCGAT-5'</pre>",
     options: ["5'-CTAGTT-3'", "5'-ATCGGC-3'", "5'-TAGCCG-3'", "5'-AAGGAT-3'", "5'-TTCCTA-3'", "5'-GATCAA-3'", "5'-GGGCAA-3'", "5'-CGGCTA-3'", "5'-CCCGTT-3'", "5'-TTGATC-3'"],
-    correct: [3, 7],
-    explain: "正解 = 4, 8 (AAGGAT + CGGCTA)。[2024-Q16 同型 — 選択肢順違い]<small>出典: Lec08 S13</small>"
+    correct: [3, 8],
+    explain:
+      "正解 = 4, 9。<br>破線(箱)の<b>内側の両端</b>に一致するプライマーを選ぶ。<br>順方向 = 箱左端の上鎖 <b>5′-AAGGAT-3′</b>(下鎖を鋳型に右へ伸長)。<br>逆方向 = 箱右端の上鎖 AACGGG の<b>逆相補 5′-CCCGTT-3′</b>(上鎖を鋳型に左へ伸長)。<br><b>CGGCTA は箱の外側(flanking)の配列</b>なので「箱のみを増幅」には不適 — 典型的なひっかけ。"
   },
   {
     id: "2021-Q21", year: 2021, num: 21, multi: false, lec: [8],
@@ -1447,19 +1430,17 @@ const PAST_EXAMS = [
       "転写終結シグナルがある。",
       "プロモーター領域によって転写開始部位が決められている。"
     ],
-    correct: [0, 3, 5],
+    correct: [0, 4, 5],
     explain:
-      "正解 = 1, 4, 6。<br>" +
-      "1. ✓ Mg²⁺ 必須。4. ✓ プロモーター認識。6. ✓ プロモーターで開始部位決定 (両者共通)。<br>" +
-      "2. ✗ 校正は限定的 (DNA pol のような厳密な校正なし)。3. ✗ <b>鋳型鎖はプロモーター方向で決まる</b> (どちらでも良いわけではない)。5. ⚠️ 両者にあるが機構が全く違うので「共通の性質」と言い切るのは微妙。<br>" +
-      "<small>出典: Lec05 Speaker_Notes</small>"
+      "正解 = 1, 5, 6。<br>真核・原核の転写で<b>共通</b>するのは <b>Mg²⁺ 要求</b>と<b>転写終結シグナルの存在</b>、および<b>プロモーター領域が転写開始部位を決めること</b>(機構自体は両者で異なるが、共通項目として成立)。<br><b>「RNA ポリメラーゼがプロモーターを認識する」は共通ではない</b> — 原核は RNA pol の σ 因子が認識するが、<u>真核では RNA pol 自身ではなく基本転写因子(TFIID 等)がプロモーターを認識する</u>(第5回スライド28)。<br>校正機能(両者とも限定的)、ポリシストロニック/ポリ A 尾部(片方のみ)、「どちらの鎖も鋳型」も共通性質ではない。"
   },
   {
     id: "2020-Q13", year: 2020, num: 13, multi: true, lec: [8],
     stem: "PCR 法により図の破線で囲んだ塩基配列のみを増幅したい。プライマーとして適切なものを 2 つ選べ。<br><pre style='font-family:monospace;background:#f4f4f4;padding:8px;border-radius:4px;font-size:12px;'>5'- GATCAAAAGGATGGCGA・・・・・・AGACTAACGGG CGGCTA-3'\n3'- CTAGTT TTCCTACCGCT・・・・・・TCTGATTGCCC GCCGAT-5'</pre>",
     options: ["5'-CTAGTT-3'", "5'-ATCGGC-3'", "5'-TAGCCG-3'", "5'-GGGCAA-3'", "5'-CGGCTA-3'", "5'-AAGGAT-3'", "5'-CCCGTT-3'", "5'-TTGATC-3'"],
-    correct: [4, 5],
-    explain: "正解 = 5, 6 (AAGGAT + CGGCTA)。[2024-Q16 同型]<small>出典: Lec08 S13</small>"
+    correct: [5, 6],
+    explain:
+      "正解 = 6, 7。<br>破線(箱)の<b>内側の両端</b>に一致するプライマーを選ぶ。<br>順方向 = 箱左端の上鎖 <b>5′-AAGGAT-3′</b>(下鎖を鋳型に右へ伸長)。<br>逆方向 = 箱右端の上鎖 AACGGG の<b>逆相補 5′-CCCGTT-3′</b>(上鎖を鋳型に左へ伸長)。<br><b>CGGCTA は箱の外側(flanking)の配列</b>なので「箱のみを増幅」には不適 — 典型的なひっかけ。"
   },
   {
     id: "2020-Q14", year: 2020, num: 14, multi: true, lec: [5, 6],
@@ -1804,11 +1785,9 @@ const PAST_EXAMS = [
     id: "2019-Q13", year: 2019, num: 13, multi: true, lec: [8],
     stem: "PCR 法により図の破線で囲んだ塩基配列のみを増幅したい。プライマーとして適切なものを 2 つ選べ。<br><pre style='font-family:monospace;background:#f4f4f4;padding:8px;border-radius:4px;font-size:12px;'>5'- GATCAAAAGGATGGCGA・・・・・・AGACTAACGGG CGGCTA-3'\n3'- CTAGTT TTCCTACCGCT・・・・・・TCTGATTGCCC GCCGAT-5'</pre>",
     options: ["5'-CTAGTT-3'", "5'-ATCGGC-3'", "5'-TAGCCG-3'", "5'-GGGCAA-3'", "5'-CGGCTA-3'", "5'-AAGGAT-3'", "5'-CCCGTT-3'", "5'-AAGGAT-3'", "5'-TTGATC-3'"],
-    correct: [4, 5],
+    correct: [5, 6],
     explain:
-      "正解 = 5, 6 (CGGCTA + AAGGAT)。[2024-Q16 同型]<br>" +
-      "⚠️ 選択肢 8 は問題 PDF の typo (6 と同じ「5'-AAGGAT-3'」)。実際は別配列のはずだが、誤植のまま掲載。<br>" +
-      "<small>出典: Lec08 S13</small>"
+      "正解 = 6, 7。<br>破線(箱)の<b>内側の両端</b>に一致するプライマーを選ぶ。<br>順方向 = 箱左端の上鎖 <b>5′-AAGGAT-3′</b>(下鎖を鋳型に右へ伸長)。<br>逆方向 = 箱右端の上鎖 AACGGG の<b>逆相補 5′-CCCGTT-3′</b>(上鎖を鋳型に左へ伸長)。<br><b>CGGCTA は箱の外側(flanking)の配列</b>なので「箱のみを増幅」には不適 — 典型的なひっかけ。"
   },
   {
     id: "2019-Q14", year: 2019, num: 14, multi: false, lec: [5, 6],
@@ -2187,8 +2166,9 @@ const PAST_EXAMS = [
     id: "2025-Q26", year: 2025, num: 26, multi: true, lec: [5],
     stem: "真核生物と原核生物の転写において共通する性質をすべて選べ。",
     options: ["RNA ポリメラーゼがプロモーター領域を認識する。", "RNA ポリメラーゼには校正機能がある。", "転写終結シグナルがある。", "隣接する複数の遺伝子が 1 つの mRNA として転写される。", "RNA ポリメラーゼの活性には Mg²⁺ を必要とする。"],
-    correct: [0, 4],
-    explain: "正解 = 1, 5 (プロモーター認識 + Mg²⁺)。[2024-Q10 同型] 校正は限定的、終結シグナルは機構が異なる、ポリシストロニックは原核のみ。<small>出典: Lec05</small>"
+    correct: [2, 4],
+    explain:
+      "正解 = 3, 5。<br>真核・原核の転写で<b>共通</b>するのは <b>Mg²⁺ 要求</b>と<b>転写終結シグナルの存在</b>(機構自体は両者で異なるが、共通項目として成立)。<br><b>「RNA ポリメラーゼがプロモーターを認識する」は共通ではない</b> — 原核は RNA pol の σ 因子が認識するが、<u>真核では RNA pol 自身ではなく基本転写因子(TFIID 等)がプロモーターを認識する</u>(第5回スライド28)。<br>校正機能(両者とも限定的)、ポリシストロニック/ポリ A 尾部(片方のみ)、「どちらの鎖も鋳型」も共通性質ではない。"
   },
   {
     id: "2025-Q27", year: 2025, num: 27, multi: false, lec: [5],
@@ -2253,8 +2233,9 @@ const PAST_EXAMS = [
     id: "2025-Q32", year: 2025, num: 32, multi: true, lec: [8],
     stem: "PCR 法により図の破線で囲んだ塩基配列のみを増幅したい。プライマーとして適切なものを 2 つ選べ。<br><pre style='font-family:monospace;background:#f4f4f4;padding:8px;border-radius:4px;font-size:12px;'>5'- GATCAAAAGGATGGCGA・・・・・・AGACTAACGGG CGGCTA-3'\n3'- CTAGTT TTCCTACCGCT・・・・・・TCTGATTGCCC GCCGAT-5'</pre>",
     options: ["5'-CTAGTT-3'", "5'-AAGGAT-3'", "5'-TAGCCG-3'", "5'-CCCGTT-3'", "5'-CGGCTA-3'", "5'-ATCGGC-3'", "5'-GGGCAA-3'", "5'-TTGATC-3'"],
-    correct: [1, 4],
-    explain: "正解 = 2, 5 (AAGGAT + CGGCTA)。[2024-Q16 同型]<small>出典: Lec08 S13</small>"
+    correct: [1, 3],
+    explain:
+      "正解 = 2, 4。<br>破線(箱)の<b>内側の両端</b>に一致するプライマーを選ぶ。<br>順方向 = 箱左端の上鎖 <b>5′-AAGGAT-3′</b>(下鎖を鋳型に右へ伸長)。<br>逆方向 = 箱右端の上鎖 AACGGG の<b>逆相補 5′-CCCGTT-3′</b>(上鎖を鋳型に左へ伸長)。<br><b>CGGCTA は箱の外側(flanking)の配列</b>なので「箱のみを増幅」には不適 — 典型的なひっかけ。"
   },
   {
     id: "2025-Q33", year: 2025, num: 33, multi: true, lec: [5, 6],
